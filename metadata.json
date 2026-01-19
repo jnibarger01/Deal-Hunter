@@ -1,0 +1,5 @@
+{
+  "name": "Deal Hunter",
+  "description": "The Bloomberg Terminal for flippers. Automatically surface under-market items for flipping, scoring them for profitability and repair difficulty.",
+  "requestFramePermissions": []
+}
