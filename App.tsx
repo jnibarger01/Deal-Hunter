@@ -1,9 +1,10 @@
 
-import React, { useState, useMemo } from 'react';
-import { Marketplace, Category, Deal } from './types';
+import React, { useState, useMemo, useEffect } from 'react';
+import { Marketplace, Category, Deal, LocationTarget } from './types';
 import { MOCK_DEALS } from './constants';
 import DealCard from './components/DealCard';
 import DealDetail from './components/DealDetail';
+import { fetchLocations, createLocation, searchDeals } from './services/api';
 
 const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'Feed' | 'Watchlist' | 'Portfolio' | 'Alerts'>('Feed');
@@ -11,21 +12,139 @@ const App: React.FC = () => {
   const [categoryFilter, setCategoryFilter] = useState<string>('All');
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState<'Score' | 'Profit' | 'Newest'>('Score');
+  const [deals, setDeals] = useState<Deal[]>(MOCK_DEALS);
+  const [loadingDeals, setLoadingDeals] = useState(false);
+  const [searchError, setSearchError] = useState<string | null>(null);
+  const [locations, setLocations] = useState<LocationTarget[]>([]);
+  const [locationsLoading, setLocationsLoading] = useState(false);
+  const [selectedLocationId, setSelectedLocationId] = useState<string>('');
+  const [locationForm, setLocationForm] = useState({
+    label: '',
+    city: '',
+    zip: '',
+    radiusMiles: 25,
+    minPrice: '',
+    maxPrice: ''
+  });
 
   const filteredDeals = useMemo(() => {
-    let deals = [...MOCK_DEALS];
+    let dealsToShow = [...deals];
     if (categoryFilter !== 'All') {
-      deals = deals.filter(d => d.category === categoryFilter);
+      dealsToShow = dealsToShow.filter(d => d.category === categoryFilter);
     }
     if (searchQuery) {
-      deals = deals.filter(d => d.title.toLowerCase().includes(searchQuery.toLowerCase()));
+      dealsToShow = dealsToShow.filter(d => d.title.toLowerCase().includes(searchQuery.toLowerCase()));
     }
     
-    if (sortBy === 'Score') deals.sort((a, b) => b.dealScore - a.dealScore);
-    if (sortBy === 'Profit') deals.sort((a, b) => b.estimatedProfit - a.estimatedProfit);
+    if (sortBy === 'Score') dealsToShow.sort((a, b) => b.dealScore - a.dealScore);
+    if (sortBy === 'Profit') dealsToShow.sort((a, b) => b.estimatedProfit - a.estimatedProfit);
     
-    return deals;
-  }, [categoryFilter, searchQuery, sortBy]);
+    return dealsToShow;
+  }, [categoryFilter, searchQuery, sortBy, deals]);
+
+  const activeLocation = useMemo(
+    () => locations.find((loc) => loc.id === selectedLocationId) || null,
+    [locations, selectedLocationId]
+  );
+
+  useEffect(() => {
+    const loadLocations = async () => {
+      setLocationsLoading(true);
+      try {
+        const items = await fetchLocations();
+        setLocations(items);
+        if (!selectedLocationId && items.length) {
+          setSelectedLocationId(items[0].id);
+        }
+      } catch (err) {
+        console.error('Failed to load locations', err);
+      } finally {
+        setLocationsLoading(false);
+      }
+    };
+    loadLocations();
+  }, []);
+
+  useEffect(() => {
+    if (!searchQuery.trim()) {
+      setDeals(MOCK_DEALS);
+      setSearchError(null);
+      return;
+    }
+
+    let isActive = true;
+    setLoadingDeals(true);
+    setSearchError(null);
+
+    const timer = setTimeout(async () => {
+      try {
+        const results = await searchDeals({
+          marketplace: 'ebay',
+          query: searchQuery.trim(),
+          locationId: selectedLocationId || undefined,
+          filters: activeLocation
+            ? {
+                minPrice: activeLocation.filters.minPrice,
+                maxPrice: activeLocation.filters.maxPrice
+              }
+            : undefined
+        });
+        if (isActive) {
+          setDeals(results.length ? results : []);
+        }
+      } catch (err) {
+        if (isActive) {
+          console.error('Search failed', err);
+          setSearchError('Search failed. Try refining your query.');
+          setDeals([]);
+        }
+      } finally {
+        if (isActive) {
+          setLoadingDeals(false);
+        }
+      }
+    }, 400);
+
+    return () => {
+      isActive = false;
+      clearTimeout(timer);
+    };
+  }, [searchQuery, selectedLocationId, activeLocation]);
+
+  const handleCreateLocation = async (event: React.FormEvent) => {
+    event.preventDefault();
+    const hasCity = locationForm.city.trim().length > 0;
+    const hasZip = locationForm.zip.trim().length > 0;
+
+    if (!hasCity && !hasZip) {
+      return;
+    }
+
+    try {
+      const created = await createLocation({
+        label: locationForm.label.trim() || undefined,
+        city: hasCity ? locationForm.city.trim() : undefined,
+        zip: hasZip ? locationForm.zip.trim() : undefined,
+        radiusMiles: Number(locationForm.radiusMiles) || 25,
+        filters: {
+          minPrice: locationForm.minPrice ? Number(locationForm.minPrice) : undefined,
+          maxPrice: locationForm.maxPrice ? Number(locationForm.maxPrice) : undefined
+        }
+      });
+      setLocations((prev) => [...prev, created]);
+      setSelectedLocationId(created.id);
+      setLocationForm({
+        label: '',
+        city: '',
+        zip: '',
+        radiusMiles: 25,
+        minPrice: '',
+        maxPrice: ''
+      });
+    } catch (err) {
+      console.error('Create location failed', err);
+    }
+  };
 
   return (
     <div className="min-h-screen flex flex-col md:flex-row">
@@ -117,6 +236,99 @@ const App: React.FC = () => {
         </header>
 
         <div className="p-4 md:p-8">
+          <div className="mb-8 bg-slate-900/50 border border-slate-800 rounded-2xl p-4 md:p-6">
+            <div className="flex flex-col lg:flex-row gap-6">
+              <div className="flex-1">
+                <p className="text-[10px] text-slate-500 uppercase font-bold tracking-widest mb-2">Target Area</p>
+                <div className="flex flex-wrap items-center gap-3">
+                  <select
+                    value={selectedLocationId}
+                    onChange={(e) => setSelectedLocationId(e.target.value)}
+                    className="bg-slate-900 border border-slate-800 rounded-xl px-4 py-2 text-xs font-bold text-slate-300 focus:outline-none cursor-pointer min-w-[200px]"
+                  >
+                    <option value="">All locations</option>
+                    {locations.map((loc) => (
+                      <option key={loc.id} value={loc.id}>
+                        {loc.label}
+                      </option>
+                    ))}
+                  </select>
+                  {locationsLoading && (
+                    <span className="text-xs text-slate-500">Loading saved areas...</span>
+                  )}
+                  {activeLocation && (
+                    <span className="text-xs text-slate-500">
+                      Radius: {activeLocation.radiusMiles} miles
+                    </span>
+                  )}
+                </div>
+                <p className="text-xs text-slate-500 mt-3">
+                  Use the search bar to trigger eBay results. Saved locations apply radius and filters automatically.
+                </p>
+              </div>
+
+              <form onSubmit={handleCreateLocation} className="flex-1">
+                <p className="text-[10px] text-slate-500 uppercase font-bold tracking-widest mb-2">Add Target Area</p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                  <input
+                    type="text"
+                    placeholder="Label (optional)"
+                    value={locationForm.label}
+                    onChange={(e) => setLocationForm((prev) => ({ ...prev, label: e.target.value }))}
+                    className="bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none"
+                  />
+                  <input
+                    type="text"
+                    placeholder="City (e.g. Austin, TX)"
+                    value={locationForm.city}
+                    onChange={(e) => setLocationForm((prev) => ({ ...prev, city: e.target.value }))}
+                    className="bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none"
+                  />
+                  <input
+                    type="text"
+                    placeholder="Zip code"
+                    value={locationForm.zip}
+                    onChange={(e) => setLocationForm((prev) => ({ ...prev, zip: e.target.value }))}
+                    className="bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none"
+                  />
+                  <input
+                    type="number"
+                    min={1}
+                    max={250}
+                    placeholder="Radius (miles)"
+                    value={locationForm.radiusMiles}
+                    onChange={(e) => setLocationForm((prev) => ({ ...prev, radiusMiles: Number(e.target.value) }))}
+                    className="bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none"
+                  />
+                  <input
+                    type="number"
+                    min={0}
+                    placeholder="Min price"
+                    value={locationForm.minPrice}
+                    onChange={(e) => setLocationForm((prev) => ({ ...prev, minPrice: e.target.value }))}
+                    className="bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none"
+                  />
+                  <input
+                    type="number"
+                    min={0}
+                    placeholder="Max price"
+                    value={locationForm.maxPrice}
+                    onChange={(e) => setLocationForm((prev) => ({ ...prev, maxPrice: e.target.value }))}
+                    className="bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none"
+                  />
+                </div>
+                <div className="mt-3 flex justify-end">
+                  <button
+                    type="submit"
+                    className="bg-blue-600 hover:bg-blue-500 text-white text-xs px-4 py-2 rounded-xl font-bold transition-colors"
+                  >
+                    Save Area
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+
           <div className="flex items-center justify-between mb-8">
             <div>
               <h2 className="text-3xl font-black text-white uppercase tracking-tighter flex items-center gap-3">
@@ -126,7 +338,11 @@ const App: React.FC = () => {
                     <span className="relative inline-flex rounded-full h-3 w-3 bg-blue-500"></span>
                  </span>
               </h2>
-              <p className="text-slate-500 text-sm font-medium">Scanned 1,242 items in the last 15 minutes near Austin, TX</p>
+              <p className="text-slate-500 text-sm font-medium">
+                {loadingDeals
+                  ? 'Scanning live inventory...'
+                  : `Showing ${filteredDeals.length} items${activeLocation ? ` near ${activeLocation.label}` : ''}`}
+              </p>
             </div>
             <div className="hidden lg:flex gap-4">
               <div className="text-right">
@@ -135,6 +351,12 @@ const App: React.FC = () => {
               </div>
             </div>
           </div>
+
+          {searchError && (
+            <div className="mb-6 p-3 rounded-xl border border-red-500/40 bg-red-500/10 text-sm text-red-200">
+              {searchError}
+            </div>
+          )}
 
           {filteredDeals.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">

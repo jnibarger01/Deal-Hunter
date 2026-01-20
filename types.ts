@@ -45,3 +45,19 @@ export interface NegotiationScript {
   closing: string;
   suggestedOffer: number;
 }
+
+export interface LocationTarget {
+  id: string;
+  label: string;
+  city: string | null;
+  zip: string | null;
+  lat: number;
+  lng: number;
+  radiusMiles: number;
+  filters: {
+    categories?: string[];
+    minPrice?: number;
+    maxPrice?: number;
+    condition?: string[];
+  };
+}
