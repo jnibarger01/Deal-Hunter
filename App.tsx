@@ -101,13 +101,24 @@ const App: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    if (!searchQuery.trim()) {
-      setDeals(MOCK_DEALS);
+    let isActive = true;
+    const runDefault = async () => {
       setSearchError(null);
-      return;
+      setLoadingDeals(false);
+      setDeals(MOCK_DEALS);
+      const hydrated = await hydrateTMVDecisions(MOCK_DEALS);
+      if (isActive) {
+        setDeals(hydrated);
+      }
+    };
+
+    if (!searchQuery.trim()) {
+      runDefault();
+      return () => {
+        isActive = false;
+      };
     }
 
-    let isActive = true;
     setLoadingDeals(true);
     setSearchError(null);
 

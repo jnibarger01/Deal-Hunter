@@ -15,7 +15,63 @@ export const MOCK_DEALS: Deal[] = [
     description: 'TV works but screen flickers occasionally. Might be a loose cable or T-CON board issue. Moving soon, need it gone.',
     dealScore: 91,
     estimatedProfit: 420,
-    condition: 'Fair'
+    condition: 'Fair',
+    soldListings: [
+      {
+        listingId: 'tv-sold-1',
+        itemPrice: 900,
+        shippingCost: 40,
+        soldDate: '2024-12-22T18:30:00Z',
+        rawCondition: 'Used - Good',
+        title: 'Sony X90L 65" 4K Google TV',
+        category: 'TVs & Speakers'
+      },
+      {
+        listingId: 'tv-sold-2',
+        itemPrice: 875,
+        shippingCost: 35,
+        soldDate: '2024-12-18T13:10:00Z',
+        rawCondition: 'Used',
+        title: 'Sony X90L 65" 4K TV',
+        category: 'TVs & Speakers'
+      },
+      {
+        listingId: 'tv-sold-3',
+        itemPrice: 920,
+        shippingCost: 45,
+        soldDate: '2024-12-10T20:05:00Z',
+        rawCondition: 'Used - Like New',
+        title: 'Sony X90L 65 inch 4K',
+        category: 'TVs & Speakers'
+      },
+      {
+        listingId: 'tv-sold-4',
+        itemPrice: 860,
+        shippingCost: 30,
+        soldDate: '2024-11-28T09:40:00Z',
+        rawCondition: 'Used - Good',
+        title: 'Sony X90L 65" Smart TV',
+        category: 'TVs & Speakers'
+      },
+      {
+        listingId: 'tv-sold-5',
+        itemPrice: 940,
+        shippingCost: 50,
+        soldDate: '2024-11-22T16:15:00Z',
+        rawCondition: 'Used',
+        title: 'Sony X90L 65" 4K UHD',
+        category: 'TVs & Speakers'
+      },
+      {
+        listingId: 'tv-sold-6',
+        itemPrice: 890,
+        shippingCost: 38,
+        soldDate: '2024-11-05T11:55:00Z',
+        rawCondition: 'Used - Good',
+        title: 'Sony X90L 65" Google TV',
+        category: 'TVs & Speakers'
+      }
+    ]
   },
   {
     id: '2',
@@ -30,7 +86,63 @@ export const MOCK_DEALS: Deal[] = [
     description: 'Won at a company raffle. Never used. Includes battery and charger.',
     dealScore: 88,
     estimatedProfit: 100,
-    condition: 'New'
+    condition: 'New',
+    soldListings: [
+      {
+        listingId: 'tool-sold-1',
+        itemPrice: 210,
+        shippingCost: 18,
+        soldDate: '2024-12-20T10:20:00Z',
+        rawCondition: 'New',
+        title: 'Milwaukee M18 Fuel Impact Driver Kit',
+        category: 'Tools'
+      },
+      {
+        listingId: 'tool-sold-2',
+        itemPrice: 195,
+        shippingCost: 15,
+        soldDate: '2024-12-15T08:40:00Z',
+        rawCondition: 'New',
+        title: 'Milwaukee M18 Fuel Impact Driver + Battery',
+        category: 'Tools'
+      },
+      {
+        listingId: 'tool-sold-3',
+        itemPrice: 205,
+        shippingCost: 20,
+        soldDate: '2024-12-07T19:05:00Z',
+        rawCondition: 'New with tags',
+        title: 'Milwaukee M18 Fuel 2853-20 Kit',
+        category: 'Tools'
+      },
+      {
+        listingId: 'tool-sold-4',
+        itemPrice: 185,
+        shippingCost: 12,
+        soldDate: '2024-11-29T12:00:00Z',
+        rawCondition: 'New',
+        title: 'Milwaukee M18 Fuel Impact Driver Set',
+        category: 'Tools'
+      },
+      {
+        listingId: 'tool-sold-5',
+        itemPrice: 220,
+        shippingCost: 22,
+        soldDate: '2024-11-18T14:30:00Z',
+        rawCondition: 'New',
+        title: 'Milwaukee M18 Fuel Impact Driver Kit',
+        category: 'Tools'
+      },
+      {
+        listingId: 'tool-sold-6',
+        itemPrice: 200,
+        shippingCost: 16,
+        soldDate: '2024-11-03T09:10:00Z',
+        rawCondition: 'New',
+        title: 'Milwaukee M18 Fuel Impact Driver',
+        category: 'Tools'
+      }
+    ]
   },
   {
     id: '3',

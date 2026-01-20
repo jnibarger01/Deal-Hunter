@@ -29,6 +29,7 @@ export interface Deal {
   condition: 'Poor' | 'Fair' | 'Good' | 'Excellent' | 'New';
   isWatched?: boolean;
   tmvDecision?: DecisionPayload;
+  soldListings?: SoldListingInput[];
 }
 
 export interface RepairInsight {

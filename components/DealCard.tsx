@@ -18,6 +18,8 @@ const DealCard: React.FC<DealCardProps> = ({ deal, onClick }) => {
   };
 
   const scoreColor = deal.dealScore > 90 ? 'text-green-400' : deal.dealScore > 80 ? 'text-yellow-400' : 'text-slate-400';
+  const tmvLabel = deal.tmvDecision?.tmv.tmv ? `$${deal.tmvDecision.tmv.tmv.toFixed(0)} TMV` : null;
+  const tmvAction = deal.tmvDecision?.recommendedAction?.action;
 
   return (
     <div 
@@ -42,6 +44,11 @@ const DealCard: React.FC<DealCardProps> = ({ deal, onClick }) => {
            <span className="text-xs font-semibold text-slate-300">Score: </span>
            <span className={`text-sm font-bold ${scoreColor}`}>{deal.dealScore}</span>
         </div>
+        {tmvLabel && (
+          <div className="absolute bottom-2 left-2 bg-slate-900/90 px-3 py-1 rounded-full border border-slate-700">
+            <span className="text-xs font-semibold text-slate-300">{tmvLabel}</span>
+          </div>
+        )}
       </div>
 
       <div className="p-4 flex-grow flex flex-col">
@@ -68,7 +75,7 @@ const DealCard: React.FC<DealCardProps> = ({ deal, onClick }) => {
               <span className="text-green-400 font-bold text-lg leading-none">+${deal.estimatedProfit}</span>
             </div>
             <button className="bg-blue-600 hover:bg-blue-500 text-white text-xs px-3 py-1.5 rounded-lg font-bold transition-colors">
-              Hunt
+              {tmvAction ? tmvAction.replace('_', ' ') : 'Hunt'}
             </button>
           </div>
         </div>

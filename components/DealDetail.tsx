@@ -132,6 +132,56 @@ const DealDetail: React.FC<DealDetailProps> = ({ deal, onClose }) => {
                 <p className="text-xs text-slate-300 italic">"{trend}"</p>
               </div>
 
+              {/* TMV Decision */}
+              <div className="bg-slate-900/50 rounded-xl p-4 border border-slate-700">
+                <div className="flex items-center justify-between mb-3">
+                  <h4 className="text-sm font-bold text-white uppercase tracking-tighter">TMV Engine</h4>
+                  <span className="text-xs font-bold text-slate-400">
+                    {deal.tmvDecision?.tmv.tmv ? `$${deal.tmvDecision.tmv.tmv.toFixed(2)}` : 'No TMV'}
+                  </span>
+                </div>
+                {deal.tmvDecision ? (
+                  <div className="space-y-3 text-[11px] text-slate-300">
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="bg-slate-950 rounded-lg border border-slate-800 p-2">
+                        <p className="text-slate-500 font-bold uppercase mb-1">Confidence</p>
+                        <p className="text-slate-200">{deal.tmvDecision.tmv.confidence}/100</p>
+                      </div>
+                      <div className="bg-slate-950 rounded-lg border border-slate-800 p-2">
+                        <p className="text-slate-500 font-bold uppercase mb-1">Velocity</p>
+                        <p className="text-slate-200">{deal.tmvDecision.tmv.velocityScore.toFixed(1)}/100</p>
+                      </div>
+                      <div className="bg-slate-950 rounded-lg border border-slate-800 p-2">
+                        <p className="text-slate-500 font-bold uppercase mb-1">Trend</p>
+                        <p className="text-slate-200">
+                          {deal.tmvDecision.tmv.trend} ({(deal.tmvDecision.tmv.trendRate * 100).toFixed(1)}%)
+                        </p>
+                      </div>
+                      <div className="bg-slate-950 rounded-lg border border-slate-800 p-2">
+                        <p className="text-slate-500 font-bold uppercase mb-1">Freshness</p>
+                        <p className="text-slate-200">{deal.tmvDecision.tmv.dataFreshnessDays.toFixed(1)}d</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between bg-slate-950 rounded-lg border border-slate-800 p-2">
+                      <div>
+                        <p className="text-slate-500 font-bold uppercase mb-1">Recommended</p>
+                        <p className="text-slate-200">{deal.tmvDecision.recommendedAction.message}</p>
+                      </div>
+                      <span className="text-xs font-black uppercase tracking-widest text-blue-400">
+                        {deal.tmvDecision.recommendedAction.action.replace('_', ' ')}
+                      </span>
+                    </div>
+                    {deal.tmvDecision.tmv.warnings.length > 0 && (
+                      <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-2 text-yellow-200">
+                        {deal.tmvDecision.tmv.warnings.join(' • ')}
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <p className="text-xs text-slate-400">TMV requires sold comps to compute.</p>
+                )}
+              </div>
+
               {/* Negotiation Script */}
               <div className="bg-blue-900/10 rounded-xl p-4 border border-blue-500/30">
                 <div className="flex justify-between items-center mb-3">
