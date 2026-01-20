@@ -14,6 +14,7 @@ import dealRoutes from './routes/deal.routes';
 import watchlistRoutes from './routes/watchlist.routes';
 import portfolioRoutes from './routes/portfolio.routes';
 import alertRoutes from './routes/alert.routes';
+import tmvRoutes from './routes/tmv.routes';
 
 const app: Application = express();
 
@@ -69,6 +70,7 @@ apiRouter.use('/deals', dealRoutes);
 apiRouter.use('/watchlist', watchlistRoutes);
 apiRouter.use('/portfolio', portfolioRoutes);
 apiRouter.use('/alerts', alertRoutes);
+apiRouter.use('/tmv', tmvRoutes);
 
 app.use(`/api/${config.apiVersion}`, apiRouter);
 

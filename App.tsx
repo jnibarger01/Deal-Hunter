@@ -4,7 +4,8 @@ import { Marketplace, Category, Deal, LocationTarget } from './types';
 import { MOCK_DEALS } from './constants';
 import DealCard from './components/DealCard';
 import DealDetail from './components/DealDetail';
-import { fetchLocations, createLocation, searchDeals } from './services/api';
+import { fetchLocations, createLocation, searchDeals, computeTMV } from './services/api';
+import { SoldListingInput } from './types';
 
 const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'Feed' | 'Watchlist' | 'Portfolio' | 'Alerts'>('Feed');
@@ -26,6 +27,40 @@ const App: React.FC = () => {
     minPrice: '',
     maxPrice: ''
   });
+
+  const getSoldListings = (deal: Deal): SoldListingInput[] | null => {
+    const soldListings = (deal as Deal & { soldListings?: SoldListingInput[] }).soldListings;
+    if (!Array.isArray(soldListings) || soldListings.length === 0) {
+      return null;
+    }
+    return soldListings;
+  };
+
+  const hydrateTMVDecisions = async (items: Deal[]) => {
+    const hasComps = items.some((deal) => getSoldListings(deal));
+    if (!hasComps) {
+      return items;
+    }
+    return Promise.all(
+      items.map(async (deal) => {
+        const soldListings = getSoldListings(deal);
+        if (!soldListings) {
+          return deal;
+        }
+        try {
+          const decision = await computeTMV({
+            category: deal.category,
+            listingPrice: deal.price,
+            soldListings
+          });
+          return { ...deal, tmvDecision: decision };
+        } catch (error) {
+          console.error('TMV compute failed', error);
+          return deal;
+        }
+      })
+    );
+  };
 
   const filteredDeals = useMemo(() => {
     let dealsToShow = [...deals];
@@ -90,7 +125,12 @@ const App: React.FC = () => {
             : undefined
         });
         if (isActive) {
-          setDeals(results.length ? results : []);
+          const baseDeals = results.length ? results : [];
+          setDeals(baseDeals);
+          const hydrated = await hydrateTMVDecisions(baseDeals);
+          if (isActive) {
+            setDeals(hydrated);
+          }
         }
       } catch (err) {
         if (isActive) {

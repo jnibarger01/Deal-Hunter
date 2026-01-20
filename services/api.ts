@@ -1,4 +1,12 @@
-import { Deal, Marketplace, LocationTarget, Category } from '../types';
+import {
+  Deal,
+  Marketplace,
+  LocationTarget,
+  Category,
+  DecisionPayload,
+  SoldListingInput,
+  MarketMetricsInput,
+} from '../types';
 
 const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:4000/api';
 
@@ -9,6 +17,19 @@ export interface SearchParams {
   filters?: {
     minPrice?: number;
     maxPrice?: number;
+  };
+}
+
+export interface TMVComputeRequest {
+  category: string;
+  listingPrice: number;
+  soldListings: SoldListingInput[];
+  conditionFilter?: string;
+  marketMetrics?: MarketMetricsInput;
+  maxAgeDays?: number;
+  shippingPolicy?: {
+    buyerShippingCharged?: number;
+    shippingLabelCost?: number;
   };
 }
 
@@ -120,4 +141,18 @@ export const searchDeals = async (params: SearchParams): Promise<Deal[]> => {
   const payload = await response.json();
   const items = (payload.items || []) as EbaySummary[];
   return items.map(toDeal);
+};
+
+export const computeTMV = async (input: TMVComputeRequest): Promise<DecisionPayload> => {
+  const response = await fetch(`${API_BASE}/tmv/compute`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(input),
+  });
+  if (!response.ok) {
+    const text = await response.text();
+    throw new Error(text || 'TMV compute failed');
+  }
+  const payload = await response.json();
+  return payload.data as DecisionPayload;
 };

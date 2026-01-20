@@ -28,6 +28,7 @@ export interface Deal {
   estimatedProfit: number;
   condition: 'Poor' | 'Fair' | 'Good' | 'Excellent' | 'New';
   isWatched?: boolean;
+  tmvDecision?: DecisionPayload;
 }
 
 export interface RepairInsight {
@@ -59,5 +60,60 @@ export interface LocationTarget {
     minPrice?: number;
     maxPrice?: number;
     condition?: string[];
+  };
+}
+
+export interface SoldListingInput {
+  listingId: string;
+  itemPrice: number;
+  shippingCost: number;
+  soldDate: string;
+  rawCondition: string;
+  title: string;
+  category: string;
+}
+
+export interface MarketMetricsInput {
+  activeListingsCount: number;
+  avgDaysToSell: number;
+  sellThroughRate: number;
+  recentSalesCount30d: number;
+}
+
+export interface TMVResult {
+  tmv: number | null;
+  confidence: number;
+  sampleSize: number;
+  dataFreshnessDays: number;
+  velocityScore: number;
+  trend: string;
+  trendRate: number;
+  rawMedian: number | null;
+  iqrFilteredMedian: number | null;
+  timeWeightedMedian: number | null;
+  outlierRemovalRatio: number;
+  recencyDistribution: string;
+  warnings: string[];
+}
+
+export interface ProfitAnalysis {
+  purchasePrice: number;
+  estimatedSalePrice: number;
+  estimatedShipping: number;
+  totalFees: number;
+  netProfit: number;
+  roiPercent: number;
+  finalValueFee: number;
+  paymentProcessingFee: number;
+  fixedFees: number;
+}
+
+export interface DecisionPayload {
+  tmv: TMVResult;
+  profit: ProfitAnalysis;
+  dealScore: number;
+  recommendedAction: {
+    action: 'buy_now' | 'good' | 'marginal' | 'skip';
+    message: string;
   };
 }
