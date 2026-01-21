@@ -15,7 +15,8 @@ WORKDIR /app
 # Copy server dependencies
 COPY server/package.json server/package-lock.json* ./server/
 WORKDIR /app/server
-RUN npm install --production
+# We need dependencies (like tsx) valid for production now that they are in 'dependencies'
+RUN npm install
 
 # Return to root for final assembly
 WORKDIR /app
@@ -26,4 +27,4 @@ COPY --from=frontend-builder /app/server ./server
 ENV NODE_ENV=production
 ENV PORT=4000
 EXPOSE 4000
-CMD ["node", "server/index.js"]
+CMD ["npx", "tsx", "server/index.js"]
