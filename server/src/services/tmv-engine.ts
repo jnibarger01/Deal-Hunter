@@ -535,8 +535,11 @@ export class ProfitCalculator {
       buyerShippingCharged = 0,
       shippingLabelCost = 0,
     } = params;
-    const [fvfRate, hasCap, capAmount, feeOnShipping] =
-      EBAY_FEE_TABLE[category] ?? EBAY_FEE_TABLE.Default;
+    const feeConfig = EBAY_FEE_TABLE[category] ?? EBAY_FEE_TABLE.Default;
+    const fvfRate = feeConfig[0];
+    const hasCap = feeConfig[1];
+    const capAmount = feeConfig[2];
+    const feeOnShipping = feeConfig[3];
     const gross = feeOnShipping ? salePrice + buyerShippingCharged : salePrice;
     let finalValueFee = gross * fvfRate;
     if (hasCap && finalValueFee > capAmount) {

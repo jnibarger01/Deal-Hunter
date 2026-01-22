@@ -1,8 +1,43 @@
 import { Request, Response, NextFunction } from 'express';
 import dealService from '../services/deal.service';
+import { EbayService } from '../services/ebay.service';
+import { LocationService } from '../services/location.service';
 import logger from '../config/logger';
 
 export class DealController {
+  async searchDeals(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { query, locationId, filters, radius } = req.query;
+
+      let loc = undefined;
+      if (locationId && typeof locationId === 'string') {
+        const found = LocationService.getById(locationId);
+        if (found) {
+          loc = { postalCode: found.zip || undefined };
+        }
+      }
+
+      let parsedFilters = undefined;
+      if (filters && typeof filters === 'string') {
+        try { parsedFilters = JSON.parse(filters); } catch { }
+      }
+
+      const results = await EbayService.search({
+        query: req.query.query as string,
+        location: loc,
+        radiusMiles: req.query.radius ? Number(req.query.radius) : undefined,
+        filters: parsedFilters
+      });
+
+      res.status(200).json({
+        success: true,
+        data: results
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
   async getAllDeals(req: Request, res: Response, next: NextFunction) {
     try {
       const filters = {

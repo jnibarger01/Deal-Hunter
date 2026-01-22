@@ -29,6 +29,7 @@ const idParamValidation = [
 
 // Public routes (no authentication required)
 router.get('/', dealController.getAllDeals);
+router.get('/search', authenticate, dealController.searchDeals); // Add search route
 router.get('/categories', dealController.getCategories);
 router.get('/marketplaces', dealController.getMarketplaces);
 router.get('/stats', dealController.getStats);

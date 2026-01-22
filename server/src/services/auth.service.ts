@@ -130,13 +130,13 @@ export class AuthService {
         throw new AppError('User account is deactivated', 401);
       }
 
-      // Generate new tokens
-      const newTokens = await this.generateAuthTokens(storedToken.user);
-
-      // Delete old refresh token
+      // Delete old refresh token BEFORE generating new ones to avoid unique constraint
       await prisma.refreshToken.delete({
         where: { id: storedToken.id },
       });
+
+      // Generate new tokens
+      const newTokens = await this.generateAuthTokens(storedToken.user);
 
       return newTokens;
     } catch (error) {
@@ -164,12 +164,12 @@ export class AuthService {
 
     // Generate access token
     const accessToken = jwt.sign(payload, config.jwt.secret, {
-      expiresIn: config.jwt.expiresIn,
+      expiresIn: config.jwt.expiresIn as jwt.SignOptions['expiresIn'],
     });
 
     // Generate refresh token
     const refreshToken = jwt.sign(payload, config.jwt.secret, {
-      expiresIn: config.jwt.refreshExpiresIn,
+      expiresIn: config.jwt.refreshExpiresIn as jwt.SignOptions['expiresIn'],
     });
 
     // Store refresh token in database

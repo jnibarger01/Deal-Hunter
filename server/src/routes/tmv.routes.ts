@@ -31,5 +31,6 @@ const computeValidation = [
 ];
 
 router.post('/compute', validate(computeValidation), tmvController.compute);
+router.post('/analyze', validate(computeValidation), tmvController.compute);
 
 export default router;
