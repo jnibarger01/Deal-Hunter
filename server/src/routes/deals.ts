@@ -1,7 +1,6 @@
 import { Router } from 'express';
-import { prisma } from '../config/prisma';
-import { TMVCalculator } from '../domain/tmv/calculator';
-import { DealScorer } from '../domain/scoring/composite';
+import prisma from '../config/database';
+import { TMVCalculator } from '../domain/tmv';
 
 const router = Router();
 
