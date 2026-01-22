@@ -1,23 +1,53 @@
 // prisma/schema.prisma
 
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
 model Deal {
-  id          String   @id @default(cuid())
-  source      String   // "ebay", "craigslist", etc.
-  sourceId    String   // External ID
-  title       String
-  price       Decimal
-  condition   String?
-  category    String
-  location    String?
-  url         String
-  createdAt   DateTime @default(now())
+  id              String   @id @default(cuid())
+  source          String   @default("manual") // "ebay", "craigslist", etc.
+  sourceId        String   @default(cuid()) // External ID
+  title           String
+  description     String?
+  price           Decimal
+  marketValue     Decimal?
+  estimatedProfit Decimal?
+  dealScore       Decimal?
+  roi             Decimal?
+  condition       String?
+  category        String
+  marketplace     String?
+  marketplaceId   String?  @unique
+  itemUrl         String?
+  location        String?
+  zipPrefix       String?
+  region          String?
+  url             String?
+  status          String   @default("active")
+  views           Int?
+  saves           Int?
+  inquiries       Int?
+  daysListed      Int?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
   
   samples     MarketSample[]
   tmvResult   TMVResult?
   score       Score?
+  watchlistItems WatchlistItem[]
+  portfolioItems PortfolioItem[]
+  alerts         Alert[]
   
   @@unique([source, sourceId])
   @@index([category, createdAt])
+  @@index([region])
+  @@index([status])
 }
 
 model MarketSample {
@@ -29,8 +59,24 @@ model MarketSample {
   observedAt      DateTime
   source          String
   condition       String?
+  status          ListingStatus?
+  finalPrice      Decimal?
+  listedAt        DateTime?
+  soldAt          DateTime?
+  daysToSell      Int?
+  location        String?
+  zipPrefix       String?
+  region          String?
+  title           String?
+  description     String?
+  features        Json?
+  views           Int?
+  saves           Int?
+  inquiries       Int?
   
   @@index([dealId, observedAt])
+  @@index([region, observedAt])
+  @@index([status])
 }
 
 model TMVResult {
@@ -39,11 +85,14 @@ model TMVResult {
   deal                Deal     @relation(fields: [dealId], references: [id])
   
   tmv                 Decimal
+  tmvNormalized       Decimal?
   confidence          Decimal  // 0.0 - 1.0
   sampleCount         Int
   volatility          Decimal
   liquidityScore      Decimal
   estimatedDaysToSell Int?
+  seasonalityIndex    Decimal?
+  regionalIndex       Decimal?
   calculatedAt        DateTime @default(now())
 }
 
@@ -56,8 +105,84 @@ model Score {
   velocityScore   Decimal
   riskScore       Decimal
   compositeRank   Decimal  // 0-100 deal score
+  demandScore     Decimal?
+  hotDeal         Boolean  @default(false)
   
   calculatedAt    DateTime @default(now())
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  firstName String?
+  lastName  String?
+  role      String   @default("user")
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  refreshTokens RefreshToken[]
+  watchlistItems WatchlistItem[]
+  portfolioItems PortfolioItem[]
+  alerts         Alert[]
+}
+
+model RefreshToken {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+}
+
+model WatchlistItem {
+  id        String   @id @default(cuid())
+  userId    String
+  dealId    String
+  notes     String?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  deal Deal @relation(fields: [dealId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, dealId])
+  @@index([userId])
+  @@index([dealId])
+}
+
+model PortfolioItem {
+  id        String   @id @default(cuid())
+  userId    String
+  dealId    String?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  deal Deal? @relation(fields: [dealId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+}
+
+model Alert {
+  id        String   @id @default(cuid())
+  userId    String
+  dealId    String?
+  message   String?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  deal Deal? @relation(fields: [dealId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+}
+
+model MarketplaceSync {
+  id           String   @id @default(cuid())
+  marketplace  String
+  lastSyncedAt DateTime?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 }
 
 model CategoryConfig {
@@ -66,4 +191,27 @@ model CategoryConfig {
   decayRate       Decimal // For exponential weighting
   minSamples      Int     @default(8)
   freshnessWindow Int     @default(180) // days
+}
+
+model RegionalIndex {
+  id         String   @id @default(cuid())
+  region     String   @unique
+  multiplier Decimal
+  updatedAt  DateTime @updatedAt
+}
+
+model SeasonalityIndex {
+  id         String   @id @default(cuid())
+  category   String
+  month      Int
+  multiplier Decimal
+  updatedAt  DateTime @updatedAt
+
+  @@unique([category, month])
+}
+
+enum ListingStatus {
+  active
+  sold
+  expired
 }

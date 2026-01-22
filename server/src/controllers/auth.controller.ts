@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import authService from '../services/auth.service';
 import logger from '../config/logger';
+import { AuthRequest } from '../middleware/auth';
 
 export class AuthController {
   async register(req: Request, res: Response, next: NextFunction) {
@@ -97,7 +98,7 @@ export class AuthController {
     }
   }
 
-  async getProfile(req: Request, res: Response, next: NextFunction) {
+  async getProfile(req: AuthRequest, res: Response, next: NextFunction) {
     try {
       // User is already attached to req by auth middleware
       res.status(200).json({

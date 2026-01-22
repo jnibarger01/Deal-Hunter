@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { authenticate } from '../middleware/auth';
+import { authenticate, AuthRequest } from '../middleware/auth';
 
 const router = Router();
 
@@ -7,7 +7,7 @@ const router = Router();
 router.use(authenticate);
 
 // Placeholder routes - implement controllers later
-router.get('/me', (req, res) => {
+router.get('/me', (req: AuthRequest, res) => {
   res.json({ success: true, data: { user: req.user }, message: 'User profile' });
 });
 

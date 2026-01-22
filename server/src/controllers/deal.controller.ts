@@ -1,6 +1,28 @@
 import { Request, Response, NextFunction } from 'express';
+import { Deal } from '@prisma/client';
+import { Decimal } from '@prisma/client/runtime/library';
 import dealService from '../services/deal.service';
 import logger from '../config/logger';
+
+type DecimalField = Decimal | null | undefined;
+
+const toNumberOrNull = (value: DecimalField): number | null => {
+  if (value === null || value === undefined) {
+    return null;
+  }
+  return Number(value);
+};
+
+type DealWithDecimalFields = Deal & Record<string, unknown>;
+
+const normalizeDeal = (deal: DealWithDecimalFields) => ({
+  ...deal,
+  price: toNumberOrNull(deal.price as DecimalField),
+  marketValue: toNumberOrNull(deal.marketValue as DecimalField),
+  estimatedProfit: toNumberOrNull(deal.estimatedProfit as DecimalField),
+  dealScore: toNumberOrNull(deal.dealScore as DecimalField),
+  roi: toNumberOrNull(deal.roi as DecimalField),
+});
 
 export class DealController {
   async getAllDeals(req: Request, res: Response, next: NextFunction) {
@@ -25,10 +47,14 @@ export class DealController {
       };
 
       const result = await dealService.getAllDeals(filters, sort, pagination);
+      const normalizedDeals = result.deals.map(normalizeDeal);
 
       res.status(200).json({
         success: true,
-        data: result,
+        data: {
+          ...result,
+          deals: normalizedDeals,
+        },
       });
     } catch (error) {
       next(error);
@@ -37,12 +63,12 @@ export class DealController {
 
   async getDealById(req: Request, res: Response, next: NextFunction) {
     try {
-      const { id } = req.params;
+      const id = String(req.params.id);
       const deal = await dealService.getDealById(id);
 
       res.status(200).json({
         success: true,
-        data: { deal },
+        data: { deal: normalizeDeal(deal) },
       });
     } catch (error) {
       next(error);
@@ -57,7 +83,7 @@ export class DealController {
 
       res.status(201).json({
         success: true,
-        data: { deal },
+        data: { deal: normalizeDeal(deal) },
         message: 'Deal created successfully',
       });
     } catch (error) {
@@ -67,14 +93,14 @@ export class DealController {
 
   async updateDeal(req: Request, res: Response, next: NextFunction) {
     try {
-      const { id } = req.params;
+      const id = String(req.params.id);
       const deal = await dealService.updateDeal(id, req.body);
 
       logger.info(`Deal updated: ${id}`);
 
       res.status(200).json({
         success: true,
-        data: { deal },
+        data: { deal: normalizeDeal(deal) },
         message: 'Deal updated successfully',
       });
     } catch (error) {
@@ -84,7 +110,7 @@ export class DealController {
 
   async deleteDeal(req: Request, res: Response, next: NextFunction) {
     try {
-      const { id } = req.params;
+      const id = String(req.params.id);
       await dealService.deleteDeal(id);
 
       logger.info(`Deal deleted: ${id}`);

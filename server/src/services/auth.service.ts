@@ -1,5 +1,7 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import type { SignOptions } from 'jsonwebtoken';
+import { randomUUID } from 'crypto';
 import { User, RefreshToken } from '@prisma/client';
 import prisma from '../config/database';
 import config from '../config/env';
@@ -164,12 +166,14 @@ export class AuthService {
 
     // Generate access token
     const accessToken = jwt.sign(payload, config.jwt.secret, {
-      expiresIn: config.jwt.expiresIn,
+      expiresIn: config.jwt.expiresIn as SignOptions['expiresIn'],
+      jwtid: randomUUID(),
     });
 
     // Generate refresh token
     const refreshToken = jwt.sign(payload, config.jwt.secret, {
-      expiresIn: config.jwt.refreshExpiresIn,
+      expiresIn: config.jwt.refreshExpiresIn as SignOptions['expiresIn'],
+      jwtid: randomUUID(),
     });
 
     // Store refresh token in database

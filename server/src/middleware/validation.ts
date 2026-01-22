@@ -17,9 +17,6 @@ export const validate = (validations: ValidationChain[]) => {
       message: err.msg,
     }));
 
-    throw new AppError(
-      JSON.stringify(extractedErrors),
-      400
-    );
+    return next(new AppError(JSON.stringify(extractedErrors), 400));
   };
 };

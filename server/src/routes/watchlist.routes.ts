@@ -10,12 +10,12 @@ const router = Router();
 router.use(authenticate);
 
 const addValidation = [
-  body('dealId').isUUID().withMessage('Valid deal ID is required'),
+  body('dealId').isString().notEmpty().withMessage('Valid deal ID is required'),
   body('notes').optional().trim(),
 ];
 
 const dealIdParamValidation = [
-  param('dealId').isUUID().withMessage('Valid deal ID is required'),
+  param('dealId').isString().notEmpty().withMessage('Valid deal ID is required'),
 ];
 
 router.get('/', watchlistController.getWatchlist);

@@ -40,7 +40,7 @@ export class WatchlistController {
   async removeFromWatchlist(req: AuthRequest, res: Response, next: NextFunction) {
     try {
       const userId = req.user!.id;
-      const { dealId } = req.params;
+      const dealId = String(req.params.dealId);
 
       await watchlistService.removeFromWatchlist(userId, dealId);
 
@@ -58,7 +58,7 @@ export class WatchlistController {
   async updateNotes(req: AuthRequest, res: Response, next: NextFunction) {
     try {
       const userId = req.user!.id;
-      const { dealId } = req.params;
+      const dealId = String(req.params.dealId);
       const { notes } = req.body;
 
       const item = await watchlistService.updateNotes(userId, dealId, notes);
