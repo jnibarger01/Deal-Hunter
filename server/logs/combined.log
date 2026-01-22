@@ -526,3 +526,945 @@
 {"level":"info","message":"User cmkps9lna005guoy3hm5wkb2g added deal cmkps9lne005juoy3h2ltwcdb to watchlist","service":"deal-hunter-api","timestamp":"2026-01-22 12:26:28"}
 {"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:26:28 +0000] \"POST /api/v1/watchlist HTTP/1.1\" 201 795 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:26:28"}
 {"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:26:28 +0000] \"PATCH /api/v1/watchlist/cmkps9lne005juoy3h2ltwcdb/notes HTTP/1.1\" 200 784 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:26:28"}
+{"level":"info","message":"Environment variables validated successfully","service":"deal-hunter-api","timestamp":"2026-01-22 12:35:20"}
+{"level":"info","message":"New user registered: test@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:35:21"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:35:21 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 910 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:35:21"}
+{"level":"error","message":"400 - [{\"field\":\"password\",\"message\":\"Password must be at least 8 characters\"},{\"field\":\"password\",\"message\":\"Password must contain at least one uppercase letter, one lowercase letter, and one number\"}] - /api/v1/auth/register - POST - ::ffff:127.0.0.1","service":"deal-hunter-api","timestamp":"2026-01-22 12:35:21"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:35:21 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 400 252 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:35:21"}
+{"level":"error","message":"400 - [{\"field\":\"email\",\"message\":\"Valid email is required\"}] - /api/v1/auth/register - POST - ::ffff:127.0.0.1","service":"deal-hunter-api","timestamp":"2026-01-22 12:35:21"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:35:21 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 400 103 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:35:21"}
+{"level":"info","message":"New user registered: test@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:35:21"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:35:21 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:35:21"}
+{"level":"error","message":"400 - User with this email already exists - /api/v1/auth/register - POST - ::ffff:127.0.0.1","service":"deal-hunter-api","timestamp":"2026-01-22 12:35:21"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:35:21 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 400 75 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:35:21"}
+{"level":"info","message":"User logged in: test@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:35:21"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:35:21 +0000] \"POST /api/v1/auth/login HTTP/1.1\" 200 898 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:35:21"}
+{"level":"error","message":"401 - Invalid credentials - /api/v1/auth/login - POST - ::ffff:127.0.0.1","service":"deal-hunter-api","timestamp":"2026-01-22 12:35:21"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:35:21 +0000] \"POST /api/v1/auth/login HTTP/1.1\" 401 59 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:35:21"}
+{"level":"error","message":"401 - Invalid credentials - /api/v1/auth/login - POST - ::ffff:127.0.0.1","service":"deal-hunter-api","timestamp":"2026-01-22 12:35:21"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:35:21 +0000] \"POST /api/v1/auth/login HTTP/1.1\" 401 59 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:35:21"}
+{"level":"info","message":"New user registered: test@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:35:21"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:35:21 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:35:21"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:35:21 +0000] \"GET /api/v1/auth/profile HTTP/1.1\" 200 108 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:35:21"}
+{"level":"info","message":"New user registered: test@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:35:21"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:35:21 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:35:21"}
+{"level":"error","message":"401 - No token provided - /api/v1/auth/profile - GET - ::ffff:127.0.0.1","service":"deal-hunter-api","timestamp":"2026-01-22 12:35:21"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:35:21 +0000] \"GET /api/v1/auth/profile HTTP/1.1\" 401 57 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:35:21"}
+{"level":"info","message":"New user registered: test@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:35:21"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:35:21 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:35:21"}
+{"level":"error","message":"401 - Invalid token - /api/v1/auth/profile - GET - ::ffff:127.0.0.1","service":"deal-hunter-api","timestamp":"2026-01-22 12:35:21"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:35:21 +0000] \"GET /api/v1/auth/profile HTTP/1.1\" 401 53 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:35:21"}
+{"level":"info","message":"New user registered: test@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:35:21"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:35:21 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:35:21"}
+{"level":"info","message":"New user registered: test@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:35:22"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:35:22 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:35:22"}
+{"level":"info","message":"New user registered: test@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:35:22"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:35:22 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:35:22"}
+{"level":"info","message":"Environment variables validated successfully","service":"deal-hunter-api","timestamp":"2026-01-22 12:35:22"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:35:22"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:35:22 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:35:22"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:35:22"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:35:22 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:35:22"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:35:22"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:35:22 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:35:22"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:35:22"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:35:22 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:35:22"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:35:23"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:35:23 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:35:23"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:35:23"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:35:23 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:35:23"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:35:23"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:35:23 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:35:23"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:35:23"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:35:23 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:35:23"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:35:23"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:35:23 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:35:23"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:35:23"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:35:23 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:35:23"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:35:23"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:35:23 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:35:23"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:35:23"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:35:23 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:35:23"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:35:23"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:35:23 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:35:23"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:35:23"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:35:23 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:35:23"}
+{"level":"info","message":"Environment variables validated successfully","service":"deal-hunter-api","timestamp":"2026-01-22 12:35:24"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:35:24"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:35:24 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:35:24"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:35:24"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:35:24 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:35:24"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:35:24"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:35:24 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:35:24"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:35:24"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:35:24 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:35:24"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:35:24"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:35:24 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:35:24"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:35:24"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:35:24 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:35:24"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:35:24"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:35:24 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:35:24"}
+{"level":"info","message":"Environment variables validated successfully","service":"deal-hunter-api","timestamp":"2026-01-22 12:37:15"}
+{"level":"info","message":"New user registered: test@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:37:16"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:37:16 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 910 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:37:16"}
+{"level":"error","message":"400 - [{\"field\":\"password\",\"message\":\"Password must be at least 8 characters\"},{\"field\":\"password\",\"message\":\"Password must contain at least one uppercase letter, one lowercase letter, and one number\"}] - /api/v1/auth/register - POST - ::ffff:127.0.0.1","service":"deal-hunter-api","timestamp":"2026-01-22 12:37:16"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:37:16 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 400 252 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:37:16"}
+{"level":"error","message":"400 - [{\"field\":\"email\",\"message\":\"Valid email is required\"}] - /api/v1/auth/register - POST - ::ffff:127.0.0.1","service":"deal-hunter-api","timestamp":"2026-01-22 12:37:16"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:37:16 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 400 103 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:37:16"}
+{"level":"info","message":"New user registered: test@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:37:16"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:37:16 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:37:16"}
+{"level":"error","message":"400 - User with this email already exists - /api/v1/auth/register - POST - ::ffff:127.0.0.1","service":"deal-hunter-api","timestamp":"2026-01-22 12:37:16"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:37:16 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 400 75 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:37:16"}
+{"level":"info","message":"User logged in: test@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:37:16"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:37:16 +0000] \"POST /api/v1/auth/login HTTP/1.1\" 200 898 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:37:16"}
+{"level":"error","message":"401 - Invalid credentials - /api/v1/auth/login - POST - ::ffff:127.0.0.1","service":"deal-hunter-api","timestamp":"2026-01-22 12:37:16"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:37:16 +0000] \"POST /api/v1/auth/login HTTP/1.1\" 401 59 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:37:16"}
+{"level":"error","message":"401 - Invalid credentials - /api/v1/auth/login - POST - ::ffff:127.0.0.1","service":"deal-hunter-api","timestamp":"2026-01-22 12:37:16"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:37:16 +0000] \"POST /api/v1/auth/login HTTP/1.1\" 401 59 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:37:16"}
+{"level":"info","message":"New user registered: test@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:37:16"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:37:16 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:37:16"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:37:16 +0000] \"GET /api/v1/auth/profile HTTP/1.1\" 200 108 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:37:16"}
+{"level":"info","message":"New user registered: test@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:37:17"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:37:17 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:37:17"}
+{"level":"error","message":"401 - No token provided - /api/v1/auth/profile - GET - ::ffff:127.0.0.1","service":"deal-hunter-api","timestamp":"2026-01-22 12:37:17"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:37:17 +0000] \"GET /api/v1/auth/profile HTTP/1.1\" 401 57 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:37:17"}
+{"level":"info","message":"New user registered: test@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:37:17"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:37:17 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:37:17"}
+{"level":"error","message":"401 - Invalid token - /api/v1/auth/profile - GET - ::ffff:127.0.0.1","service":"deal-hunter-api","timestamp":"2026-01-22 12:37:17"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:37:17 +0000] \"GET /api/v1/auth/profile HTTP/1.1\" 401 53 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:37:17"}
+{"level":"info","message":"New user registered: test@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:37:17"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:37:17 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:37:17"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:37:17 +0000] \"POST /api/v1/auth/refresh HTTP/1.1\" 200 696 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:37:17"}
+{"level":"info","message":"New user registered: test@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:37:17"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:37:17 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:37:17"}
+{"level":"error","message":"401 - Invalid refresh token - /api/v1/auth/refresh - POST - ::ffff:127.0.0.1","service":"deal-hunter-api","timestamp":"2026-01-22 12:37:17"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:37:17 +0000] \"POST /api/v1/auth/refresh HTTP/1.1\" 401 61 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:37:17"}
+{"level":"info","message":"New user registered: test@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:37:17"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:37:17 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:37:17"}
+{"level":"info","message":"User logged out","service":"deal-hunter-api","timestamp":"2026-01-22 12:37:17"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:37:17 +0000] \"POST /api/v1/auth/logout HTTP/1.1\" 200 46 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:37:17"}
+{"level":"error","message":"401 - Invalid refresh token - /api/v1/auth/refresh - POST - ::ffff:127.0.0.1","service":"deal-hunter-api","timestamp":"2026-01-22 12:37:17"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:37:17 +0000] \"POST /api/v1/auth/refresh HTTP/1.1\" 401 61 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:37:17"}
+{"level":"info","message":"Environment variables validated successfully","service":"deal-hunter-api","timestamp":"2026-01-22 12:37:17"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:37:17"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:37:17 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:37:17"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:37:17 +0000] \"GET /api/v1/deals HTTP/1.1\" 200 1175 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:37:17"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:37:17"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:37:17 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:37:17"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:37:17 +0000] \"GET /api/v1/deals?category=tech HTTP/1.1\" 200 1175 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:37:17"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:37:17"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:37:17 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:37:17"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:37:18 +0000] \"GET /api/v1/deals?marketplace=craigslist HTTP/1.1\" 200 636 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:37:18"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:37:18"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:37:18 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:37:18"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:37:18 +0000] \"GET /api/v1/deals?sortBy=dealScore&sortOrder=desc HTTP/1.1\" 200 1175 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:37:18"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:37:18"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:37:18 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:37:18"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:37:18 +0000] \"GET /api/v1/deals?search=iPhone HTTP/1.1\" 200 636 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:37:18"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:37:18"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:37:18 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:37:18"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:37:18 +0000] \"GET /api/v1/deals?page=1&limit=1 HTTP/1.1\" 200 633 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:37:18"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:37:18"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:37:18 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:37:18"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:37:18 +0000] \"GET /api/v1/deals/cmkpsnj45002b3zolm5uiitz6 HTTP/1.1\" 200 573 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:37:18"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:37:18"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:37:18 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:37:18"}
+{"level":"error","message":"404 - Deal not found - /api/v1/deals/00000000-0000-0000-0000-000000000000 - GET - ::ffff:127.0.0.1","service":"deal-hunter-api","timestamp":"2026-01-22 12:37:18"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:37:18 +0000] \"GET /api/v1/deals/00000000-0000-0000-0000-000000000000 HTTP/1.1\" 404 54 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:37:18"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:37:18"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:37:18 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:37:18"}
+{"level":"info","message":"Deal created: cmkpsnj91002v3zol480b0h1n","service":"deal-hunter-api","timestamp":"2026-01-22 12:37:18"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:37:18 +0000] \"POST /api/v1/deals HTTP/1.1\" 201 607 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:37:18"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:37:18"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:37:18 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:37:18"}
+{"level":"error","message":"403 - Insufficient permissions - /api/v1/deals - POST - ::ffff:127.0.0.1","service":"deal-hunter-api","timestamp":"2026-01-22 12:37:18"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:37:18 +0000] \"POST /api/v1/deals HTTP/1.1\" 403 64 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:37:18"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:37:18"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:37:18 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:37:18"}
+{"level":"error","message":"401 - No token provided - /api/v1/deals - POST - ::ffff:127.0.0.1","service":"deal-hunter-api","timestamp":"2026-01-22 12:37:18"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:37:18 +0000] \"POST /api/v1/deals HTTP/1.1\" 401 57 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:37:18"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:37:18"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:37:18 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:37:18"}
+{"level":"error","message":"400 - [{\"field\":\"price\",\"message\":\"Price must be a positive number\"},{\"field\":\"marketValue\",\"message\":\"Market value must be a positive number\"},{\"field\":\"itemUrl\",\"message\":\"Valid item URL is required\"},{\"field\":\"category\",\"message\":\"Category is required\"},{\"field\":\"marketplace\",\"message\":\"Marketplace is required\"}] - /api/v1/deals - POST - ::ffff:127.0.0.1","service":"deal-hunter-api","timestamp":"2026-01-22 12:37:18"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:37:18 +0000] \"POST /api/v1/deals HTTP/1.1\" 400 391 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:37:18"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:37:18"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:37:18 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:37:18"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:37:18 +0000] \"GET /api/v1/deals/categories HTTP/1.1\" 200 47 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:37:18"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:37:18"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:37:18 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:37:18"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:37:18 +0000] \"GET /api/v1/deals/marketplaces HTTP/1.1\" 200 62 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:37:18"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:37:19"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:37:19 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:37:19"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:37:19 +0000] \"GET /api/v1/deals/stats HTTP/1.1\" 200 128 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:37:19"}
+{"level":"info","message":"Environment variables validated successfully","service":"deal-hunter-api","timestamp":"2026-01-22 12:37:19"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:37:19"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:37:19 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:37:19"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:37:19 +0000] \"GET /api/v1/watchlist HTTP/1.1\" 200 36 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:37:19"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:37:19"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:37:19 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:37:19"}
+{"level":"error","message":"401 - No token provided - /api/v1/watchlist - GET - ::ffff:127.0.0.1","service":"deal-hunter-api","timestamp":"2026-01-22 12:37:19"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:37:19 +0000] \"GET /api/v1/watchlist HTTP/1.1\" 401 57 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:37:19"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:37:19"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:37:19 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:37:19"}
+{"level":"info","message":"User cmkpsnk4s004j3zolyw3skd3b added deal cmkpsnk4w004m3zolveolf1n1 to watchlist","service":"deal-hunter-api","timestamp":"2026-01-22 12:37:19"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:37:19 +0000] \"POST /api/v1/watchlist HTTP/1.1\" 201 797 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:37:19"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:37:19"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:37:19 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:37:19"}
+{"level":"info","message":"User cmkpsnk7a004q3zolx2h72xcf added deal cmkpsnk7e004t3zol6a9fel09 to watchlist","service":"deal-hunter-api","timestamp":"2026-01-22 12:37:19"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:37:19 +0000] \"POST /api/v1/watchlist HTTP/1.1\" 201 783 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:37:19"}
+{"level":"error","message":"400 - Deal already in watchlist - /api/v1/watchlist - POST - ::ffff:127.0.0.1","service":"deal-hunter-api","timestamp":"2026-01-22 12:37:19"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:37:19 +0000] \"POST /api/v1/watchlist HTTP/1.1\" 400 65 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:37:19"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:37:19"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:37:19 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:37:19"}
+{"level":"error","message":"404 - Deal not found - /api/v1/watchlist - POST - ::ffff:127.0.0.1","service":"deal-hunter-api","timestamp":"2026-01-22 12:37:19"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:37:19 +0000] \"POST /api/v1/watchlist HTTP/1.1\" 404 54 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:37:19"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:37:19"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:37:19 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:37:19"}
+{"level":"info","message":"User cmkpsnkck00523zolc3hda1bl added deal cmkpsnkcn00553zolltj4lveu to watchlist","service":"deal-hunter-api","timestamp":"2026-01-22 12:37:19"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:37:19 +0000] \"POST /api/v1/watchlist HTTP/1.1\" 201 783 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:37:19"}
+{"level":"info","message":"User cmkpsnkck00523zolc3hda1bl removed deal cmkpsnkcn00553zolltj4lveu from watchlist","service":"deal-hunter-api","timestamp":"2026-01-22 12:37:19"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:37:19 +0000] \"DELETE /api/v1/watchlist/cmkpsnkcn00553zolltj4lveu HTTP/1.1\" 200 56 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:37:19"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:37:19 +0000] \"GET /api/v1/watchlist HTTP/1.1\" 200 36 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:37:19"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:37:20"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:37:20 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:37:20"}
+{"level":"info","message":"User cmkpsnkf500593zoly9ij9ylf added deal cmkpsnkf8005c3zol5szcig9c to watchlist","service":"deal-hunter-api","timestamp":"2026-01-22 12:37:20"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:37:20 +0000] \"POST /api/v1/watchlist HTTP/1.1\" 201 783 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:37:20"}
+{"level":"error","message":"404 - Watchlist item not found - /api/v1/watchlist/00000000-0000-0000-0000-000000000000 - DELETE - ::ffff:127.0.0.1","service":"deal-hunter-api","timestamp":"2026-01-22 12:37:20"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:37:20 +0000] \"DELETE /api/v1/watchlist/00000000-0000-0000-0000-000000000000 HTTP/1.1\" 404 64 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:37:20"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:37:20"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:37:20 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:37:20"}
+{"level":"info","message":"User cmkpsnkhl005g3zol53bnuibu added deal cmkpsnkhp005j3zolr2ixfw0i to watchlist","service":"deal-hunter-api","timestamp":"2026-01-22 12:37:20"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:37:20 +0000] \"POST /api/v1/watchlist HTTP/1.1\" 201 795 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:37:20"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:37:20 +0000] \"PATCH /api/v1/watchlist/cmkpsnkhp005j3zolr2ixfw0i/notes HTTP/1.1\" 200 784 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:37:20"}
+{"level":"info","message":"Environment variables validated successfully","service":"deal-hunter-api","timestamp":"2026-01-22 12:42:10"}
+{"level":"info","message":"New user registered: test@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:42:11"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:42:11 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 910 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:42:11"}
+{"level":"error","message":"400 - [{\"field\":\"password\",\"message\":\"Password must be at least 8 characters\"},{\"field\":\"password\",\"message\":\"Password must contain at least one uppercase letter, one lowercase letter, and one number\"}] - /api/v1/auth/register - POST - ::ffff:127.0.0.1","service":"deal-hunter-api","timestamp":"2026-01-22 12:42:11"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:42:11 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 400 252 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:42:11"}
+{"level":"error","message":"400 - [{\"field\":\"email\",\"message\":\"Valid email is required\"}] - /api/v1/auth/register - POST - ::ffff:127.0.0.1","service":"deal-hunter-api","timestamp":"2026-01-22 12:42:11"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:42:11 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 400 103 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:42:11"}
+{"level":"info","message":"New user registered: test@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:42:11"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:42:11 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:42:11"}
+{"level":"error","message":"400 - User with this email already exists - /api/v1/auth/register - POST - ::ffff:127.0.0.1","service":"deal-hunter-api","timestamp":"2026-01-22 12:42:11"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:42:11 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 400 75 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:42:11"}
+{"level":"info","message":"User logged in: test@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:42:11"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:42:11 +0000] \"POST /api/v1/auth/login HTTP/1.1\" 200 898 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:42:11"}
+{"level":"error","message":"401 - Invalid credentials - /api/v1/auth/login - POST - ::ffff:127.0.0.1","service":"deal-hunter-api","timestamp":"2026-01-22 12:42:11"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:42:11 +0000] \"POST /api/v1/auth/login HTTP/1.1\" 401 59 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:42:11"}
+{"level":"error","message":"401 - Invalid credentials - /api/v1/auth/login - POST - ::ffff:127.0.0.1","service":"deal-hunter-api","timestamp":"2026-01-22 12:42:12"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:42:12 +0000] \"POST /api/v1/auth/login HTTP/1.1\" 401 59 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:42:12"}
+{"level":"info","message":"New user registered: test@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:42:12"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:42:12 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:42:12"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:42:12 +0000] \"GET /api/v1/auth/profile HTTP/1.1\" 200 108 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:42:12"}
+{"level":"info","message":"New user registered: test@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:42:12"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:42:12 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:42:12"}
+{"level":"error","message":"401 - No token provided - /api/v1/auth/profile - GET - ::ffff:127.0.0.1","service":"deal-hunter-api","timestamp":"2026-01-22 12:42:12"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:42:12 +0000] \"GET /api/v1/auth/profile HTTP/1.1\" 401 57 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:42:12"}
+{"level":"info","message":"New user registered: test@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:42:12"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:42:12 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:42:12"}
+{"level":"error","message":"401 - Invalid token - /api/v1/auth/profile - GET - ::ffff:127.0.0.1","service":"deal-hunter-api","timestamp":"2026-01-22 12:42:12"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:42:12 +0000] \"GET /api/v1/auth/profile HTTP/1.1\" 401 53 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:42:12"}
+{"level":"info","message":"New user registered: test@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:42:12"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:42:12 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:42:12"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:42:12 +0000] \"POST /api/v1/auth/refresh HTTP/1.1\" 200 696 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:42:12"}
+{"level":"info","message":"New user registered: test@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:42:12"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:42:12 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:42:12"}
+{"level":"error","message":"401 - Invalid refresh token - /api/v1/auth/refresh - POST - ::ffff:127.0.0.1","service":"deal-hunter-api","timestamp":"2026-01-22 12:42:12"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:42:12 +0000] \"POST /api/v1/auth/refresh HTTP/1.1\" 401 61 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:42:12"}
+{"level":"info","message":"New user registered: test@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:42:12"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:42:12 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:42:12"}
+{"level":"info","message":"User logged out","service":"deal-hunter-api","timestamp":"2026-01-22 12:42:12"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:42:12 +0000] \"POST /api/v1/auth/logout HTTP/1.1\" 200 46 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:42:12"}
+{"level":"error","message":"401 - Invalid refresh token - /api/v1/auth/refresh - POST - ::ffff:127.0.0.1","service":"deal-hunter-api","timestamp":"2026-01-22 12:42:12"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:42:12 +0000] \"POST /api/v1/auth/refresh HTTP/1.1\" 401 61 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:42:12"}
+{"level":"info","message":"Environment variables validated successfully","service":"deal-hunter-api","timestamp":"2026-01-22 12:42:12"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:42:13"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:42:13 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:42:13"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:42:13 +0000] \"GET /api/v1/deals HTTP/1.1\" 200 1175 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:42:13"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:42:13"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:42:13 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:42:13"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:42:13 +0000] \"GET /api/v1/deals?category=tech HTTP/1.1\" 200 1175 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:42:13"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:42:13"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:42:13 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:42:13"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:42:13 +0000] \"GET /api/v1/deals?marketplace=craigslist HTTP/1.1\" 200 636 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:42:13"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:42:13"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:42:13 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:42:13"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:42:13 +0000] \"GET /api/v1/deals?sortBy=dealScore&sortOrder=desc HTTP/1.1\" 200 1175 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:42:13"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:42:13"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:42:13 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:42:13"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:42:13 +0000] \"GET /api/v1/deals?search=iPhone HTTP/1.1\" 200 636 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:42:13"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:42:13"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:42:13 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:42:13"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:42:13 +0000] \"GET /api/v1/deals?page=1&limit=1 HTTP/1.1\" 200 633 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:42:13"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:42:13"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:42:13 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:42:13"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:42:13 +0000] \"GET /api/v1/deals/cmkpstuvt002bpjjec6k1bwkz HTTP/1.1\" 200 573 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:42:13"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:42:13"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:42:13 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:42:13"}
+{"level":"error","message":"404 - Deal not found - /api/v1/deals/00000000-0000-0000-0000-000000000000 - GET - ::ffff:127.0.0.1","service":"deal-hunter-api","timestamp":"2026-01-22 12:42:13"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:42:13 +0000] \"GET /api/v1/deals/00000000-0000-0000-0000-000000000000 HTTP/1.1\" 404 54 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:42:13"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:42:13"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:42:13 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:42:13"}
+{"level":"info","message":"Deal created: cmkpstv0f002vpjjerzf55mgd","service":"deal-hunter-api","timestamp":"2026-01-22 12:42:13"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:42:13 +0000] \"POST /api/v1/deals HTTP/1.1\" 201 607 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:42:13"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:42:13"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:42:13 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:42:13"}
+{"level":"error","message":"403 - Insufficient permissions - /api/v1/deals - POST - ::ffff:127.0.0.1","service":"deal-hunter-api","timestamp":"2026-01-22 12:42:13"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:42:13 +0000] \"POST /api/v1/deals HTTP/1.1\" 403 64 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:42:13"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:42:13"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:42:13 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:42:13"}
+{"level":"error","message":"401 - No token provided - /api/v1/deals - POST - ::ffff:127.0.0.1","service":"deal-hunter-api","timestamp":"2026-01-22 12:42:13"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:42:13 +0000] \"POST /api/v1/deals HTTP/1.1\" 401 57 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:42:13"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:42:13"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:42:13 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:42:13"}
+{"level":"error","message":"400 - [{\"field\":\"price\",\"message\":\"Price must be a positive number\"},{\"field\":\"marketValue\",\"message\":\"Market value must be a positive number\"},{\"field\":\"itemUrl\",\"message\":\"Valid item URL is required\"},{\"field\":\"category\",\"message\":\"Category is required\"},{\"field\":\"marketplace\",\"message\":\"Marketplace is required\"}] - /api/v1/deals - POST - ::ffff:127.0.0.1","service":"deal-hunter-api","timestamp":"2026-01-22 12:42:13"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:42:13 +0000] \"POST /api/v1/deals HTTP/1.1\" 400 391 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:42:13"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:42:14"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:42:14 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:42:14"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:42:14 +0000] \"GET /api/v1/deals/categories HTTP/1.1\" 200 47 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:42:14"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:42:14"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:42:14 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:42:14"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:42:14 +0000] \"GET /api/v1/deals/marketplaces HTTP/1.1\" 200 62 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:42:14"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:42:14"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:42:14 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:42:14"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:42:14 +0000] \"GET /api/v1/deals/stats HTTP/1.1\" 200 128 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:42:14"}
+{"level":"info","message":"Environment variables validated successfully","service":"deal-hunter-api","timestamp":"2026-01-22 12:42:14"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:42:14"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:42:14 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:42:14"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:42:14 +0000] \"GET /api/v1/watchlist HTTP/1.1\" 200 36 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:42:14"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:42:14"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:42:14 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:42:14"}
+{"level":"error","message":"401 - No token provided - /api/v1/watchlist - GET - ::ffff:127.0.0.1","service":"deal-hunter-api","timestamp":"2026-01-22 12:42:14"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:42:14 +0000] \"GET /api/v1/watchlist HTTP/1.1\" 401 57 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:42:14"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:42:14"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:42:14 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:42:14"}
+{"level":"info","message":"User cmkpstvxk004jpjjegt180t3n added deal cmkpstvxo004mpjjezrh4zm02 to watchlist","service":"deal-hunter-api","timestamp":"2026-01-22 12:42:14"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:42:14 +0000] \"POST /api/v1/watchlist HTTP/1.1\" 201 797 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:42:14"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:42:14"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:42:14 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:42:14"}
+{"level":"info","message":"User cmkpstvzy004qpjjei125opg9 added deal cmkpstw02004tpjjervvmjx6j to watchlist","service":"deal-hunter-api","timestamp":"2026-01-22 12:42:14"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:42:14 +0000] \"POST /api/v1/watchlist HTTP/1.1\" 201 783 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:42:14"}
+{"level":"error","message":"400 - Deal already in watchlist - /api/v1/watchlist - POST - ::ffff:127.0.0.1","service":"deal-hunter-api","timestamp":"2026-01-22 12:42:14"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:42:14 +0000] \"POST /api/v1/watchlist HTTP/1.1\" 400 65 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:42:14"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:42:15"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:42:15 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:42:15"}
+{"level":"error","message":"404 - Deal not found - /api/v1/watchlist - POST - ::ffff:127.0.0.1","service":"deal-hunter-api","timestamp":"2026-01-22 12:42:15"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:42:15 +0000] \"POST /api/v1/watchlist HTTP/1.1\" 404 54 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:42:15"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:42:15"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:42:15 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:42:15"}
+{"level":"info","message":"User cmkpstw4u0052pjjea51u934c added deal cmkpstw4x0055pjjetf32fqnt to watchlist","service":"deal-hunter-api","timestamp":"2026-01-22 12:42:15"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:42:15 +0000] \"POST /api/v1/watchlist HTTP/1.1\" 201 783 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:42:15"}
+{"level":"info","message":"User cmkpstw4u0052pjjea51u934c removed deal cmkpstw4x0055pjjetf32fqnt from watchlist","service":"deal-hunter-api","timestamp":"2026-01-22 12:42:15"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:42:15 +0000] \"DELETE /api/v1/watchlist/cmkpstw4x0055pjjetf32fqnt HTTP/1.1\" 200 56 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:42:15"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:42:15 +0000] \"GET /api/v1/watchlist HTTP/1.1\" 200 36 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:42:15"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:42:15"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:42:15 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:42:15"}
+{"level":"info","message":"User cmkpstw7s0059pjjeiqdp26fv added deal cmkpstw7w005cpjjem03fcvrx to watchlist","service":"deal-hunter-api","timestamp":"2026-01-22 12:42:15"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:42:15 +0000] \"POST /api/v1/watchlist HTTP/1.1\" 201 783 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:42:15"}
+{"level":"error","message":"404 - Watchlist item not found - /api/v1/watchlist/00000000-0000-0000-0000-000000000000 - DELETE - ::ffff:127.0.0.1","service":"deal-hunter-api","timestamp":"2026-01-22 12:42:15"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:42:15 +0000] \"DELETE /api/v1/watchlist/00000000-0000-0000-0000-000000000000 HTTP/1.1\" 404 64 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:42:15"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:42:15"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:42:15 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:42:15"}
+{"level":"info","message":"User cmkpstwa7005gpjjernl23wfz added deal cmkpstwab005jpjjemgyd7orq to watchlist","service":"deal-hunter-api","timestamp":"2026-01-22 12:42:15"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:42:15 +0000] \"POST /api/v1/watchlist HTTP/1.1\" 201 795 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:42:15"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:42:15 +0000] \"PATCH /api/v1/watchlist/cmkpstwab005jpjjemgyd7orq/notes HTTP/1.1\" 200 784 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:42:15"}
+{"level":"info","message":"Environment variables validated successfully","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:29"}
+{"level":"info","message":"New user registered: ingest@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:29"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:44:29 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 914 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:29"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:44:29 +0000] \"POST /api/v1/deals/ingest HTTP/1.1\" 200 206 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:29"}
+{"level":"info","message":"New user registered: ingest@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:29"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:44:29 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 914 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:29"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:44:29 +0000] \"POST /api/v1/deals/ingest HTTP/1.1\" 200 39 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:29"}
+{"level":"error","message":"400 - Bad request - /test - GET - 127.0.0.1","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:29"}
+{"level":"error","message":"500 - Boom - /test - GET - 127.0.0.1","service":"deal-hunter-api","stack":"Error: Boom\n    at Object.<anonymous> (/home/jace-nibarger/Deal-Hunter/server/tests/unit/error-handler.test.ts:39:17)\n    at Promise.then.completed (/home/jace-nibarger/Deal-Hunter/server/node_modules/jest-circus/build/utils.js:298:28)\n    at new Promise (<anonymous>)\n    at callAsyncCircusFn (/home/jace-nibarger/Deal-Hunter/server/node_modules/jest-circus/build/utils.js:231:10)\n    at _callCircusTest (/home/jace-nibarger/Deal-Hunter/server/node_modules/jest-circus/build/run.js:316:40)\n    at _runTest (/home/jace-nibarger/Deal-Hunter/server/node_modules/jest-circus/build/run.js:252:3)\n    at _runTestsForDescribeBlock (/home/jace-nibarger/Deal-Hunter/server/node_modules/jest-circus/build/run.js:126:9)\n    at _runTestsForDescribeBlock (/home/jace-nibarger/Deal-Hunter/server/node_modules/jest-circus/build/run.js:121:9)\n    at run (/home/jace-nibarger/Deal-Hunter/server/node_modules/jest-circus/build/run.js:71:3)\n    at runAndTransformResultsToJestFormat (/home/jace-nibarger/Deal-Hunter/server/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapterInit.js:122:21)\n    at jestAdapter (/home/jace-nibarger/Deal-Hunter/server/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapter.js:79:19)\n    at runTestInternal (/home/jace-nibarger/Deal-Hunter/server/node_modules/jest-runner/build/runTest.js:367:16)\n    at runTest (/home/jace-nibarger/Deal-Hunter/server/node_modules/jest-runner/build/runTest.js:444:34)","timestamp":"2026-01-22 12:44:29"}
+{"level":"info","message":"Environment variables validated successfully","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:30"}
+{"level":"info","message":"New user registered: tmv@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:30"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:44:30 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 903 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:30"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:44:30 +0000] \"POST /api/v1/deals/missing-deal/calculate-tmv HTTP/1.1\" 404 26 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:30"}
+{"level":"info","message":"New user registered: tmv@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:30"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:44:30 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 903 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:30"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:44:30 +0000] \"POST /api/v1/deals/cmkpswsml000drc5j9fsttfat/calculate-tmv HTTP/1.1\" 400 37 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:30"}
+{"level":"info","message":"Environment variables validated successfully","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:30"}
+{"level":"info","message":"New user registered: test@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:30"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:44:30 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 910 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:30"}
+{"level":"error","message":"400 - [{\"field\":\"password\",\"message\":\"Password must be at least 8 characters\"},{\"field\":\"password\",\"message\":\"Password must contain at least one uppercase letter, one lowercase letter, and one number\"}] - /api/v1/auth/register - POST - ::ffff:127.0.0.1","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:30"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:44:30 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 400 252 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:30"}
+{"level":"error","message":"400 - [{\"field\":\"email\",\"message\":\"Valid email is required\"}] - /api/v1/auth/register - POST - ::ffff:127.0.0.1","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:30"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:44:30 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 400 103 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:30"}
+{"level":"info","message":"New user registered: test@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:31"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:44:31 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:31"}
+{"level":"error","message":"400 - User with this email already exists - /api/v1/auth/register - POST - ::ffff:127.0.0.1","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:31"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:44:31 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 400 75 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:31"}
+{"level":"info","message":"User logged in: test@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:31"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:44:31 +0000] \"POST /api/v1/auth/login HTTP/1.1\" 200 898 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:31"}
+{"level":"error","message":"401 - Invalid credentials - /api/v1/auth/login - POST - ::ffff:127.0.0.1","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:31"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:44:31 +0000] \"POST /api/v1/auth/login HTTP/1.1\" 401 59 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:31"}
+{"level":"error","message":"401 - Invalid credentials - /api/v1/auth/login - POST - ::ffff:127.0.0.1","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:31"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:44:31 +0000] \"POST /api/v1/auth/login HTTP/1.1\" 401 59 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:31"}
+{"level":"info","message":"New user registered: test@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:31"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:44:31 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:31"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:44:31 +0000] \"GET /api/v1/auth/profile HTTP/1.1\" 200 108 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:31"}
+{"level":"info","message":"New user registered: test@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:31"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:44:31 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:31"}
+{"level":"error","message":"401 - No token provided - /api/v1/auth/profile - GET - ::ffff:127.0.0.1","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:31"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:44:31 +0000] \"GET /api/v1/auth/profile HTTP/1.1\" 401 57 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:31"}
+{"level":"info","message":"New user registered: test@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:31"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:44:31 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:31"}
+{"level":"error","message":"401 - Invalid token - /api/v1/auth/profile - GET - ::ffff:127.0.0.1","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:31"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:44:31 +0000] \"GET /api/v1/auth/profile HTTP/1.1\" 401 53 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:31"}
+{"level":"info","message":"New user registered: test@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:31"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:44:31 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:31"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:44:31 +0000] \"POST /api/v1/auth/refresh HTTP/1.1\" 200 696 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:31"}
+{"level":"info","message":"New user registered: test@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:31"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:44:31 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:31"}
+{"level":"error","message":"401 - Invalid refresh token - /api/v1/auth/refresh - POST - ::ffff:127.0.0.1","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:31"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:44:31 +0000] \"POST /api/v1/auth/refresh HTTP/1.1\" 401 61 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:31"}
+{"level":"info","message":"New user registered: test@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:31"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:44:31 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:31"}
+{"level":"info","message":"User logged out","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:31"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:44:31 +0000] \"POST /api/v1/auth/logout HTTP/1.1\" 200 46 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:31"}
+{"level":"error","message":"401 - Invalid refresh token - /api/v1/auth/refresh - POST - ::ffff:127.0.0.1","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:31"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:44:31 +0000] \"POST /api/v1/auth/refresh HTTP/1.1\" 401 61 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:31"}
+{"level":"info","message":"Environment variables validated successfully","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:31"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:32"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:44:32 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:32"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:44:32 +0000] \"GET /api/v1/deals HTTP/1.1\" 200 1175 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:32"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:32"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:44:32 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:32"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:44:32 +0000] \"GET /api/v1/deals?category=tech HTTP/1.1\" 200 1175 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:32"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:32"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:44:32 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:32"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:44:32 +0000] \"GET /api/v1/deals?marketplace=craigslist HTTP/1.1\" 200 636 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:32"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:32"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:44:32 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:32"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:44:32 +0000] \"GET /api/v1/deals?sortBy=dealScore&sortOrder=desc HTTP/1.1\" 200 1175 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:32"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:32"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:44:32 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:32"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:44:32 +0000] \"GET /api/v1/deals?search=iPhone HTTP/1.1\" 200 636 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:32"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:32"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:44:32 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:32"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:44:32 +0000] \"GET /api/v1/deals?page=1&limit=1 HTTP/1.1\" 200 633 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:32"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:32"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:44:32 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:32"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:44:32 +0000] \"GET /api/v1/deals/cmkpswubp002prc5jqwff5mf9 HTTP/1.1\" 200 573 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:32"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:32"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:44:32 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:32"}
+{"level":"error","message":"404 - Deal not found - /api/v1/deals/00000000-0000-0000-0000-000000000000 - GET - ::ffff:127.0.0.1","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:32"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:44:32 +0000] \"GET /api/v1/deals/00000000-0000-0000-0000-000000000000 HTTP/1.1\" 404 54 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:32"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:32"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:44:32 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:32"}
+{"level":"info","message":"Deal created: cmkpswugn0039rc5j6qqvs15b","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:32"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:44:32 +0000] \"POST /api/v1/deals HTTP/1.1\" 201 607 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:32"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:33"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:44:33 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:33"}
+{"level":"error","message":"403 - Insufficient permissions - /api/v1/deals - POST - ::ffff:127.0.0.1","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:33"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:44:33 +0000] \"POST /api/v1/deals HTTP/1.1\" 403 64 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:33"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:33"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:44:33 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:33"}
+{"level":"error","message":"401 - No token provided - /api/v1/deals - POST - ::ffff:127.0.0.1","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:33"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:44:33 +0000] \"POST /api/v1/deals HTTP/1.1\" 401 57 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:33"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:33"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:44:33 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:33"}
+{"level":"error","message":"400 - [{\"field\":\"price\",\"message\":\"Price must be a positive number\"},{\"field\":\"marketValue\",\"message\":\"Market value must be a positive number\"},{\"field\":\"itemUrl\",\"message\":\"Valid item URL is required\"},{\"field\":\"category\",\"message\":\"Category is required\"},{\"field\":\"marketplace\",\"message\":\"Marketplace is required\"}] - /api/v1/deals - POST - ::ffff:127.0.0.1","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:33"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:44:33 +0000] \"POST /api/v1/deals HTTP/1.1\" 400 391 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:33"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:33"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:44:33 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:33"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:44:33 +0000] \"GET /api/v1/deals/categories HTTP/1.1\" 200 47 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:33"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:33"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:44:33 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:33"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:44:33 +0000] \"GET /api/v1/deals/marketplaces HTTP/1.1\" 200 62 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:33"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:33"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:44:33 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:33"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:44:33 +0000] \"GET /api/v1/deals/stats HTTP/1.1\" 200 128 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:33"}
+{"level":"info","message":"Environment variables validated successfully","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:33"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:33"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:44:33 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:33"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:44:33 +0000] \"GET /api/v1/watchlist HTTP/1.1\" 200 36 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:33"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:34"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:44:34 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:34"}
+{"level":"error","message":"401 - No token provided - /api/v1/watchlist - GET - ::ffff:127.0.0.1","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:34"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:44:34 +0000] \"GET /api/v1/watchlist HTTP/1.1\" 401 57 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:34"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:34"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:44:34 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:34"}
+{"level":"info","message":"User cmkpswvdt004xrc5jlc5fdt7b added deal cmkpswvdw0050rc5jz28mk0ba to watchlist","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:34"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:44:34 +0000] \"POST /api/v1/watchlist HTTP/1.1\" 201 797 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:34"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:34"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:44:34 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:34"}
+{"level":"info","message":"User cmkpswvgj0054rc5jvv62v0y0 added deal cmkpswvgn0057rc5jrc0bs06t to watchlist","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:34"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:44:34 +0000] \"POST /api/v1/watchlist HTTP/1.1\" 201 783 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:34"}
+{"level":"error","message":"400 - Deal already in watchlist - /api/v1/watchlist - POST - ::ffff:127.0.0.1","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:34"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:44:34 +0000] \"POST /api/v1/watchlist HTTP/1.1\" 400 65 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:34"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:34"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:44:34 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:34"}
+{"level":"error","message":"404 - Deal not found - /api/v1/watchlist - POST - ::ffff:127.0.0.1","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:34"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:44:34 +0000] \"POST /api/v1/watchlist HTTP/1.1\" 404 54 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:34"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:34"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:44:34 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:34"}
+{"level":"info","message":"User cmkpswvli005grc5jwrotpk3e added deal cmkpswvll005jrc5j2ol0f24l to watchlist","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:34"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:44:34 +0000] \"POST /api/v1/watchlist HTTP/1.1\" 201 783 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:34"}
+{"level":"info","message":"User cmkpswvli005grc5jwrotpk3e removed deal cmkpswvll005jrc5j2ol0f24l from watchlist","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:34"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:44:34 +0000] \"DELETE /api/v1/watchlist/cmkpswvll005jrc5j2ol0f24l HTTP/1.1\" 200 56 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:34"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:44:34 +0000] \"GET /api/v1/watchlist HTTP/1.1\" 200 36 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:34"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:34"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:44:34 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:34"}
+{"level":"info","message":"User cmkpswvo1005nrc5jo2w4chuj added deal cmkpswvo4005qrc5jmnw2lpnp to watchlist","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:34"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:44:34 +0000] \"POST /api/v1/watchlist HTTP/1.1\" 201 783 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:34"}
+{"level":"error","message":"404 - Watchlist item not found - /api/v1/watchlist/00000000-0000-0000-0000-000000000000 - DELETE - ::ffff:127.0.0.1","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:34"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:44:34 +0000] \"DELETE /api/v1/watchlist/00000000-0000-0000-0000-000000000000 HTTP/1.1\" 404 64 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:34"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:34"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:44:34 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:34"}
+{"level":"info","message":"User cmkpswvqd005urc5j9v0owx86 added deal cmkpswvqg005xrc5ju6mtemor to watchlist","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:34"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:44:34 +0000] \"POST /api/v1/watchlist HTTP/1.1\" 201 795 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:34"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:44:34 +0000] \"PATCH /api/v1/watchlist/cmkpswvqg005xrc5ju6mtemor/notes HTTP/1.1\" 200 784 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:34"}
+{"level":"info","message":"Environment variables validated successfully","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:57"}
+{"0":{"code":"too_small","exact":false,"inclusive":true,"message":"String must contain at least 32 character(s)","minimum":32,"path":["JWT_SECRET"],"type":"string"},"level":"error","message":"Environment validation error:","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:57"}
+{"level":"info","message":"Environment variables validated successfully","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:57"}
+{"level":"info","message":"New user registered: ingest@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:58"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:44:58 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 914 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:58"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:44:58 +0000] \"POST /api/v1/deals/ingest HTTP/1.1\" 200 206 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:58"}
+{"level":"info","message":"New user registered: ingest@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:58"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:44:58 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 914 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:58"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:44:58 +0000] \"POST /api/v1/deals/ingest HTTP/1.1\" 200 39 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:58"}
+{"level":"info","message":"Environment variables validated successfully","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:58"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:58"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:44:58 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:58"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:44:58 +0000] \"GET /api/v1/deals HTTP/1.1\" 200 1175 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:58"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:58"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:44:58 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:58"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:44:58 +0000] \"GET /api/v1/deals?category=tech HTTP/1.1\" 200 1175 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:58"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:59"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:44:59 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:59"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:44:59 +0000] \"GET /api/v1/deals?marketplace=craigslist HTTP/1.1\" 200 636 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:59"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:59"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:44:59 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:59"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:44:59 +0000] \"GET /api/v1/deals?sortBy=dealScore&sortOrder=desc HTTP/1.1\" 200 1175 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:59"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:59"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:44:59 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:59"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:44:59 +0000] \"GET /api/v1/deals?search=iPhone HTTP/1.1\" 200 636 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:59"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:59"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:44:59 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:59"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:44:59 +0000] \"GET /api/v1/deals?page=1&limit=1 HTTP/1.1\" 200 633 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:59"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:59"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:44:59 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:59"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:44:59 +0000] \"GET /api/v1/deals/cmkpsxevn001nq28srzycwg5m HTTP/1.1\" 200 573 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:59"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:59"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:44:59 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:59"}
+{"level":"error","message":"404 - Deal not found - /api/v1/deals/00000000-0000-0000-0000-000000000000 - GET - ::ffff:127.0.0.1","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:59"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:44:59 +0000] \"GET /api/v1/deals/00000000-0000-0000-0000-000000000000 HTTP/1.1\" 404 54 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:59"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:59"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:44:59 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:59"}
+{"level":"info","message":"Deal created: cmkpsxf0a0027q28sg6oux46d","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:59"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:44:59 +0000] \"POST /api/v1/deals HTTP/1.1\" 201 607 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:59"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:59"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:44:59 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:59"}
+{"level":"error","message":"403 - Insufficient permissions - /api/v1/deals - POST - ::ffff:127.0.0.1","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:59"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:44:59 +0000] \"POST /api/v1/deals HTTP/1.1\" 403 64 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:59"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:59"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:44:59 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:59"}
+{"level":"error","message":"401 - No token provided - /api/v1/deals - POST - ::ffff:127.0.0.1","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:59"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:44:59 +0000] \"POST /api/v1/deals HTTP/1.1\" 401 57 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:59"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:59"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:44:59 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:59"}
+{"level":"error","message":"400 - [{\"field\":\"price\",\"message\":\"Price must be a positive number\"},{\"field\":\"marketValue\",\"message\":\"Market value must be a positive number\"},{\"field\":\"itemUrl\",\"message\":\"Valid item URL is required\"},{\"field\":\"category\",\"message\":\"Category is required\"},{\"field\":\"marketplace\",\"message\":\"Marketplace is required\"}] - /api/v1/deals - POST - ::ffff:127.0.0.1","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:59"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:44:59 +0000] \"POST /api/v1/deals HTTP/1.1\" 400 391 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:59"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:59"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:44:59 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:59"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:44:59 +0000] \"GET /api/v1/deals/categories HTTP/1.1\" 200 47 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:59"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:59"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:44:59 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:59"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:44:59 +0000] \"GET /api/v1/deals/marketplaces HTTP/1.1\" 200 62 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:44:59"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:00"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:00 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:00"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:00 +0000] \"GET /api/v1/deals/stats HTTP/1.1\" 200 128 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:00"}
+{"level":"info","message":"Environment variables validated successfully","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:00"}
+{"level":"info","message":"New user registered: test@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:00"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:00 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 910 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:00"}
+{"level":"error","message":"400 - [{\"field\":\"password\",\"message\":\"Password must be at least 8 characters\"},{\"field\":\"password\",\"message\":\"Password must contain at least one uppercase letter, one lowercase letter, and one number\"}] - /api/v1/auth/register - POST - ::ffff:127.0.0.1","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:00"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:00 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 400 252 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:00"}
+{"level":"error","message":"400 - [{\"field\":\"email\",\"message\":\"Valid email is required\"}] - /api/v1/auth/register - POST - ::ffff:127.0.0.1","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:00"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:00 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 400 103 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:00"}
+{"level":"info","message":"New user registered: test@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:00"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:00 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:00"}
+{"level":"error","message":"400 - User with this email already exists - /api/v1/auth/register - POST - ::ffff:127.0.0.1","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:00"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:00 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 400 75 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:00"}
+{"level":"info","message":"User logged in: test@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:00"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:00 +0000] \"POST /api/v1/auth/login HTTP/1.1\" 200 898 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:00"}
+{"level":"error","message":"401 - Invalid credentials - /api/v1/auth/login - POST - ::ffff:127.0.0.1","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:00"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:00 +0000] \"POST /api/v1/auth/login HTTP/1.1\" 401 59 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:00"}
+{"level":"error","message":"401 - Invalid credentials - /api/v1/auth/login - POST - ::ffff:127.0.0.1","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:00"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:00 +0000] \"POST /api/v1/auth/login HTTP/1.1\" 401 59 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:00"}
+{"level":"info","message":"New user registered: test@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:01"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:01 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:01"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:01 +0000] \"GET /api/v1/auth/profile HTTP/1.1\" 200 108 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:01"}
+{"level":"info","message":"New user registered: test@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:01"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:01 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:01"}
+{"level":"error","message":"401 - No token provided - /api/v1/auth/profile - GET - ::ffff:127.0.0.1","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:01"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:01 +0000] \"GET /api/v1/auth/profile HTTP/1.1\" 401 57 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:01"}
+{"level":"info","message":"New user registered: test@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:01"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:01 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:01"}
+{"level":"error","message":"401 - Invalid token - /api/v1/auth/profile - GET - ::ffff:127.0.0.1","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:01"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:01 +0000] \"GET /api/v1/auth/profile HTTP/1.1\" 401 53 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:01"}
+{"level":"info","message":"New user registered: test@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:01"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:01 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:01"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:01 +0000] \"POST /api/v1/auth/refresh HTTP/1.1\" 200 696 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:01"}
+{"level":"info","message":"New user registered: test@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:01"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:01 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:01"}
+{"level":"error","message":"401 - Invalid refresh token - /api/v1/auth/refresh - POST - ::ffff:127.0.0.1","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:01"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:01 +0000] \"POST /api/v1/auth/refresh HTTP/1.1\" 401 61 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:01"}
+{"level":"info","message":"New user registered: test@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:01"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:01 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:01"}
+{"level":"info","message":"User logged out","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:01"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:01 +0000] \"POST /api/v1/auth/logout HTTP/1.1\" 200 46 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:01"}
+{"level":"error","message":"401 - Invalid refresh token - /api/v1/auth/refresh - POST - ::ffff:127.0.0.1","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:01"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:01 +0000] \"POST /api/v1/auth/refresh HTTP/1.1\" 401 61 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:01"}
+{"level":"info","message":"Environment variables validated successfully","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:01"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:01"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:01 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:01"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:01 +0000] \"GET /api/v1/watchlist HTTP/1.1\" 200 36 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:01"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:01"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:01 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:01"}
+{"level":"error","message":"401 - No token provided - /api/v1/watchlist - GET - ::ffff:127.0.0.1","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:01"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:01 +0000] \"GET /api/v1/watchlist HTTP/1.1\" 401 57 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:01"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:01"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:01 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:01"}
+{"level":"info","message":"User cmkpsxgvc004qq28ssjx8tzqq added deal cmkpsxgvg004tq28sna537zc1 to watchlist","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:02"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:02 +0000] \"POST /api/v1/watchlist HTTP/1.1\" 201 797 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:02"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:02"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:02 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:02"}
+{"level":"info","message":"User cmkpsxgxt004xq28sa87umwuh added deal cmkpsxgxw0050q28su6rkevza to watchlist","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:02"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:02 +0000] \"POST /api/v1/watchlist HTTP/1.1\" 201 783 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:02"}
+{"level":"error","message":"400 - Deal already in watchlist - /api/v1/watchlist - POST - ::ffff:127.0.0.1","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:02"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:02 +0000] \"POST /api/v1/watchlist HTTP/1.1\" 400 65 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:02"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:02"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:02 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:02"}
+{"level":"error","message":"404 - Deal not found - /api/v1/watchlist - POST - ::ffff:127.0.0.1","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:02"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:02 +0000] \"POST /api/v1/watchlist HTTP/1.1\" 404 54 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:02"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:02"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:02 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:02"}
+{"level":"info","message":"User cmkpsxh2d0059q28sawqqwrge added deal cmkpsxh2h005cq28skjm5hwhb to watchlist","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:02"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:02 +0000] \"POST /api/v1/watchlist HTTP/1.1\" 201 783 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:02"}
+{"level":"info","message":"User cmkpsxh2d0059q28sawqqwrge removed deal cmkpsxh2h005cq28skjm5hwhb from watchlist","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:02"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:02 +0000] \"DELETE /api/v1/watchlist/cmkpsxh2h005cq28skjm5hwhb HTTP/1.1\" 200 56 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:02"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:02 +0000] \"GET /api/v1/watchlist HTTP/1.1\" 200 36 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:02"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:02"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:02 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:02"}
+{"level":"info","message":"User cmkpsxh4w005gq28sb2bvq4eg added deal cmkpsxh4z005jq28s9cfrxg0q to watchlist","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:02"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:02 +0000] \"POST /api/v1/watchlist HTTP/1.1\" 201 783 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:02"}
+{"level":"error","message":"404 - Watchlist item not found - /api/v1/watchlist/00000000-0000-0000-0000-000000000000 - DELETE - ::ffff:127.0.0.1","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:02"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:02 +0000] \"DELETE /api/v1/watchlist/00000000-0000-0000-0000-000000000000 HTTP/1.1\" 404 64 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:02"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:02"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:02 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:02"}
+{"level":"info","message":"User cmkpsxh7t005nq28s012xkjvf added deal cmkpsxh7x005qq28sz0o75o4e to watchlist","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:02"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:02 +0000] \"POST /api/v1/watchlist HTTP/1.1\" 201 795 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:02"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:02 +0000] \"PATCH /api/v1/watchlist/cmkpsxh7x005qq28sz0o75o4e/notes HTTP/1.1\" 200 784 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:02"}
+{"level":"info","message":"Environment variables validated successfully","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:02"}
+{"level":"info","message":"New user registered: tmv@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:02"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:02 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 903 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:02"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:02 +0000] \"POST /api/v1/deals/missing-deal/calculate-tmv HTTP/1.1\" 404 26 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:02"}
+{"level":"info","message":"New user registered: tmv@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:02"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:02 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 903 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:02"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:02 +0000] \"POST /api/v1/deals/cmkpsxhm70060q28sb3e4hz6f/calculate-tmv HTTP/1.1\" 400 37 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:02"}
+{"level":"error","message":"400 - Bad request - /test - GET - 127.0.0.1","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:03"}
+{"level":"error","message":"500 - Boom - /test - GET - 127.0.0.1","service":"deal-hunter-api","stack":"Error: Boom\n    at Object.<anonymous> (/home/jace-nibarger/Deal-Hunter/server/tests/unit/error-handler.test.ts:39:17)\n    at Promise.then.completed (/home/jace-nibarger/Deal-Hunter/server/node_modules/jest-circus/build/utils.js:298:28)\n    at new Promise (<anonymous>)\n    at callAsyncCircusFn (/home/jace-nibarger/Deal-Hunter/server/node_modules/jest-circus/build/utils.js:231:10)\n    at _callCircusTest (/home/jace-nibarger/Deal-Hunter/server/node_modules/jest-circus/build/run.js:316:40)\n    at _runTest (/home/jace-nibarger/Deal-Hunter/server/node_modules/jest-circus/build/run.js:252:3)\n    at _runTestsForDescribeBlock (/home/jace-nibarger/Deal-Hunter/server/node_modules/jest-circus/build/run.js:126:9)\n    at _runTestsForDescribeBlock (/home/jace-nibarger/Deal-Hunter/server/node_modules/jest-circus/build/run.js:121:9)\n    at run (/home/jace-nibarger/Deal-Hunter/server/node_modules/jest-circus/build/run.js:71:3)\n    at runAndTransformResultsToJestFormat (/home/jace-nibarger/Deal-Hunter/server/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapterInit.js:122:21)\n    at jestAdapter (/home/jace-nibarger/Deal-Hunter/server/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapter.js:79:19)\n    at runTestInternal (/home/jace-nibarger/Deal-Hunter/server/node_modules/jest-runner/build/runTest.js:367:16)\n    at runTest (/home/jace-nibarger/Deal-Hunter/server/node_modules/jest-runner/build/runTest.js:444:34)","timestamp":"2026-01-22 12:45:03"}
+{"level":"info","message":"Environment variables validated successfully","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:20"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:21"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:21 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:21"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:21 +0000] \"GET /api/v1/deals HTTP/1.1\" 200 1175 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:21"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:21"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:21 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:21"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:21 +0000] \"GET /api/v1/deals?category=tech HTTP/1.1\" 200 1175 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:21"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:21"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:21 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:21"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:21 +0000] \"GET /api/v1/deals?marketplace=craigslist HTTP/1.1\" 200 636 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:21"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:21"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:21 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:21"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:21 +0000] \"GET /api/v1/deals?sortBy=dealScore&sortOrder=desc HTTP/1.1\" 200 1175 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:21"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:21"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:21 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:21"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:21 +0000] \"GET /api/v1/deals?search=iPhone HTTP/1.1\" 200 636 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:21"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:21"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:21 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:21"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:21 +0000] \"GET /api/v1/deals?page=1&limit=1 HTTP/1.1\" 200 633 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:21"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:21"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:21 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:21"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:21 +0000] \"GET /api/v1/deals/cmkpsxw3r001gunf924m4ahpt HTTP/1.1\" 200 573 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:21"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:21"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:21 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:21"}
+{"level":"error","message":"404 - Deal not found - /api/v1/deals/00000000-0000-0000-0000-000000000000 - GET - ::ffff:127.0.0.1","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:21"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:21 +0000] \"GET /api/v1/deals/00000000-0000-0000-0000-000000000000 HTTP/1.1\" 404 54 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:21"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:21"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:21 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:21"}
+{"level":"info","message":"Deal created: cmkpsxw8k0020unf96ppqbau6","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:21"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:21 +0000] \"POST /api/v1/deals HTTP/1.1\" 201 607 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:21"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:21"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:21 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:21"}
+{"level":"error","message":"403 - Insufficient permissions - /api/v1/deals - POST - ::ffff:127.0.0.1","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:21"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:21 +0000] \"POST /api/v1/deals HTTP/1.1\" 403 64 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:21"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:22"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:22 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:22"}
+{"level":"error","message":"401 - No token provided - /api/v1/deals - POST - ::ffff:127.0.0.1","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:22"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:22 +0000] \"POST /api/v1/deals HTTP/1.1\" 401 57 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:22"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:22"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:22 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:22"}
+{"level":"error","message":"400 - [{\"field\":\"price\",\"message\":\"Price must be a positive number\"},{\"field\":\"marketValue\",\"message\":\"Market value must be a positive number\"},{\"field\":\"itemUrl\",\"message\":\"Valid item URL is required\"},{\"field\":\"category\",\"message\":\"Category is required\"},{\"field\":\"marketplace\",\"message\":\"Marketplace is required\"}] - /api/v1/deals - POST - ::ffff:127.0.0.1","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:22"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:22 +0000] \"POST /api/v1/deals HTTP/1.1\" 400 391 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:22"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:22"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:22 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:22"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:22 +0000] \"GET /api/v1/deals/categories HTTP/1.1\" 200 47 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:22"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:22"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:22 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:22"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:22 +0000] \"GET /api/v1/deals/marketplaces HTTP/1.1\" 200 62 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:22"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:22"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:22 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:22"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:22 +0000] \"GET /api/v1/deals/stats HTTP/1.1\" 200 128 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:22"}
+{"level":"info","message":"Environment variables validated successfully","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:22"}
+{"level":"info","message":"New user registered: test@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:22"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:22 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 910 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:22"}
+{"level":"error","message":"400 - [{\"field\":\"password\",\"message\":\"Password must be at least 8 characters\"},{\"field\":\"password\",\"message\":\"Password must contain at least one uppercase letter, one lowercase letter, and one number\"}] - /api/v1/auth/register - POST - ::ffff:127.0.0.1","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:22"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:22 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 400 252 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:22"}
+{"level":"error","message":"400 - [{\"field\":\"email\",\"message\":\"Valid email is required\"}] - /api/v1/auth/register - POST - ::ffff:127.0.0.1","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:22"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:22 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 400 103 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:22"}
+{"level":"info","message":"New user registered: test@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:22"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:22 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:22"}
+{"level":"error","message":"400 - User with this email already exists - /api/v1/auth/register - POST - ::ffff:127.0.0.1","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:22"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:22 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 400 75 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:22"}
+{"level":"info","message":"User logged in: test@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:23"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:23 +0000] \"POST /api/v1/auth/login HTTP/1.1\" 200 898 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:23"}
+{"level":"error","message":"401 - Invalid credentials - /api/v1/auth/login - POST - ::ffff:127.0.0.1","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:23"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:23 +0000] \"POST /api/v1/auth/login HTTP/1.1\" 401 59 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:23"}
+{"level":"error","message":"401 - Invalid credentials - /api/v1/auth/login - POST - ::ffff:127.0.0.1","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:23"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:23 +0000] \"POST /api/v1/auth/login HTTP/1.1\" 401 59 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:23"}
+{"level":"info","message":"New user registered: test@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:23"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:23 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:23"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:23 +0000] \"GET /api/v1/auth/profile HTTP/1.1\" 200 108 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:23"}
+{"level":"info","message":"New user registered: test@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:23"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:23 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:23"}
+{"level":"error","message":"401 - No token provided - /api/v1/auth/profile - GET - ::ffff:127.0.0.1","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:23"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:23 +0000] \"GET /api/v1/auth/profile HTTP/1.1\" 401 57 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:23"}
+{"level":"info","message":"New user registered: test@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:23"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:23 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:23"}
+{"level":"error","message":"401 - Invalid token - /api/v1/auth/profile - GET - ::ffff:127.0.0.1","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:23"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:23 +0000] \"GET /api/v1/auth/profile HTTP/1.1\" 401 53 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:23"}
+{"level":"info","message":"New user registered: test@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:23"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:23 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:23"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:23 +0000] \"POST /api/v1/auth/refresh HTTP/1.1\" 200 696 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:23"}
+{"level":"info","message":"New user registered: test@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:23"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:23 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:23"}
+{"level":"error","message":"401 - Invalid refresh token - /api/v1/auth/refresh - POST - ::ffff:127.0.0.1","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:23"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:23 +0000] \"POST /api/v1/auth/refresh HTTP/1.1\" 401 61 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:23"}
+{"level":"info","message":"New user registered: test@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:23"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:23 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:23"}
+{"level":"info","message":"User logged out","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:23"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:23 +0000] \"POST /api/v1/auth/logout HTTP/1.1\" 200 46 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:23"}
+{"level":"error","message":"401 - Invalid refresh token - /api/v1/auth/refresh - POST - ::ffff:127.0.0.1","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:23"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:23 +0000] \"POST /api/v1/auth/refresh HTTP/1.1\" 401 61 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:23"}
+{"level":"info","message":"Environment variables validated successfully","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:23"}
+{"0":{"code":"too_small","exact":false,"inclusive":true,"message":"String must contain at least 32 character(s)","minimum":32,"path":["JWT_SECRET"],"type":"string"},"level":"error","message":"Environment validation error:","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:23"}
+{"level":"info","message":"Environment variables validated successfully","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:24"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:24"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:24 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:24"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:24 +0000] \"GET /api/v1/watchlist HTTP/1.1\" 200 36 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:24"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:24"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:24 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:24"}
+{"level":"error","message":"401 - No token provided - /api/v1/watchlist - GET - ::ffff:127.0.0.1","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:24"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:24 +0000] \"GET /api/v1/watchlist HTTP/1.1\" 401 57 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:24"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:24"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:24 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:24"}
+{"level":"info","message":"User cmkpsxy7t004junf95bnmwl7m added deal cmkpsxy7w004munf9f6zgbmhj to watchlist","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:24"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:24 +0000] \"POST /api/v1/watchlist HTTP/1.1\" 201 797 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:24"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:24"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:24 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:24"}
+{"level":"info","message":"User cmkpsxya5004qunf933htfbfk added deal cmkpsxya8004tunf9sb2s3gza to watchlist","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:24"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:24 +0000] \"POST /api/v1/watchlist HTTP/1.1\" 201 783 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:24"}
+{"level":"error","message":"400 - Deal already in watchlist - /api/v1/watchlist - POST - ::ffff:127.0.0.1","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:24"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:24 +0000] \"POST /api/v1/watchlist HTTP/1.1\" 400 65 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:24"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:24"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:24 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:24"}
+{"level":"error","message":"404 - Deal not found - /api/v1/watchlist - POST - ::ffff:127.0.0.1","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:24"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:24 +0000] \"POST /api/v1/watchlist HTTP/1.1\" 404 54 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:24"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:24"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:24 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:24"}
+{"level":"info","message":"User cmkpsxyf30052unf9t0uwl371 added deal cmkpsxyf70055unf9xe7aje4e to watchlist","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:24"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:24 +0000] \"POST /api/v1/watchlist HTTP/1.1\" 201 783 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:24"}
+{"level":"info","message":"User cmkpsxyf30052unf9t0uwl371 removed deal cmkpsxyf70055unf9xe7aje4e from watchlist","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:24"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:24 +0000] \"DELETE /api/v1/watchlist/cmkpsxyf70055unf9xe7aje4e HTTP/1.1\" 200 56 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:24"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:24 +0000] \"GET /api/v1/watchlist HTTP/1.1\" 200 36 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:24"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:24"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:24 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:24"}
+{"level":"info","message":"User cmkpsxyhq0059unf9skqbfbrr added deal cmkpsxyht005cunf94ht3r3ti to watchlist","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:24"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:24 +0000] \"POST /api/v1/watchlist HTTP/1.1\" 201 783 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:24"}
+{"level":"error","message":"404 - Watchlist item not found - /api/v1/watchlist/00000000-0000-0000-0000-000000000000 - DELETE - ::ffff:127.0.0.1","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:24"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:24 +0000] \"DELETE /api/v1/watchlist/00000000-0000-0000-0000-000000000000 HTTP/1.1\" 404 64 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:24"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:24"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:24 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:24"}
+{"level":"info","message":"User cmkpsxykh005gunf9zkjvkk9n added deal cmkpsxykl005junf9h6v7aws1 to watchlist","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:24"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:24 +0000] \"POST /api/v1/watchlist HTTP/1.1\" 201 795 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:24"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:24 +0000] \"PATCH /api/v1/watchlist/cmkpsxykl005junf9h6v7aws1/notes HTTP/1.1\" 200 784 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:24"}
+{"level":"info","message":"Environment variables validated successfully","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:25"}
+{"level":"info","message":"New user registered: ingest@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:25"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:25 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 914 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:25"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:25 +0000] \"POST /api/v1/deals/ingest HTTP/1.1\" 200 206 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:25"}
+{"level":"info","message":"New user registered: ingest@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:25"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:25 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 914 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:25"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:25 +0000] \"POST /api/v1/deals/ingest HTTP/1.1\" 200 39 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:25"}
+{"level":"info","message":"Environment variables validated successfully","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:25"}
+{"level":"info","message":"New user registered: tmv@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:25"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:25 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 903 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:25"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:25 +0000] \"POST /api/v1/deals/missing-deal/calculate-tmv HTTP/1.1\" 404 26 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:25"}
+{"level":"info","message":"New user registered: tmv@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:25"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:25 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 903 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:25"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:25 +0000] \"POST /api/v1/deals/cmkpsxzc50060unf9dzy9enlm/calculate-tmv HTTP/1.1\" 400 37 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:25"}
+{"level":"error","message":"400 - Bad request - /test - GET - 127.0.0.1","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:26"}
+{"level":"error","message":"500 - Boom - /test - GET - 127.0.0.1","service":"deal-hunter-api","stack":"Error: Boom\n    at Object.<anonymous> (/home/jace-nibarger/Deal-Hunter/server/tests/unit/error-handler.test.ts:39:17)\n    at Promise.then.completed (/home/jace-nibarger/Deal-Hunter/server/node_modules/jest-circus/build/utils.js:298:28)\n    at new Promise (<anonymous>)\n    at callAsyncCircusFn (/home/jace-nibarger/Deal-Hunter/server/node_modules/jest-circus/build/utils.js:231:10)\n    at _callCircusTest (/home/jace-nibarger/Deal-Hunter/server/node_modules/jest-circus/build/run.js:316:40)\n    at _runTest (/home/jace-nibarger/Deal-Hunter/server/node_modules/jest-circus/build/run.js:252:3)\n    at _runTestsForDescribeBlock (/home/jace-nibarger/Deal-Hunter/server/node_modules/jest-circus/build/run.js:126:9)\n    at _runTestsForDescribeBlock (/home/jace-nibarger/Deal-Hunter/server/node_modules/jest-circus/build/run.js:121:9)\n    at run (/home/jace-nibarger/Deal-Hunter/server/node_modules/jest-circus/build/run.js:71:3)\n    at runAndTransformResultsToJestFormat (/home/jace-nibarger/Deal-Hunter/server/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapterInit.js:122:21)\n    at jestAdapter (/home/jace-nibarger/Deal-Hunter/server/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapter.js:79:19)\n    at runTestInternal (/home/jace-nibarger/Deal-Hunter/server/node_modules/jest-runner/build/runTest.js:367:16)\n    at runTest (/home/jace-nibarger/Deal-Hunter/server/node_modules/jest-runner/build/runTest.js:444:34)","timestamp":"2026-01-22 12:45:26"}
+{"level":"error","message":"403 - Forbidden - /test - GET - 127.0.0.1","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:26"}
+{"level":"info","message":"Environment variables validated successfully","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:52"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:52"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:52 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:52"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:52 +0000] \"GET /api/v1/deals HTTP/1.1\" 200 1175 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:52"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:52"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:52 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:52"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:52 +0000] \"GET /api/v1/deals?category=tech HTTP/1.1\" 200 1175 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:52"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:52"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:52 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:52"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:52 +0000] \"GET /api/v1/deals?marketplace=craigslist HTTP/1.1\" 200 636 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:52"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:52"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:52 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:52"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:52 +0000] \"GET /api/v1/deals?sortBy=dealScore&sortOrder=desc HTTP/1.1\" 200 1175 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:52"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:52"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:52 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:52"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:52 +0000] \"GET /api/v1/deals?search=iPhone HTTP/1.1\" 200 636 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:52"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:53"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:53 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:53"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:53 +0000] \"GET /api/v1/deals?page=1&limit=1 HTTP/1.1\" 200 633 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:53"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:53"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:53 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:53"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:53 +0000] \"GET /api/v1/deals/cmkpsykcp001guyp6tuvrlh0n HTTP/1.1\" 200 573 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:53"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:53"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:53 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:53"}
+{"level":"error","message":"404 - Deal not found - /api/v1/deals/00000000-0000-0000-0000-000000000000 - GET - ::ffff:127.0.0.1","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:53"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:53 +0000] \"GET /api/v1/deals/00000000-0000-0000-0000-000000000000 HTTP/1.1\" 404 54 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:53"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:53"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:53 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:53"}
+{"level":"info","message":"Deal created: cmkpsykhp0020uyp6elgjddzd","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:53"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:53 +0000] \"POST /api/v1/deals HTTP/1.1\" 201 607 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:53"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:53"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:53 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:53"}
+{"level":"error","message":"403 - Insufficient permissions - /api/v1/deals - POST - ::ffff:127.0.0.1","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:53"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:53 +0000] \"POST /api/v1/deals HTTP/1.1\" 403 64 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:53"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:53"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:53 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:53"}
+{"level":"error","message":"401 - No token provided - /api/v1/deals - POST - ::ffff:127.0.0.1","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:53"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:53 +0000] \"POST /api/v1/deals HTTP/1.1\" 401 57 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:53"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:53"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:53 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:53"}
+{"level":"error","message":"400 - [{\"field\":\"price\",\"message\":\"Price must be a positive number\"},{\"field\":\"marketValue\",\"message\":\"Market value must be a positive number\"},{\"field\":\"itemUrl\",\"message\":\"Valid item URL is required\"},{\"field\":\"category\",\"message\":\"Category is required\"},{\"field\":\"marketplace\",\"message\":\"Marketplace is required\"}] - /api/v1/deals - POST - ::ffff:127.0.0.1","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:53"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:53 +0000] \"POST /api/v1/deals HTTP/1.1\" 400 391 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:53"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:53"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:53 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:53"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:53 +0000] \"GET /api/v1/deals/categories HTTP/1.1\" 200 47 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:53"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:53"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:53 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:53"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:53 +0000] \"GET /api/v1/deals/marketplaces HTTP/1.1\" 200 62 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:53"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:53"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:53 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:53"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:53 +0000] \"GET /api/v1/deals/stats HTTP/1.1\" 200 128 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:53"}
+{"level":"info","message":"Environment variables validated successfully","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:53"}
+{"level":"info","message":"New user registered: test@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:54"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:54 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 910 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:54"}
+{"level":"error","message":"400 - [{\"field\":\"password\",\"message\":\"Password must be at least 8 characters\"},{\"field\":\"password\",\"message\":\"Password must contain at least one uppercase letter, one lowercase letter, and one number\"}] - /api/v1/auth/register - POST - ::ffff:127.0.0.1","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:54"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:54 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 400 252 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:54"}
+{"level":"error","message":"400 - [{\"field\":\"email\",\"message\":\"Valid email is required\"}] - /api/v1/auth/register - POST - ::ffff:127.0.0.1","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:54"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:54 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 400 103 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:54"}
+{"level":"info","message":"New user registered: test@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:54"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:54 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:54"}
+{"level":"error","message":"400 - User with this email already exists - /api/v1/auth/register - POST - ::ffff:127.0.0.1","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:54"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:54 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 400 75 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:54"}
+{"level":"info","message":"User logged in: test@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:54"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:54 +0000] \"POST /api/v1/auth/login HTTP/1.1\" 200 898 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:54"}
+{"level":"error","message":"401 - Invalid credentials - /api/v1/auth/login - POST - ::ffff:127.0.0.1","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:54"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:54 +0000] \"POST /api/v1/auth/login HTTP/1.1\" 401 59 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:54"}
+{"level":"error","message":"401 - Invalid credentials - /api/v1/auth/login - POST - ::ffff:127.0.0.1","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:54"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:54 +0000] \"POST /api/v1/auth/login HTTP/1.1\" 401 59 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:54"}
+{"level":"info","message":"New user registered: test@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:54"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:54 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:54"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:54 +0000] \"GET /api/v1/auth/profile HTTP/1.1\" 200 108 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:54"}
+{"level":"info","message":"New user registered: test@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:54"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:54 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:54"}
+{"level":"error","message":"401 - No token provided - /api/v1/auth/profile - GET - ::ffff:127.0.0.1","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:54"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:54 +0000] \"GET /api/v1/auth/profile HTTP/1.1\" 401 57 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:54"}
+{"level":"info","message":"New user registered: test@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:55"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:55 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:55"}
+{"level":"error","message":"401 - Invalid token - /api/v1/auth/profile - GET - ::ffff:127.0.0.1","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:55"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:55 +0000] \"GET /api/v1/auth/profile HTTP/1.1\" 401 53 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:55"}
+{"level":"info","message":"New user registered: test@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:55"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:55 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:55"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:55 +0000] \"POST /api/v1/auth/refresh HTTP/1.1\" 200 696 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:55"}
+{"level":"info","message":"New user registered: test@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:55"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:55 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:55"}
+{"level":"error","message":"401 - Invalid refresh token - /api/v1/auth/refresh - POST - ::ffff:127.0.0.1","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:55"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:55 +0000] \"POST /api/v1/auth/refresh HTTP/1.1\" 401 61 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:55"}
+{"level":"info","message":"New user registered: test@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:55"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:55 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:55"}
+{"level":"info","message":"User logged out","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:55"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:55 +0000] \"POST /api/v1/auth/logout HTTP/1.1\" 200 46 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:55"}
+{"level":"error","message":"401 - Invalid refresh token - /api/v1/auth/refresh - POST - ::ffff:127.0.0.1","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:55"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:55 +0000] \"POST /api/v1/auth/refresh HTTP/1.1\" 401 61 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:55"}
+{"level":"info","message":"Environment variables validated successfully","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:55"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:55"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:55 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:55"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:55 +0000] \"GET /api/v1/watchlist HTTP/1.1\" 200 36 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:55"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:55"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:55 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:55"}
+{"level":"error","message":"401 - No token provided - /api/v1/watchlist - GET - ::ffff:127.0.0.1","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:55"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:55 +0000] \"GET /api/v1/watchlist HTTP/1.1\" 401 57 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:55"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:55"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:55 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:55"}
+{"level":"info","message":"User cmkpsymey004juyp6sccayio2 added deal cmkpsymf1004muyp64jqh48gu to watchlist","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:55"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:55 +0000] \"POST /api/v1/watchlist HTTP/1.1\" 201 797 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:55"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:55"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:55 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:55"}
+{"level":"info","message":"User cmkpsymhq004quyp6n69n0o1h added deal cmkpsymhu004tuyp6myoaihpb to watchlist","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:55"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:55 +0000] \"POST /api/v1/watchlist HTTP/1.1\" 201 783 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:55"}
+{"level":"error","message":"400 - Deal already in watchlist - /api/v1/watchlist - POST - ::ffff:127.0.0.1","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:55"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:55 +0000] \"POST /api/v1/watchlist HTTP/1.1\" 400 65 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:55"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:56"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:56 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:56"}
+{"level":"error","message":"404 - Deal not found - /api/v1/watchlist - POST - ::ffff:127.0.0.1","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:56"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:56 +0000] \"POST /api/v1/watchlist HTTP/1.1\" 404 54 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:56"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:56"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:56 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:56"}
+{"level":"info","message":"User cmkpsymmg0052uyp6h4j6l6qw added deal cmkpsymmj0055uyp6ighntylo to watchlist","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:56"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:56 +0000] \"POST /api/v1/watchlist HTTP/1.1\" 201 783 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:56"}
+{"level":"info","message":"User cmkpsymmg0052uyp6h4j6l6qw removed deal cmkpsymmj0055uyp6ighntylo from watchlist","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:56"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:56 +0000] \"DELETE /api/v1/watchlist/cmkpsymmj0055uyp6ighntylo HTTP/1.1\" 200 56 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:56"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:56 +0000] \"GET /api/v1/watchlist HTTP/1.1\" 200 36 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:56"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:56"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:56 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:56"}
+{"level":"info","message":"User cmkpsymox0059uyp6a7dzr9wr added deal cmkpsymp0005cuyp6m9c6ekqj to watchlist","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:56"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:56 +0000] \"POST /api/v1/watchlist HTTP/1.1\" 201 783 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:56"}
+{"level":"error","message":"404 - Watchlist item not found - /api/v1/watchlist/00000000-0000-0000-0000-000000000000 - DELETE - ::ffff:127.0.0.1","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:56"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:56 +0000] \"DELETE /api/v1/watchlist/00000000-0000-0000-0000-000000000000 HTTP/1.1\" 404 64 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:56"}
+{"level":"info","message":"New user registered: user@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:56"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:56 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 906 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:56"}
+{"level":"info","message":"User cmkpsymr9005guyp65ytvh1g3 added deal cmkpsymrb005juyp66s0il63e to watchlist","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:56"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:56 +0000] \"POST /api/v1/watchlist HTTP/1.1\" 201 795 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:56"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:56 +0000] \"PATCH /api/v1/watchlist/cmkpsymrb005juyp66s0il63e/notes HTTP/1.1\" 200 784 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:56"}
+{"level":"info","message":"Environment variables validated successfully","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:56"}
+{"level":"info","message":"New user registered: tmv@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:56"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:56 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 903 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:56"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:56 +0000] \"POST /api/v1/deals/missing-deal/calculate-tmv HTTP/1.1\" 404 26 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:56"}
+{"level":"info","message":"New user registered: tmv@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:56"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:56 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 903 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:56"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:56 +0000] \"POST /api/v1/deals/cmkpsyn3x005tuyp658k78sml/calculate-tmv HTTP/1.1\" 400 37 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:56"}
+{"level":"info","message":"Environment variables validated successfully","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:56"}
+{"level":"info","message":"New user registered: ingest@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:57"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:57 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 914 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:57"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:57 +0000] \"POST /api/v1/deals/ingest HTTP/1.1\" 200 206 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:57"}
+{"level":"info","message":"New user registered: ingest@example.com","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:57"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:57 +0000] \"POST /api/v1/auth/register HTTP/1.1\" 201 914 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:57"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [22/Jan/2026:18:45:57 +0000] \"POST /api/v1/deals/ingest HTTP/1.1\" 200 39 \"-\" \"-\"","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:57"}
+{"level":"error","message":"400 - Bad request - /test - GET - 127.0.0.1","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:57"}
+{"level":"error","message":"500 - Boom - /test - GET - 127.0.0.1","service":"deal-hunter-api","stack":"Error: Boom\n    at Object.<anonymous> (/home/jace-nibarger/Deal-Hunter/server/tests/unit/error-handler.test.ts:39:17)\n    at Promise.then.completed (/home/jace-nibarger/Deal-Hunter/server/node_modules/jest-circus/build/utils.js:298:28)\n    at new Promise (<anonymous>)\n    at callAsyncCircusFn (/home/jace-nibarger/Deal-Hunter/server/node_modules/jest-circus/build/utils.js:231:10)\n    at _callCircusTest (/home/jace-nibarger/Deal-Hunter/server/node_modules/jest-circus/build/run.js:316:40)\n    at _runTest (/home/jace-nibarger/Deal-Hunter/server/node_modules/jest-circus/build/run.js:252:3)\n    at _runTestsForDescribeBlock (/home/jace-nibarger/Deal-Hunter/server/node_modules/jest-circus/build/run.js:126:9)\n    at _runTestsForDescribeBlock (/home/jace-nibarger/Deal-Hunter/server/node_modules/jest-circus/build/run.js:121:9)\n    at run (/home/jace-nibarger/Deal-Hunter/server/node_modules/jest-circus/build/run.js:71:3)\n    at runAndTransformResultsToJestFormat (/home/jace-nibarger/Deal-Hunter/server/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapterInit.js:122:21)\n    at jestAdapter (/home/jace-nibarger/Deal-Hunter/server/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapter.js:79:19)\n    at runTestInternal (/home/jace-nibarger/Deal-Hunter/server/node_modules/jest-runner/build/runTest.js:367:16)\n    at runTest (/home/jace-nibarger/Deal-Hunter/server/node_modules/jest-runner/build/runTest.js:444:34)","timestamp":"2026-01-22 12:45:57"}
+{"level":"error","message":"403 - Forbidden - /test - GET - 127.0.0.1","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:57"}
+{"level":"info","message":"Environment variables validated successfully","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:57"}
+{"0":{"code":"too_small","exact":false,"inclusive":true,"message":"String must contain at least 32 character(s)","minimum":32,"path":["JWT_SECRET"],"type":"string"},"level":"error","message":"Environment validation error:","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:57"}

@@ -164,7 +164,7 @@ router.post(
   authenticate,
   tmvLimiter,
   asyncHandler(async (req, res) => {
-    const { id } = req.params;
+    const id = String(req.params.id);
 
     const deal = await prisma.deal.findUnique({
       where: { id },
