@@ -61,6 +61,24 @@ app.get('/health', (_req, res) => {
   });
 });
 
+// Webhooks
+app.post('/webhooks/marketplace-account-deletion', (req, res) => {
+  const headerToken =
+    req.headers['x-verification-token'] ?? req.headers['x-hub-verify-token'];
+  const token =
+    (typeof req.query.verification_token === 'string'
+      ? req.query.verification_token
+      : undefined) ??
+    (typeof headerToken === 'string' ? headerToken : undefined);
+
+  if (!config.marketplace.deleteToken || token !== config.marketplace.deleteToken) {
+    return res.status(401).send('Invalid token');
+  }
+
+  logger.info('Account deletion webhook received', { body: req.body });
+  return res.status(200).send('OK');
+});
+
 // API Routes
 const apiRouter = express.Router();
 apiRouter.use('/auth', authRoutes);

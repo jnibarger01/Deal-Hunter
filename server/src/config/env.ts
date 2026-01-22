@@ -15,6 +15,7 @@ const envSchema = z.object({
   GEMINI_API_KEY: z.string().optional(),
   EBAY_API_KEY: z.string().optional(),
   FACEBOOK_API_KEY: z.string().optional(),
+  MARKETPLACE_DELETE_TOKEN: z.string().optional(),
   RATE_LIMIT_WINDOW_MS: z.string().default('900000'),
   RATE_LIMIT_MAX_REQUESTS: z.string().default('100'),
   CORS_ORIGIN: z.string().default('http://localhost:3000'),
@@ -50,6 +51,9 @@ export const config = {
     gemini: env.GEMINI_API_KEY,
     ebay: env.EBAY_API_KEY,
     facebook: env.FACEBOOK_API_KEY,
+  },
+  marketplace: {
+    deleteToken: env.MARKETPLACE_DELETE_TOKEN,
   },
   rateLimit: {
     windowMs: parseInt(env.RATE_LIMIT_WINDOW_MS, 10),
