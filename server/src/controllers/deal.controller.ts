@@ -61,7 +61,7 @@ export class DealController {
       const sort = {
         sortBy: sortBy && allowedSortBy.has(sortBy) ? sortBy : undefined,
         sortOrder: sortOrder && allowedSortOrder.has(sortOrder) ? (sortOrder as 'asc' | 'desc') : undefined,
-      };
+      } as any;
 
       const pagination = {
         page: parseInteger(req.query.page),
