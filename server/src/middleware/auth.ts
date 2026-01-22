@@ -51,11 +51,11 @@ export const authenticate = async (
 
       next();
     } catch (error) {
-      if (error instanceof jwt.JsonWebTokenError) {
-        throw new AppError('Invalid token', 401);
-      }
       if (error instanceof jwt.TokenExpiredError) {
         throw new AppError('Token expired', 401);
+      }
+      if (error instanceof jwt.JsonWebTokenError) {
+        throw new AppError('Invalid token', 401);
       }
       throw error;
     }

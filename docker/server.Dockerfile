@@ -1,5 +1,41 @@
-# Server Dockerfile (placeholder)
-FROM node:20-alpine
+# Server Dockerfile
+
+# Build stage
+FROM node:20-alpine AS builder
+
 WORKDIR /app
-COPY server/package.json server/tsconfig.json ./
-RUN echo "placeholder"
+
+# Copy configuration files
+COPY server/package*.json ./server/
+COPY server/tsconfig.json ./server/
+COPY server/prisma ./server/prisma/
+
+# Install dependencies
+WORKDIR /app/server
+RUN npm ci
+
+# Copy source code
+COPY server/src ./src
+
+# Generate Prisma client
+RUN npx prisma generate
+
+# Build the application
+RUN npm run build
+
+# Production stage
+FROM node:20-alpine AS runner
+
+WORKDIR /app
+
+# Copy built artifacts and dependencies
+COPY --from=builder /app/server/dist ./dist
+COPY --from=builder /app/server/package*.json ./
+COPY --from=builder /app/server/node_modules ./node_modules
+COPY --from=builder /app/server/prisma ./prisma
+
+# Expose port
+EXPOSE 5000
+
+# Start application
+CMD ["npm", "start"]

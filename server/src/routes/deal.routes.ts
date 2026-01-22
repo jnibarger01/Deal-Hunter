@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import rateLimit from 'express-rate-limit';
-import { body, param } from 'express-validator';
+import { body, param, query } from 'express-validator';
 import dealController from '../controllers/deal.controller';
 import { validate } from '../middleware/validation';
 import { authenticate, authorize } from '../middleware/auth';
@@ -48,6 +48,28 @@ const idParamValidation = [
   param('id').isString().notEmpty().withMessage('Valid deal ID is required'),
 ];
 
+const listDealsValidation = [
+  query('page').optional().isInt({ min: 1 }).toInt(),
+  query('limit').optional().isInt({ min: 1, max: 100 }).toInt(),
+  query('sortBy')
+    .optional()
+    .isIn(['dealScore', 'estimatedProfit', 'createdAt', 'price'])
+    .withMessage('Invalid sortBy value'),
+  query('sortOrder')
+    .optional()
+    .isIn(['asc', 'desc'])
+    .withMessage('Invalid sortOrder value'),
+  query('minDealScore').optional().isFloat({ min: 0 }).toFloat(),
+  query('maxPrice').optional().isFloat({ min: 0 }).toFloat(),
+  query('status')
+    .optional()
+    .isIn(['active', 'sold', 'expired'])
+    .withMessage('Invalid status value'),
+  query('category').optional().isString().trim(),
+  query('marketplace').optional().isString().trim(),
+  query('search').optional().isString().trim(),
+];
+
 const ingestValidation = [
   body('source').trim().notEmpty().withMessage('Source is required'),
   body('listings')
@@ -83,7 +105,7 @@ const validateListing = (listing: any) => {
 };
 
 // Public routes (no authentication required)
-router.get('/', dealController.getAllDeals);
+router.get('/', validate(listDealsValidation), dealController.getAllDeals);
 router.get('/categories', dealController.getCategories);
 router.get('/marketplaces', dealController.getMarketplaces);
 router.get('/stats', dealController.getStats);

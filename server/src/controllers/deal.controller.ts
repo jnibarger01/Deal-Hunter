@@ -24,26 +24,48 @@ const normalizeDeal = (deal: DealWithDecimalFields) => ({
   roi: toNumberOrNull(deal.roi as DecimalField),
 });
 
+const parseNumber = (value: unknown): number | undefined => {
+  if (value === undefined || value === null || value === '') {
+    return undefined;
+  }
+  const parsed = typeof value === 'number' ? value : Number(value);
+  return Number.isFinite(parsed) ? parsed : undefined;
+};
+
+const parseInteger = (value: unknown): number | undefined => {
+  const parsed = parseNumber(value);
+  if (parsed === undefined) {
+    return undefined;
+  }
+  return Number.isInteger(parsed) ? parsed : undefined;
+};
+
+const allowedSortBy = new Set(['dealScore', 'estimatedProfit', 'createdAt', 'price']);
+const allowedSortOrder = new Set(['asc', 'desc']);
+
 export class DealController {
   async getAllDeals(req: Request, res: Response, next: NextFunction) {
     try {
       const filters = {
         category: req.query.category as string,
         marketplace: req.query.marketplace as string,
-        minDealScore: req.query.minDealScore ? parseFloat(req.query.minDealScore as string) : undefined,
-        maxPrice: req.query.maxPrice ? parseFloat(req.query.maxPrice as string) : undefined,
+        minDealScore: parseNumber(req.query.minDealScore),
+        maxPrice: parseNumber(req.query.maxPrice),
         search: req.query.search as string,
         status: req.query.status as string,
       };
 
+      const sortBy = req.query.sortBy as string | undefined;
+      const sortOrder = req.query.sortOrder as string | undefined;
+
       const sort = {
-        sortBy: req.query.sortBy as any,
-        sortOrder: req.query.sortOrder as any,
+        sortBy: sortBy && allowedSortBy.has(sortBy) ? sortBy : undefined,
+        sortOrder: sortOrder && allowedSortOrder.has(sortOrder) ? (sortOrder as 'asc' | 'desc') : undefined,
       };
 
       const pagination = {
-        page: req.query.page ? parseInt(req.query.page as string) : undefined,
-        limit: req.query.limit ? parseInt(req.query.limit as string) : undefined,
+        page: parseInteger(req.query.page),
+        limit: parseInteger(req.query.limit),
       };
 
       const result = await dealService.getAllDeals(filters, sort, pagination);

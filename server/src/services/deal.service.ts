@@ -46,8 +46,8 @@ export class DealService {
       status,
       ...(category && { category }),
       ...(marketplace && { marketplace }),
-      ...(minDealScore && { dealScore: { gte: minDealScore } }),
-      ...(maxPrice && { price: { lte: maxPrice } }),
+      ...(minDealScore !== undefined && minDealScore !== null && { dealScore: { gte: minDealScore } }),
+      ...(maxPrice !== undefined && maxPrice !== null && { price: { lte: maxPrice } }),
       ...(search && {
         OR: [
           { title: { contains: search, mode: 'insensitive' } },
