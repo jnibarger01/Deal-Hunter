@@ -1,0 +1,69 @@
+// prisma/schema.prisma
+
+model Deal {
+  id          String   @id @default(cuid())
+  source      String   // "ebay", "craigslist", etc.
+  sourceId    String   // External ID
+  title       String
+  price       Decimal
+  condition   String?
+  category    String
+  location    String?
+  url         String
+  createdAt   DateTime @default(now())
+  
+  samples     MarketSample[]
+  tmvResult   TMVResult?
+  score       Score?
+  
+  @@unique([source, sourceId])
+  @@index([category, createdAt])
+}
+
+model MarketSample {
+  id              String   @id @default(cuid())
+  dealId          String
+  deal            Deal     @relation(fields: [dealId], references: [id])
+  
+  observedPrice   Decimal
+  observedAt      DateTime
+  source          String
+  condition       String?
+  
+  @@index([dealId, observedAt])
+}
+
+model TMVResult {
+  id                  String   @id @default(cuid())
+  dealId              String   @unique
+  deal                Deal     @relation(fields: [dealId], references: [id])
+  
+  tmv                 Decimal
+  confidence          Decimal  // 0.0 - 1.0
+  sampleCount         Int
+  volatility          Decimal
+  liquidityScore      Decimal
+  estimatedDaysToSell Int?
+  calculatedAt        DateTime @default(now())
+}
+
+model Score {
+  id              String   @id @default(cuid())
+  dealId          String   @unique
+  deal            Deal     @relation(fields: [dealId], references: [id])
+  
+  profitMargin    Decimal
+  velocityScore   Decimal
+  riskScore       Decimal
+  compositeRank   Decimal  // 0-100 deal score
+  
+  calculatedAt    DateTime @default(now())
+}
+
+model CategoryConfig {
+  id              String  @id @default(cuid())
+  category        String  @unique
+  decayRate       Decimal // For exponential weighting
+  minSamples      Int     @default(8)
+  freshnessWindow Int     @default(180) // days
+}

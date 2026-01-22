@@ -1,0 +1,14 @@
+version: "3.9"
+services:
+  server:
+    build:
+      context: .
+      dockerfile: docker/server.Dockerfile
+  frontend:
+    build:
+      context: .
+      dockerfile: docker/frontend.Dockerfile
+  nginx:
+    build:
+      context: .
+      dockerfile: docker/nginx.Dockerfile
