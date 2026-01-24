@@ -1,0 +1,99 @@
+/* Badge Component Styles */
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-family: var(--font-data);
+  font-weight: var(--weight-medium);
+  border-radius: var(--radius-full);
+  white-space: nowrap;
+  transition: all var(--transition-fast);
+}
+
+/* Sizes */
+.size-sm {
+  padding: var(--space-1) var(--space-2);
+  font-size: var(--text-xs);
+}
+
+.size-md {
+  padding: 6px var(--space-3);
+  font-size: var(--text-sm);
+}
+
+.size-lg {
+  padding: var(--space-2) var(--space-4);
+  font-size: var(--text-base);
+}
+
+/* Variants */
+.variant-default {
+  background: var(--color-bg-tertiary);
+  color: var(--color-text-secondary);
+  border: 1px solid var(--color-border-subtle);
+}
+
+.variant-success {
+  background: var(--color-profit-dim);
+  color: var(--color-profit-text);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.variant-warning {
+  background: var(--color-warning-dim);
+  color: var(--color-warning-text);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.variant-danger {
+  background: var(--color-risk-dim);
+  color: var(--color-risk-text);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.variant-info {
+  background: var(--color-info-dim);
+  color: #a5b4fc;
+  border: 1px solid rgba(99, 102, 241, 0.3);
+}
+
+.variant-accent {
+  background: var(--color-accent-dim);
+  color: var(--color-accent);
+  border: 1px solid rgba(0, 212, 255, 0.3);
+}
+
+/* Glow effect */
+.glow.variant-success {
+  box-shadow: 0 0 12px var(--color-profit-glow);
+}
+
+.glow.variant-warning {
+  box-shadow: 0 0 12px var(--color-warning-glow);
+}
+
+.glow.variant-danger {
+  box-shadow: 0 0 12px var(--color-risk-glow);
+}
+
+.glow.variant-accent {
+  box-shadow: 0 0 12px var(--color-accent-glow);
+}
+
+/* Icon */
+.icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon svg {
+  width: 1em;
+  height: 1em;
+}
+
+/* Text */
+.text {
+  line-height: 1;
+}

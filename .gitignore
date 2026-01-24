@@ -1,7 +1,9 @@
 node_modules/
 dist/
 .env
-.env.production
+.env.*
+Deal-Hunter.env
+*.env
 
 # Coverage reports
 coverage/

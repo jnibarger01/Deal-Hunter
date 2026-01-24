@@ -1,0 +1,248 @@
+/* MetricCard Component Styles */
+
+.card {
+  background: var(--color-surface-card);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  position: relative;
+  overflow: hidden;
+  transition: all var(--transition-fast);
+}
+
+.card:hover {
+  border-color: var(--color-border-default);
+}
+
+/* Variants */
+.variant-default {
+  /* Default styling */
+}
+
+.variant-profit {
+  border-color: rgba(16, 185, 129, 0.2);
+}
+
+.variant-profit .value {
+  color: var(--color-profit-text);
+}
+
+.variant-warning {
+  border-color: rgba(245, 158, 11, 0.2);
+}
+
+.variant-warning .value {
+  color: var(--color-warning-text);
+}
+
+.variant-danger {
+  border-color: rgba(239, 68, 68, 0.2);
+}
+
+.variant-danger .value {
+  color: var(--color-risk-text);
+}
+
+.variant-accent {
+  border-color: rgba(0, 212, 255, 0.2);
+}
+
+.variant-accent .value {
+  color: var(--color-accent);
+}
+
+/* Header */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-2);
+}
+
+.label {
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
+  color: var(--color-text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-tertiary);
+}
+
+.icon svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* Value */
+.valueContainer {
+  margin-bottom: var(--space-2);
+}
+
+.value {
+  font-family: var(--font-data);
+  font-size: var(--text-2xl);
+  font-weight: var(--weight-bold);
+  color: var(--color-text-primary);
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+.prefix,
+.suffix {
+  font-size: var(--text-lg);
+  font-weight: var(--weight-semibold);
+  color: var(--color-text-secondary);
+}
+
+.prefix {
+  margin-right: 2px;
+}
+
+.suffix {
+  margin-left: 2px;
+}
+
+/* Footer */
+.footer {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.trend {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-family: var(--font-data);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-medium);
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-full);
+}
+
+.trend-up {
+  color: var(--color-profit-text);
+  background: var(--color-profit-dim);
+}
+
+.trend-down {
+  color: var(--color-risk-text);
+  background: var(--color-risk-dim);
+}
+
+.trend-neutral {
+  color: var(--color-text-tertiary);
+  background: var(--color-bg-tertiary);
+}
+
+.subtitle {
+  font-size: var(--text-xs);
+  color: var(--color-text-tertiary);
+}
+
+/* Glow effect for profit variant */
+.glow {
+  position: absolute;
+  top: -50%;
+  right: -50%;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(
+    circle,
+    var(--color-profit-glow) 0%,
+    transparent 60%
+  );
+  opacity: 0.3;
+  pointer-events: none;
+}
+
+/* Loading state */
+.loading {
+  pointer-events: none;
+}
+
+.skeletonLabel {
+  width: 60%;
+  height: 12px;
+  background: linear-gradient(
+    90deg,
+    var(--color-bg-tertiary) 0%,
+    var(--color-bg-hover) 50%,
+    var(--color-bg-tertiary) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: var(--radius-sm);
+  margin-bottom: var(--space-3);
+}
+
+.skeletonValue {
+  width: 80%;
+  height: 28px;
+  background: linear-gradient(
+    90deg,
+    var(--color-bg-tertiary) 0%,
+    var(--color-bg-hover) 50%,
+    var(--color-bg-tertiary) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: var(--radius-sm);
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+/* Grid */
+.grid {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.columns-2 {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.columns-3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.columns-4 {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.columns-5 {
+  grid-template-columns: repeat(5, 1fr);
+}
+
+@media (max-width: 1200px) {
+  .columns-4,
+  .columns-5 {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 900px) {
+  .columns-3,
+  .columns-4,
+  .columns-5 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .columns-2,
+  .columns-3,
+  .columns-4,
+  .columns-5 {
+    grid-template-columns: 1fr;
+  }
+}
