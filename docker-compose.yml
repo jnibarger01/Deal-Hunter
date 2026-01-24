@@ -1,20 +1,73 @@
 version: "3.9"
 services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: dealhunter
+      POSTGRES_USER: dealhunter
+      POSTGRES_PASSWORD: dealhunter_dev_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U dealhunter"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - deal-hunter-network
+
   server:
     build:
       context: .
       dockerfile: docker/server.Dockerfile
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      - NODE_ENV=development
+      - PORT=5000
+      - DATABASE_URL=postgresql://dealhunter:dealhunter_dev_password@db:5432/dealhunter?schema=public
+      - JWT_SECRET=f971505a609dd75ef812ab00ed730748c21f9d6bbe1d5249e93e6e66a650e460386f3dd966f935c6266fed5300fdbfb18a91e8db45f6239a85e9834bfa1802fe
+      - API_VERSION=v1
+      - CORS_ORIGIN=http://localhost:5173
+      - LOG_LEVEL=info
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:5000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
     ports:
-      - "3000:3000"
+      - "5000:5000"
+    networks:
+      - deal-hunter-network
+
   frontend:
     build:
       context: .
       dockerfile: docker/frontend.Dockerfile
     ports:
       - "5173:5173"
+    networks:
+      - deal-hunter-network
+
   nginx:
     build:
       context: .
       dockerfile: docker/nginx.Dockerfile
     ports:
       - "8080:80"
+    depends_on:
+      - server
+    networks:
+      - deal-hunter-network
+
+networks:
+  deal-hunter-network:
+    driver: bridge
+
+volumes:
+  postgres_data:

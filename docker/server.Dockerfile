@@ -24,9 +24,12 @@ RUN npx prisma generate
 RUN npm run build
 
 # Production stage
-FROM node:20-bookworm-slim AS runner 
+FROM node:20-bookworm-slim AS runner
 
 WORKDIR /app
+
+# Install OpenSSL (required by Prisma)
+RUN apt-get update && apt-get install -y openssl wget && rm -rf /var/lib/apt/lists/*
 
 # Copy built artifacts and dependencies
 COPY --from=builder /app/server/dist ./dist
@@ -34,8 +37,11 @@ COPY --from=builder /app/server/package*.json ./
 COPY --from=builder /app/server/node_modules ./node_modules
 COPY --from=builder /app/server/prisma ./prisma
 
+# Create logs directory
+RUN mkdir -p logs
+
 # Expose port
 EXPOSE 5000
 
-# Start application
-CMD ["npm", "start"]
+# Run migrations and start application
+CMD ["sh", "-c", "npx prisma migrate deploy && npm start"]
