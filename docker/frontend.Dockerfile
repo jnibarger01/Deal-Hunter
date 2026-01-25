@@ -12,7 +12,7 @@ COPY frontend/tsconfig.json ./frontend/
 
 # Install dependencies
 WORKDIR /app/frontend
-RUN npm install
+RUN npm ci
 
 # Copy source code
 COPY frontend/index.html ./
