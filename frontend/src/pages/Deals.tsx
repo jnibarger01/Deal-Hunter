@@ -208,15 +208,20 @@ export function Deals() {
 
   const deals = apiDeals || mockDeals;
 
-  // Get unique categories and sources
-  const categories = useMemo(() => {
-    const cats = new Set(deals.map((d) => d.category));
-    return ['all', ...Array.from(cats)];
-  }, [deals]);
-
-  const sources = useMemo(() => {
-    const srcs = new Set(deals.map((d) => d.source));
-    return ['all', ...Array.from(srcs)];
+  // Ticker stats
+  const categoryStats = useMemo(() => {
+    const stats: Record<string, number> = { all: deals.length };
+    deals.forEach((d) => {
+      stats[d.category] = (stats[d.category] || 0) + 1;
+    });
+    // Sort by count desc, but keep 'all' first
+    return [
+      { name: 'all', count: deals.length },
+      ...Object.entries(stats)
+        .filter(([name]) => name !== 'all')
+        .map(([name, count]) => ({ name, count }))
+        .sort((a, b) => b.count - a.count),
+    ];
   }, [deals]);
 
   // Filter deals
@@ -327,36 +332,23 @@ export function Deals() {
         <Card className={styles.filterBar}>
           <CardContent>
             <div className={styles.filters}>
-              <div className={styles.filterGroup}>
-                <Filter size={16} className={styles.filterIcon} />
-                <select
-                  value={categoryFilter}
-                  onChange={(e) => setCategoryFilter(e.target.value)}
-                  className={styles.filterSelect}
-                >
-                  {categories.map((cat) => (
-                    <option key={cat} value={cat}>
-                      {cat === 'all' ? 'All Categories' : cat}
-                    </option>
-                  ))}
-                </select>
+              {/* Ticker Tape */}
+              <div className={styles.tickerContainer}>
+                {categoryStats.map((stat) => (
+                  <button
+                    key={stat.name}
+                    className={`${styles.tickerItem} ${
+                      categoryFilter === stat.name ? styles.active : ''
+                    }`}
+                    onClick={() => setCategoryFilter(stat.name)}
+                  >
+                    <span>{stat.name === 'all' ? 'ALL MARKETS' : stat.name}</span>
+                    <span className={styles.tickerCount}>{stat.count}</span>
+                  </button>
+                ))}
               </div>
 
-              <div className={styles.filterGroup}>
-                <SlidersHorizontal size={16} className={styles.filterIcon} />
-                <select
-                  value={sourceFilter}
-                  onChange={(e) => setSourceFilter(e.target.value)}
-                  className={styles.filterSelect}
-                >
-                  {sources.map((src) => (
-                    <option key={src} value={src}>
-                      {src === 'all' ? 'All Sources' : src}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
+              {/* View Toggle (kept on right) */}
               <div className={styles.viewToggle}>
                 <button
                   className={`${styles.viewButton} ${viewMode === 'grid' ? styles.active : ''}`}
