@@ -202,7 +202,7 @@ type ViewMode = 'grid' | 'table';
 export function Deals() {
   const navigate = useNavigate();
   const { data: apiDeals, loading, refetch } = useRankedDeals();
-  const [viewMode, setViewMode] = useState<ViewMode>('grid');
+  const [viewMode, setViewMode] = useState<ViewMode>('table');
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
   const [sourceFilter, setSourceFilter] = useState<string>('all');
 
@@ -268,11 +268,29 @@ export function Deals() {
       render: (deal: RankedDeal) => <CellCurrency value={deal.tmv.tmv} highlight />,
     },
     {
+      key: 'spread',
+      header: 'Spread',
+      sortable: true,
+      align: 'right' as const,
+      render: (deal: RankedDeal) => (
+        <CellCurrency value={deal.tmv.tmv - deal.price} />
+      ),
+    },
+    {
       key: 'profit',
       header: 'Profit',
       sortable: true,
       align: 'right' as const,
       render: (deal: RankedDeal) => <CellPercent value={deal.score.profitMargin} />,
+    },
+    {
+      key: 'velocity',
+      header: 'Days',
+      sortable: true,
+      align: 'right' as const,
+      render: (deal: RankedDeal) => (
+        <CellText primary={`${deal.tmv.estimatedDaysToSell}d`} />
+      ),
     },
     {
       key: 'confidence',
