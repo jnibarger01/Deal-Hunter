@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Filter, SlidersHorizontal, Grid, List } from 'lucide-react';
+import { Grid, List } from 'lucide-react';
 import { Header } from '../components/layout';
 import {
   Card,
@@ -204,7 +204,7 @@ export function Deals() {
   const { data: apiDeals, loading, refetch } = useRankedDeals();
   const [viewMode, setViewMode] = useState<ViewMode>('table');
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
-  const [sourceFilter, setSourceFilter] = useState<string>('all');
+  const [sourceFilter] = useState<string>('all');
 
   const deals = apiDeals || mockDeals;
 
