@@ -1468,3 +1468,13 @@
 {"level":"error","message":"403 - Forbidden - /test - GET - 127.0.0.1","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:57"}
 {"level":"info","message":"Environment variables validated successfully","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:57"}
 {"0":{"code":"too_small","exact":false,"inclusive":true,"message":"String must contain at least 32 character(s)","minimum":32,"path":["JWT_SECRET"],"type":"string"},"level":"error","message":"Environment validation error:","service":"deal-hunter-api","timestamp":"2026-01-22 12:45:57"}
+{"level":"info","message":"Environment variables validated successfully","service":"deal-hunter-api","timestamp":"2026-01-28 03:55:46"}
+{"level":"info","message":"Environment variables validated successfully","service":"deal-hunter-api","timestamp":"2026-01-28 03:55:46"}
+{"level":"info","message":"Environment variables validated successfully","service":"deal-hunter-api","timestamp":"2026-01-28 03:55:47"}
+{"level":"info","message":"Environment variables validated successfully","service":"deal-hunter-api","timestamp":"2026-01-28 03:55:47"}
+{"level":"info","message":"Environment variables validated successfully","service":"deal-hunter-api","timestamp":"2026-01-28 03:55:47"}
+{"level":"info","message":"Environment variables validated successfully","service":"deal-hunter-api","timestamp":"2026-01-28 03:56:47"}
+{"level":"info","message":"Environment variables validated successfully","service":"deal-hunter-api","timestamp":"2026-01-28 03:56:48"}
+{"level":"info","message":"Environment variables validated successfully","service":"deal-hunter-api","timestamp":"2026-01-28 03:56:48"}
+{"level":"info","message":"Environment variables validated successfully","service":"deal-hunter-api","timestamp":"2026-01-28 03:56:49"}
+{"level":"info","message":"Environment variables validated successfully","service":"deal-hunter-api","timestamp":"2026-01-28 03:56:49"}

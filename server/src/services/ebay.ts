@@ -74,17 +74,32 @@ export class EbayClient {
   async searchActiveListings(
     keywords: string,
     category?: string,
-    maxResults = 100
+    maxResults = 100,
+    options?: {
+      buyerPostalCode?: string;
+      maxDistance?: number;
+    }
   ): Promise<EbayListing[]> {
-    const params = {
+    const params: Record<string, string | number> = {
       'OPERATION-NAME': 'findItemsAdvanced',
       'SERVICE-VERSION': '1.0.0',
       'SECURITY-APPNAME': this.config.appId,
       'RESPONSE-DATA-FORMAT': 'JSON',
       keywords,
       'paginationInput.entriesPerPage': maxResults,
-      ...(category && { categoryId: category }),
+      ...(category ? { categoryId: category } : {}),
     };
+
+    if (options?.buyerPostalCode) {
+      params.buyerPostalCode = options.buyerPostalCode;
+    }
+
+    if (options?.maxDistance && options?.buyerPostalCode) {
+      params['itemFilter(0).name'] = 'MaxDistance';
+      params['itemFilter(0).value'] = String(options.maxDistance);
+      params['itemFilter(1).name'] = 'LocatedIn';
+      params['itemFilter(1).value'] = 'US';
+    }
 
     const response = await axios.get(this.baseUrl, { params });
     
