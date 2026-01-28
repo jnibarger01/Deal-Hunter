@@ -2,7 +2,7 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import type { SignOptions } from 'jsonwebtoken';
 import { randomUUID } from 'crypto';
-import { User, RefreshToken } from '@prisma/client';
+import { User } from '@prisma/client';
 import prisma from '../config/database';
 import config from '../config/env';
 import { AppError } from '../middleware/errorHandler';
@@ -59,7 +59,8 @@ export class AuthService {
     const tokens = await this.generateAuthTokens(user);
 
     // Remove password from response
-    const { password: _, ...userWithoutPassword } = user;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { password: _password, ...userWithoutPassword } = user;
 
     return {
       user: userWithoutPassword,
@@ -94,7 +95,8 @@ export class AuthService {
     const tokens = await this.generateAuthTokens(user);
 
     // Remove password from response
-    const { password: _, ...userWithoutPassword } = user;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { password: _password, ...userWithoutPassword } = user;
 
     return {
       user: userWithoutPassword,
@@ -106,7 +108,7 @@ export class AuthService {
   async refreshToken(refreshToken: string): Promise<AuthTokens> {
     try {
       // Verify refresh token
-      const decoded = jwt.verify(refreshToken, config.jwt.secret) as TokenPayload;
+      jwt.verify(refreshToken, config.jwt.secret) as TokenPayload;
 
       // Check if refresh token exists in database
       const storedToken = await prisma.refreshToken.findUnique({
@@ -195,19 +197,19 @@ export class AuthService {
   }
 
   // Verify email (placeholder for future implementation)
-  async verifyEmail(token: string): Promise<void> {
+  async verifyEmail(_token: string): Promise<void> {
     // TODO: Implement email verification logic
     throw new AppError('Email verification not implemented', 501);
   }
 
   // Request password reset (placeholder for future implementation)
-  async requestPasswordReset(email: string): Promise<void> {
+  async requestPasswordReset(_email: string): Promise<void> {
     // TODO: Implement password reset logic
     throw new AppError('Password reset not implemented', 501);
   }
 
   // Reset password (placeholder for future implementation)
-  async resetPassword(token: string, newPassword: string): Promise<void> {
+  async resetPassword(_token: string, _newPassword: string): Promise<void> {
     // TODO: Implement password reset logic
     throw new AppError('Password reset not implemented', 501);
   }

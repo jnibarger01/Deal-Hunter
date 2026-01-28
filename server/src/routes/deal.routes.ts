@@ -77,31 +77,42 @@ const ingestValidation = [
     .withMessage('Listings must be a non-empty array'),
 ];
 
-const validateListing = (listing: any) => {
+const validateListing = (listing: unknown) => {
   const errors: string[] = [];
 
   if (!listing || typeof listing !== 'object') {
     return ['Listing must be an object'];
   }
 
-  if (!listing.id) {
+  const listingRecord = listing as Record<string, unknown>;
+
+  if (!listingRecord.id) {
     errors.push('id is required');
   }
 
-  if (typeof listing.title !== 'string' || listing.title.trim().length === 0) {
+  if (typeof listingRecord.title !== 'string' || listingRecord.title.trim().length === 0) {
     errors.push('title is required');
   }
 
-  if (typeof listing.category !== 'string' || listing.category.trim().length === 0) {
+  if (typeof listingRecord.category !== 'string' || listingRecord.category.trim().length === 0) {
     errors.push('category is required');
   }
 
-  const price = Number(listing.price);
+  const price = Number(listingRecord.price);
   if (!Number.isFinite(price) || price < 0) {
     errors.push('price must be a positive number');
   }
 
   return errors;
+};
+
+const toOptionalString = (value: unknown): string | undefined => {
+  return typeof value === 'string' ? value : undefined;
+};
+
+const toOptionalNumber = (value: unknown): number | undefined => {
+  const parsed = typeof value === 'number' ? value : Number(value);
+  return Number.isFinite(parsed) ? parsed : undefined;
 };
 
 // Public routes (no authentication required)
@@ -123,51 +134,59 @@ router.post(
     let accepted = 0;
 
     for (let index = 0; index < listings.length; index += 1) {
-      const listing = listings[index];
+      const listing = listings[index] as Record<string, unknown>;
       const listingErrors = validateListing(listing);
       if (listingErrors.length > 0) {
-        errors.push({ index, id: listing?.id, errors: listingErrors });
+        const listingId = typeof listing.id === 'string' ? listing.id : undefined;
+        errors.push({ index, id: listingId, errors: listingErrors });
         continue;
       }
 
       try {
+        const sourceId = String(listing.id);
+        const title = String(listing.title);
+        const category = String(listing.category);
+        const price = Number(listing.price);
+
         await prisma.deal.upsert({
-          where: { source_sourceId: { source, sourceId: listing.id } },
+          where: { source_sourceId: { source, sourceId } },
           create: {
             source,
-            sourceId: listing.id,
-            title: listing.title,
-            description: listing.description,
-            price: listing.price,
-            condition: listing.condition,
-            category: listing.category,
-            location: listing.location,
-            region: listing.region,
-            zipPrefix: listing.zipPrefix,
-            url: listing.url,
-            views: listing.views,
-            saves: listing.saves,
-            inquiries: listing.inquiries,
-            daysListed: listing.daysListed,
+            sourceId,
+            title,
+            description: toOptionalString(listing.description),
+            price,
+            condition: toOptionalString(listing.condition),
+            category,
+            location: toOptionalString(listing.location),
+            region: toOptionalString(listing.region),
+            zipPrefix: toOptionalString(listing.zipPrefix),
+            url: toOptionalString(listing.url),
+            views: toOptionalNumber(listing.views),
+            saves: toOptionalNumber(listing.saves),
+            inquiries: toOptionalNumber(listing.inquiries),
+            daysListed: toOptionalNumber(listing.daysListed),
           },
           update: {
-            price: listing.price,
-            condition: listing.condition,
-            location: listing.location,
-            region: listing.region,
-            zipPrefix: listing.zipPrefix,
-            views: listing.views,
-            saves: listing.saves,
-            inquiries: listing.inquiries,
-            daysListed: listing.daysListed,
+            price,
+            condition: toOptionalString(listing.condition),
+            location: toOptionalString(listing.location),
+            region: toOptionalString(listing.region),
+            zipPrefix: toOptionalString(listing.zipPrefix),
+            views: toOptionalNumber(listing.views),
+            saves: toOptionalNumber(listing.saves),
+            inquiries: toOptionalNumber(listing.inquiries),
+            daysListed: toOptionalNumber(listing.daysListed),
           },
         });
         accepted += 1;
-      } catch (error: any) {
+      } catch (error: unknown) {
+        const message = error instanceof Error ? error.message : 'Failed to ingest listing';
+        const listingId = typeof listing.id === 'string' ? listing.id : undefined;
         errors.push({
           index,
-          id: listing?.id,
-          errors: [error?.message ?? 'Failed to ingest listing'],
+          id: listingId,
+          errors: [message],
         });
       }
     }

@@ -5,6 +5,10 @@ import dealService from '../services/deal.service';
 import logger from '../config/logger';
 
 type DecimalField = Decimal | null | undefined;
+type DealSortOptions = {
+  sortBy?: 'dealScore' | 'estimatedProfit' | 'createdAt' | 'price';
+  sortOrder?: 'asc' | 'desc';
+};
 
 const toNumberOrNull = (value: DecimalField): number | null => {
   if (value === null || value === undefined) {
@@ -58,10 +62,12 @@ export class DealController {
       const sortBy = req.query.sortBy as string | undefined;
       const sortOrder = req.query.sortOrder as string | undefined;
 
-      const sort = {
-        sortBy: sortBy && allowedSortBy.has(sortBy) ? sortBy : undefined,
-        sortOrder: sortOrder && allowedSortOrder.has(sortOrder) ? (sortOrder as 'asc' | 'desc') : undefined,
-      } as any;
+      const sort: DealSortOptions = {
+        sortBy: sortBy && allowedSortBy.has(sortBy) ? (sortBy as DealSortOptions['sortBy']) : undefined,
+        sortOrder: sortOrder && allowedSortOrder.has(sortOrder)
+          ? (sortOrder as DealSortOptions['sortOrder'])
+          : undefined,
+      };
 
       const pagination = {
         page: parseInteger(req.query.page),

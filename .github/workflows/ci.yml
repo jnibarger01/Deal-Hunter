@@ -81,7 +81,7 @@ jobs:
         working-directory: ./server
         env:
           DATABASE_URL: "postgresql://test:test@localhost:5432/test?schema=public"
-          JWT_SECRET: "test-jwt-secret-for-ci"
+          JWT_SECRET: "test-jwt-secret-for-ci-32-characters-long"
         run: npm test
 
       - name: Upload coverage report
