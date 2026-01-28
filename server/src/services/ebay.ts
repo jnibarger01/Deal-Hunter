@@ -23,6 +23,49 @@ interface EbaySoldItem {
   condition: string;
 }
 
+type EbayApiItem = {
+  itemId?: string[];
+  title?: string[];
+  sellingStatus?: Array<{
+    currentPrice?: Array<{
+      __value__?: string;
+    }>;
+  }>;
+  condition?: Array<{
+    conditionDisplayName?: string[];
+  }>;
+  primaryCategory?: Array<{
+    categoryName?: string[];
+  }>;
+  location?: string[];
+  viewItemURL?: string[];
+  listingInfo?: Array<{
+    endTime?: string[];
+  }>;
+};
+
+type EbayApiResponse = {
+  findItemsAdvancedResponse?: Array<{
+    searchResult?: Array<{
+      item?: EbayApiItem[];
+    }>;
+  }>;
+  findCompletedItemsResponse?: Array<{
+    searchResult?: Array<{
+      item?: EbayApiItem[];
+    }>;
+  }>;
+};
+
+const getFirstString = (value?: string[]): string | undefined => {
+  return value && value.length > 0 ? value[0] : undefined;
+};
+
+const parsePrice = (value?: string): number => {
+  const parsed = value ? Number.parseFloat(value) : NaN;
+  return Number.isFinite(parsed) ? parsed : 0;
+};
+
 export class EbayClient {
   private baseUrl = 'https://svcs.ebay.com/services/search/FindingService/v1';
   
@@ -45,7 +88,7 @@ export class EbayClient {
 
     const response = await axios.get(this.baseUrl, { params });
     
-    return this.parseListings(response.data);
+    return this.parseListings(response.data as EbayApiResponse);
   }
 
   async searchCompletedListings(
@@ -68,31 +111,31 @@ export class EbayClient {
 
     const response = await axios.get(this.baseUrl, { params });
     
-    return this.parseSoldItems(response.data);
+    return this.parseSoldItems(response.data as EbayApiResponse);
   }
 
-  private parseListings(data: any): EbayListing[] {
+  private parseListings(data: EbayApiResponse): EbayListing[] {
     const items = data?.findItemsAdvancedResponse?.[0]?.searchResult?.[0]?.item || [];
     
-    return items.map((item: any) => ({
-      itemId: item.itemId[0],
-      title: item.title[0],
-      currentPrice: parseFloat(item.sellingStatus[0].currentPrice[0].__value__),
-      condition: item.condition?.[0]?.conditionDisplayName?.[0] || 'Unknown',
-      categoryName: item.primaryCategory[0].categoryName[0],
-      location: item.location?.[0] || '',
-      viewItemURL: item.viewItemURL[0],
+    return items.map((item) => ({
+      itemId: getFirstString(item.itemId) ?? '',
+      title: getFirstString(item.title) ?? '',
+      currentPrice: parsePrice(item.sellingStatus?.[0]?.currentPrice?.[0]?.__value__),
+      condition: getFirstString(item.condition?.[0]?.conditionDisplayName) ?? 'Unknown',
+      categoryName: getFirstString(item.primaryCategory?.[0]?.categoryName) ?? '',
+      location: getFirstString(item.location) ?? '',
+      viewItemURL: getFirstString(item.viewItemURL) ?? '',
     }));
   }
 
-  private parseSoldItems(data: any): EbaySoldItem[] {
+  private parseSoldItems(data: EbayApiResponse): EbaySoldItem[] {
     const items = data?.findCompletedItemsResponse?.[0]?.searchResult?.[0]?.item || [];
     
-    return items.map((item: any) => ({
-      itemId: item.itemId[0],
-      soldPrice: parseFloat(item.sellingStatus[0].currentPrice[0].__value__),
-      soldDate: new Date(item.listingInfo[0].endTime[0]),
-      condition: item.condition?.[0]?.conditionDisplayName?.[0] || 'Unknown',
+    return items.map((item) => ({
+      itemId: getFirstString(item.itemId) ?? '',
+      soldPrice: parsePrice(item.sellingStatus?.[0]?.currentPrice?.[0]?.__value__),
+      soldDate: new Date(getFirstString(item.listingInfo?.[0]?.endTime) ?? 0),
+      condition: getFirstString(item.condition?.[0]?.conditionDisplayName) ?? 'Unknown',
     }));
   }
 

@@ -115,6 +115,14 @@ const toOptionalNumber = (value: unknown): number | undefined => {
   return Number.isFinite(parsed) ? parsed : undefined;
 };
 
+const getListingId = (listing: unknown): string | undefined => {
+  if (!listing || typeof listing !== 'object') {
+    return undefined;
+  }
+  const record = listing as Record<string, unknown>;
+  return typeof record.id === 'string' ? record.id : undefined;
+};
+
 // Public routes (no authentication required)
 router.get('/', validate(listDealsValidation), dealController.getAllDeals);
 router.get('/categories', dealController.getCategories);
@@ -137,7 +145,7 @@ router.post(
       const listing = listings[index] as Record<string, unknown>;
       const listingErrors = validateListing(listing);
       if (listingErrors.length > 0) {
-        const listingId = typeof listing.id === 'string' ? listing.id : undefined;
+        const listingId = getListingId(listing);
         errors.push({ index, id: listingId, errors: listingErrors });
         continue;
       }
@@ -182,7 +190,7 @@ router.post(
         accepted += 1;
       } catch (error: unknown) {
         const message = error instanceof Error ? error.message : 'Failed to ingest listing';
-        const listingId = typeof listing.id === 'string' ? listing.id : undefined;
+        const listingId = getListingId(listing);
         errors.push({
           index,
           id: listingId,
