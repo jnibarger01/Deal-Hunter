@@ -302,7 +302,7 @@ for a in alerts:
         if not target:
             print("ERROR: TELEGRAM_TARGET not set; cannot send alert")
             continue
-        cmd=[openclaw_bin,'message','send','--target',target,'--message',body]
+        cmd=[openclaw_bin,'message','send','--channel','telegram','--target',target,'--message',body]
         subprocess.run(cmd,check=False)
         print("SENT:"+a['msg_id'])
 PY
@@ -311,7 +311,7 @@ PY
 main() {
   init_db
 
-  if ! waking_hours_ok; then
+  if [[ "${FORCE_RUN:-0}" != "1" ]] && ! waking_hours_ok; then
     log "Outside configured waking hours. Exiting."
     exit 0
   fi
