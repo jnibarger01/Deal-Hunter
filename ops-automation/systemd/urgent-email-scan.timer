@@ -1,0 +1,13 @@
+[Unit]
+Description=Run urgent email scan every 30 min during configured windows
+
+[Timer]
+# Weekdays 17:00-21:00 every 30 min
+OnCalendar=Mon..Fri *-*-* 17,18,19,20,21:00,30:00
+# Weekends 07:00-21:00 every 30 min
+OnCalendar=Sat,Sun *-*-* 07,08,09,10,11,12,13,14,15,16,17,18,19,20,21:00,30:00
+Persistent=true
+Unit=urgent-email-scan.service
+
+[Install]
+WantedBy=timers.target

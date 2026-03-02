@@ -1,0 +1,6 @@
+# One sender pattern per line (case-insensitive substring match)
+# Examples:
+# noreply@
+# notifications@
+# linkedin.com
+# deals@
