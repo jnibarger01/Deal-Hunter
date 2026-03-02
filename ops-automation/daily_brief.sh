@@ -148,7 +148,7 @@ send_message() {
     return 1
   fi
 
-  "$OPENCLAW_BIN" message send --target "$TELEGRAM_TARGET" --message "$body"
+  "$OPENCLAW_BIN" message send --channel telegram --target "$TELEGRAM_TARGET" --message "$body"
 }
 
 main() {
