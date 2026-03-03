@@ -19,24 +19,14 @@ interface MarketSample {
   inquiries?: number | null;
 }
 
-interface DemandSignals {
-  views?: number | null;
-  saves?: number | null;
-  inquiries?: number | null;
-  daysListed?: number | null;
-}
-
 interface TMVConfig {
   minSamples: number;
   freshnessWindow: number; // days
   decayRate?: number;
   halfLifeDays?: number;
   minConfidence: number;
-  soldWeightMultiplier?: number;
   conditionFactors?: Record<string, number>;
-  regionalMultipliers?: Record<string, number>;
   comparableSimilarityThreshold?: number;
-  demandThreshold?: number;
 }
 
 interface TMVContext {
@@ -45,22 +35,15 @@ interface TMVContext {
   targetTitle?: string | null;
   targetDescription?: string | null;
   targetCategory?: string | null;
-  demandSignals?: DemandSignals | null;
-  targetPrice?: Decimal | null;
 }
 
 interface TMVResult {
   tmv: Decimal;
-  tmvNormalized: Decimal;
   confidence: number;
   sampleCount: number;
   volatility: Decimal;
   liquidityScore: number;
   estimatedDaysToSell: number | null;
-  seasonalityIndex: number;
-  regionalIndex: number;
-  demandScore: number;
-  hotDeal: boolean;
 }
 
 const DEFAULT_CONDITION_FACTORS: Record<string, number> = {
@@ -89,7 +72,13 @@ export class TMVCalculator {
   constructor(private config: TMVConfig) {}
 
   calculate(samples: MarketSample[], context: TMVContext = {}): TMVResult | null {
-    const freshSamples = this.filterFreshSamples(samples);
+    const soldSamples = this.filterSoldSamples(samples);
+
+    if (soldSamples.length < this.config.minSamples) {
+      return null;
+    }
+
+    const freshSamples = this.filterFreshSamples(soldSamples);
 
     if (freshSamples.length < this.config.minSamples) {
       return null;
@@ -109,7 +98,11 @@ export class TMVCalculator {
     }
 
     const weighted = this.applyWeights(comparable);
-    const weightedTmv = this.weightedMean(weighted);
+    const weightedMedian = this.weightedMedian(weighted);
+    const weightedMean = this.weightedMean(weighted);
+    const weightedTmv = this.isFiniteNumber(weightedMedian) && weightedMedian > 0
+      ? weightedMedian
+      : weightedMean;
 
     if (!this.isFiniteNumber(weightedTmv) || weightedTmv <= 0) {
       return null;
@@ -133,47 +126,21 @@ export class TMVCalculator {
     const { liquidityScore, estimatedDaysToSell } =
       this.calculateLiquidity(weighted.map(w => w.sample));
 
-    const seasonalityIndex = this.calculateSeasonalityIndex(weighted);
-    const regionalIndex = this.calculateRegionalIndex(weighted, context);
-
-    if (
-      !this.isFiniteNumber(seasonalityIndex) ||
-      !this.isFiniteNumber(regionalIndex) ||
-      seasonalityIndex <= 0 ||
-      regionalIndex <= 0
-    ) {
-      return null;
-    }
-
-    const adjustedNormalized = weightedTmv * seasonalityIndex * regionalIndex;
-    if (!this.isFiniteNumber(adjustedNormalized) || adjustedNormalized <= 0) {
-      return null;
-    }
-    const tmvNormalized = new Decimal(adjustedNormalized);
     const conditionFactor = this.getConditionFactor(context.targetCondition);
-    const tmv = new Decimal(adjustedNormalized * conditionFactor);
-
-    const demandScore = this.calculateDemandScore(context.demandSignals);
-    const hotDeal = this.isHotDeal(
-      demandScore,
-      context.targetPrice,
-      tmv,
-      this.config.demandThreshold ?? 1
-    );
+    const tmv = new Decimal(weightedTmv * conditionFactor);
 
     return {
       tmv,
-      tmvNormalized,
       confidence,
       sampleCount: weighted.length,
       volatility,
       liquidityScore,
       estimatedDaysToSell,
-      seasonalityIndex,
-      regionalIndex,
-      demandScore,
-      hotDeal,
     };
+  }
+
+  private filterSoldSamples(samples: MarketSample[]): MarketSample[] {
+    return samples.filter(sample => sample.status === 'sold');
   }
 
   private filterFreshSamples(samples: MarketSample[]): MarketSample[] {
@@ -239,13 +206,29 @@ export class TMVCalculator {
   }
 
   private applyWeights(samples: PreparedSample[]): Array<PreparedSample & { weight: number }> {
-    const soldMultiplier = this.config.soldWeightMultiplier ?? 3;
+    return samples.map(sample => ({
+      ...sample,
+      weight: sample.weightBase,
+    }));
+  }
 
-    return samples.map(sample => {
-      const isSold = sample.sample.status === 'sold';
-      const weight = sample.weightBase * (isSold ? soldMultiplier : 1);
-      return { ...sample, weight };
-    });
+  private weightedMedian(samples: Array<PreparedSample & { weight: number }>): number {
+    const sorted = [...samples].sort((a, b) => a.normalizedPrice - b.normalizedPrice);
+    const totalWeight = sorted.reduce((sum, sample) => sum + sample.weight, 0);
+
+    if (totalWeight <= 0) {
+      return 0;
+    }
+
+    let cumulativeWeight = 0;
+    for (const sample of sorted) {
+      cumulativeWeight += sample.weight;
+      if (cumulativeWeight >= totalWeight / 2) {
+        return sample.normalizedPrice;
+      }
+    }
+
+    return sorted[sorted.length - 1]?.normalizedPrice ?? 0;
   }
 
   private weightedMean(samples: Array<PreparedSample & { weight: number }>): number {
@@ -316,116 +299,6 @@ export class TMVCalculator {
       liquidityScore,
       estimatedDaysToSell: Math.round(avgInterval),
     };
-  }
-
-  private calculateSeasonalityIndex(
-    samples: Array<PreparedSample & { weight: number }>
-  ): number {
-    if (samples.length < 6) {
-      return 1;
-    }
-
-    const monthTotals = new Map<number, { sum: number; weight: number }>();
-    let overallSum = 0;
-    let overallWeight = 0;
-
-    for (const sample of samples) {
-      const month = sample.date.getUTCMonth() + 1;
-      const entry = monthTotals.get(month) ?? { sum: 0, weight: 0 };
-      entry.sum += sample.normalizedPrice * sample.weight;
-      entry.weight += sample.weight;
-      monthTotals.set(month, entry);
-
-      overallSum += sample.normalizedPrice * sample.weight;
-      overallWeight += sample.weight;
-    }
-
-    if (overallWeight === 0) {
-      return 1;
-    }
-
-    const overallAvg = overallSum / overallWeight;
-    if (!this.isFiniteNumber(overallAvg) || overallAvg <= 0) {
-      return 1;
-    }
-    const currentMonth = new Date().getUTCMonth() + 1;
-    const monthEntry = monthTotals.get(currentMonth);
-
-    if (!monthEntry || monthEntry.weight === 0) {
-      return 1;
-    }
-
-    return monthEntry.sum / monthEntry.weight / overallAvg;
-  }
-
-  private calculateRegionalIndex(
-    samples: Array<PreparedSample & { weight: number }>,
-    context: TMVContext
-  ): number {
-    const targetRegion = context.targetRegion ?? '';
-
-    if (!targetRegion) {
-      return 1;
-    }
-
-    const regionTotals = new Map<string, { sum: number; weight: number }>();
-    let overallSum = 0;
-    let overallWeight = 0;
-
-    for (const sample of samples) {
-      if (!sample.region) {
-        continue;
-      }
-      const entry = regionTotals.get(sample.region) ?? { sum: 0, weight: 0 };
-      entry.sum += sample.normalizedPrice * sample.weight;
-      entry.weight += sample.weight;
-      regionTotals.set(sample.region, entry);
-
-      overallSum += sample.normalizedPrice * sample.weight;
-      overallWeight += sample.weight;
-    }
-
-    if (overallWeight === 0) {
-      return this.config.regionalMultipliers?.[targetRegion] ?? 1;
-    }
-
-    const overallAvg = overallSum / overallWeight;
-    if (!this.isFiniteNumber(overallAvg) || overallAvg <= 0) {
-      return this.config.regionalMultipliers?.[targetRegion] ?? 1;
-    }
-    const targetEntry = regionTotals.get(targetRegion);
-
-    if (!targetEntry || targetEntry.weight === 0) {
-      return this.config.regionalMultipliers?.[targetRegion] ?? 1;
-    }
-
-    return targetEntry.sum / targetEntry.weight / overallAvg;
-  }
-
-  private calculateDemandScore(signals: DemandSignals | null | undefined): number {
-    if (!signals) {
-      return 0;
-    }
-
-    const views = signals.views ?? 0;
-    const saves = signals.saves ?? 0;
-    const inquiries = signals.inquiries ?? 0;
-    const daysListed = Math.max(signals.daysListed ?? 0, 1);
-
-    return (views * 0.3 + saves * 0.5 + inquiries * 0.2) / daysListed;
-  }
-
-  private isHotDeal(
-    demandScore: number,
-    targetPrice: Decimal | null | undefined,
-    tmv: Decimal,
-    threshold: number
-  ): boolean {
-    if (!targetPrice) {
-      return false;
-    }
-
-    return demandScore > threshold && targetPrice.toNumber() < tmv.toNumber() * 0.85;
   }
 
   private calculateTimeWeight(date: Date): number {

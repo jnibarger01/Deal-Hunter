@@ -136,9 +136,10 @@ const mockRankedDeals: RankedDeal[] = [
 export function Dashboard() {
   const { data: rankedDeals, loading: rankedLoading, refetch } = useRankedDeals();
 
-  // Use mock data if API fails
-  const deals = rankedDeals || mockRankedDeals;
-  const loading = rankedLoading && !mockRankedDeals.length;
+  const enableMockFallback =
+    import.meta.env.DEV && import.meta.env.VITE_ENABLE_MOCK_FALLBACK === 'true';
+  const deals = rankedDeals ?? (enableMockFallback ? mockRankedDeals : []);
+  const loading = rankedLoading && deals.length === 0;
 
   // Calculate summary metrics
   const metrics = useMemo(() => {

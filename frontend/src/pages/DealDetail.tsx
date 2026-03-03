@@ -88,9 +88,10 @@ export function DealDetail() {
   const { data: apiDeal, loading: dealLoading } = useDeal(id || '');
   const { calculate, loading: calculating } = useCalculateTMV();
 
-  // Use mock data if API unavailable
-  const deal = (apiDeal as RankedDeal) || mockDeal;
-  const loading = dealLoading && !mockDeal;
+  const enableMockFallback =
+    import.meta.env.DEV && import.meta.env.VITE_ENABLE_MOCK_FALLBACK === 'true';
+  const deal = (apiDeal as RankedDeal) ?? (enableMockFallback ? mockDeal : undefined);
+  const loading = dealLoading && !deal;
 
   const hasTMV = deal.tmv !== undefined;
   const hasScore = deal.score !== undefined;
@@ -109,6 +110,14 @@ export function DealDetail() {
         <div className={styles.content}>
           <div className={styles.skeleton} />
         </div>
+      </div>
+    );
+  }
+
+  if (!deal) {
+    return (
+      <div className={styles.page}>
+        <Header title="Deal not found" subtitle="No deal data available" />
       </div>
     );
   }
@@ -138,7 +147,7 @@ export function DealDetail() {
               <div className={styles.headerContent}>
                 <div className={styles.badges}>
                   <Badge variant="default">{deal.source}</Badge>
-                  <ConditionBadge condition={deal.condition} />
+                  <ConditionBadge condition={deal.condition ?? 'Unknown'} />
                   {hasScore && (
                     <Badge variant="accent" glow>
                       Rank #{deal.score.compositeRank}
@@ -147,7 +156,7 @@ export function DealDetail() {
                 </div>
                 <h1 className={styles.title}>{deal.title}</h1>
                 <div className={styles.meta}>
-                  <span className={styles.location}>{deal.location}</span>
+                  <span className={styles.location}>{deal.location ?? 'Unknown location'}</span>
                   <span className={styles.separator}>·</span>
                   <span className={styles.date}>Listed {formatDate(deal.createdAt)}</span>
                 </div>
@@ -296,7 +305,7 @@ export function DealDetail() {
                     fullWidth
                     icon={<ExternalLink size={16} />}
                     iconPosition="right"
-                    onClick={() => window.open(deal.url, '_blank')}
+                    onClick={() => deal.url && window.open(deal.url, '_blank')}
                   >
                     View Original Listing
                   </Button>

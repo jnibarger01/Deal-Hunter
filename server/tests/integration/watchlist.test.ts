@@ -24,10 +24,6 @@ describe('Watchlist API', () => {
       data: {
         title: 'Test Deal',
         price: 100,
-        marketValue: 200,
-        estimatedProfit: 80,
-        dealScore: 75,
-        roi: 80,
         category: 'test',
         condition: 'good',
         itemUrl: 'https://example.com/test',

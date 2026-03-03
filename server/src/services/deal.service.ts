@@ -12,7 +12,7 @@ interface DealFilters {
 }
 
 interface DealSortOptions {
-  sortBy?: 'dealScore' | 'estimatedProfit' | 'createdAt' | 'price';
+  sortBy?: 'createdAt' | 'price';
   sortOrder?: 'asc' | 'desc';
 }
 
@@ -36,7 +36,7 @@ export class DealService {
       status = 'active',
     } = filters;
 
-    const { sortBy = 'dealScore', sortOrder = 'desc' } = sort;
+    const { sortBy = 'createdAt', sortOrder = 'desc' } = sort;
     const { page = 1, limit = 20 } = pagination;
 
     const skip = (page - 1) * limit;
@@ -46,7 +46,6 @@ export class DealService {
       status,
       ...(category && { category }),
       ...(marketplace && { marketplace }),
-      ...(minDealScore !== undefined && minDealScore !== null && { dealScore: { gte: minDealScore } }),
       ...(maxPrice !== undefined && maxPrice !== null && { price: { lte: maxPrice } }),
       ...(search && {
         OR: [
@@ -145,15 +144,14 @@ export class DealService {
   }
 
   async getDealStats() {
-    const [totalDeals, avgDealScore, avgProfit, topCategories] = await Promise.all([
+    const [totalDeals, avgPrice, avgRank, topCategories] = await Promise.all([
       prisma.deal.count({ where: { status: 'active' } }),
       prisma.deal.aggregate({
         where: { status: 'active' },
-        _avg: { dealScore: true },
+        _avg: { price: true },
       }),
-      prisma.deal.aggregate({
-        where: { status: 'active' },
-        _avg: { estimatedProfit: true },
+      prisma.score.aggregate({
+        _avg: { compositeRank: true },
       }),
       prisma.deal.groupBy({
         by: ['category'],
@@ -166,8 +164,8 @@ export class DealService {
 
     return {
       totalDeals,
-      avgDealScore: avgDealScore._avg.dealScore || 0,
-      avgProfit: avgProfit._avg.estimatedProfit || 0,
+      avgPrice: avgPrice._avg.price || 0,
+      avgCompositeRank: avgRank._avg.compositeRank || 0,
       topCategories: topCategories.map((c) => ({
         category: c.category,
         count: c._count.category,

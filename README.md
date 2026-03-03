@@ -111,6 +111,32 @@ The easiest way to get started is using Docker Compose:
    npm run dev
    ```
 
+## 🔌 API Contract (MVP)
+
+Base URL: `http://localhost:5000/api/v1`
+
+- `POST /tmv/calculate`
+  - Body: `{ "dealId": "<uuid>" }`
+  - Response: `{ dealId, tmv, confidence, sampleCount, volatility, liquidityScore, estimatedDaysToSell, calculatedAt }`
+- `GET /tmv/:dealId`
+  - Response: same shape as TMV calculate
+- `POST /score`
+  - Body: `{ "dealId": "<uuid>", "feeAssumptions": { "platformFeeRate": 0.13, "shippingCost": 12, "fixedFees": 1.5 } }`
+  - Response: `{ dealId, profitMargin, velocityScore, riskScore, compositeRank, feesApplied, calculatedAt }`
+- `GET /ranked?limit=50`
+  - Response: `RankedDeal[]` with embedded `tmv` and `score`
+
+Legacy routes under `/api/v1/deals` remain available for CRUD and ingest.
+
+## 🔒 Developer Hardening
+
+- Normalize line endings/encoding via `.gitattributes` (UTF-8 + LF)
+- Install local git hooks:
+  ```bash
+  ./scripts/install-git-hooks.sh
+  ```
+  This enables a pre-commit binary-file guard.
+
 ## 🏗️ Project Structure
 
 - `frontend/`: React application (Vite-based)

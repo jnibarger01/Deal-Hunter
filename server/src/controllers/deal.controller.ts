@@ -6,7 +6,7 @@ import logger from '../config/logger';
 
 type DecimalField = Decimal | null | undefined;
 type DealSortOptions = {
-  sortBy?: 'dealScore' | 'estimatedProfit' | 'createdAt' | 'price';
+  sortBy?: 'createdAt' | 'price';
   sortOrder?: 'asc' | 'desc';
 };
 
@@ -22,10 +22,6 @@ type DealWithDecimalFields = Deal & Record<string, unknown>;
 const normalizeDeal = (deal: DealWithDecimalFields) => ({
   ...deal,
   price: toNumberOrNull(deal.price as DecimalField),
-  marketValue: toNumberOrNull(deal.marketValue as DecimalField),
-  estimatedProfit: toNumberOrNull(deal.estimatedProfit as DecimalField),
-  dealScore: toNumberOrNull(deal.dealScore as DecimalField),
-  roi: toNumberOrNull(deal.roi as DecimalField),
 });
 
 const parseNumber = (value: unknown): number | undefined => {
@@ -44,7 +40,7 @@ const parseInteger = (value: unknown): number | undefined => {
   return Number.isInteger(parsed) ? parsed : undefined;
 };
 
-const allowedSortBy = new Set(['dealScore', 'estimatedProfit', 'createdAt', 'price']);
+const allowedSortBy = new Set(['createdAt', 'price']);
 const allowedSortOrder = new Set(['asc', 'desc']);
 
 export class DealController {

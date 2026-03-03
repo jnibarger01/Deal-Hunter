@@ -6,10 +6,10 @@ export interface Deal {
   sourceId: string;
   title: string;
   price: number;
-  condition: string;
+  condition: string | null;
   category: string;
-  location: string;
-  url: string;
+  location: string | null;
+  url: string | null;
   createdAt: string;
   tmv?: TMVResult;
   score?: Score;
@@ -40,6 +40,8 @@ export interface Score {
   velocityScore: number;
   riskScore: number;
   compositeRank: number;
+  feesApplied?: number;
+  calculatedAt?: string;
 }
 
 export interface RankedDeal extends Deal {
@@ -48,8 +50,9 @@ export interface RankedDeal extends Deal {
 }
 
 export interface HealthStatus {
-  status: string;
+  status: 'ok' | 'error';
   timestamp: string;
+  environment?: string;
 }
 
 // UI State types

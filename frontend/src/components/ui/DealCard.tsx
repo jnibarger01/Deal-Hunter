@@ -43,14 +43,14 @@ export function DealCard({ deal, rank, variant = 'default' }: DealCardProps) {
 
       {/* Header with title and source */}
       <div className={styles.header}>
-        <Link to={`/deals/${deal.id}`} className={styles.title}>
+        <Link to={`/app/deals/${deal.id}`} className={styles.title}>
           {deal.title}
         </Link>
         <div className={styles.meta}>
           <Badge variant="default" size="sm">
             {deal.source}
           </Badge>
-          <ConditionBadge condition={deal.condition} />
+          <ConditionBadge condition={deal.condition ?? 'Unknown'} />
         </div>
       </div>
 
@@ -107,19 +107,21 @@ export function DealCard({ deal, rank, variant = 'default' }: DealCardProps) {
 
       {/* Footer */}
       <div className={styles.footer}>
-        <span className={styles.location}>{deal.location}</span>
+        <span className={styles.location}>{deal.location ?? 'Unknown location'}</span>
         <div className={styles.actions}>
-          <Link to={`/deals/${deal.id}`} className={styles.actionLink}>
+          <Link to={`/app/deals/${deal.id}`} className={styles.actionLink}>
             View Details
           </Link>
-          <a
-            href={deal.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className={styles.externalLink}
-          >
-            <ExternalLink size={14} />
-          </a>
+          {deal.url ? (
+            <a
+              href={deal.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={styles.externalLink}
+            >
+              <ExternalLink size={14} />
+            </a>
+          ) : null}
         </div>
       </div>
 

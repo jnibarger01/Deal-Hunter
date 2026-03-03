@@ -2,7 +2,7 @@ import { Decimal } from '@prisma/client/runtime/library';
 import { DealScorer } from '../../src/domain/score';
 
 describe('DealScorer', () => {
-  it('calculates a composite score from deal, tmv, and fees', () => {
+  it('calculates a composite score from deal, tmv, and fee assumptions', () => {
     const scorer = new DealScorer();
     const deal = {
       price: new Decimal(100),
@@ -14,17 +14,21 @@ describe('DealScorer', () => {
       volatility: new Decimal(0.1),
       liquidityScore: 0.5,
     };
-    const fees = new Decimal(10);
 
-    const result = scorer.calculateScore(deal, tmv, fees);
+    const result = scorer.calculateScore(deal, tmv, {
+      platformFeeRate: 0.1,
+      shippingCost: 5,
+      fixedFees: 2,
+    });
 
-    expect(result.profitMargin.toNumber()).toBeCloseTo(40, 2);
-    expect(result.velocityScore.toNumber()).toBeCloseTo(50, 2);
-    expect(result.riskScore.toNumber()).toBeCloseTo(20, 2);
-    expect(result.compositeRank.toNumber()).toBeCloseTo(51, 2);
+    expect(result.feesApplied.toNumber()).toBeCloseTo(17, 2);
+    expect(result.profitMargin.toNumber()).toBeCloseTo(0.33, 2);
+    expect(result.velocityScore.toNumber()).toBeCloseTo(0.5, 2);
+    expect(result.riskScore.toNumber()).toBeCloseTo(0.28, 2);
+    expect(result.compositeRank.toNumber()).toBeCloseTo(45.9, 2);
   });
 
-  it('caps volatility risk contribution at 50', () => {
+  it('caps volatility risk contribution at 0.4 and includes liquidity risk', () => {
     const scorer = new DealScorer();
     const deal = {
       price: new Decimal(100),
@@ -37,8 +41,8 @@ describe('DealScorer', () => {
       liquidityScore: 0.2,
     };
 
-    const result = scorer.calculateScore(deal, tmv, new Decimal(0));
+    const result = scorer.calculateScore(deal, tmv);
 
-    expect(result.riskScore.toNumber()).toBeCloseTo(55, 2);
+    expect(result.riskScore.toNumber()).toBeCloseTo(0.6, 2);
   });
 });

@@ -5,8 +5,6 @@ import dealController from '../controllers/deal.controller';
 import { validate } from '../middleware/validation';
 import { authenticate, authorize } from '../middleware/auth';
 import prisma from '../config/database';
-import { TMVCalculator } from '../domain/tmv';
-import tmvConfig from '../config/tmv';
 import asyncHandler from '../utils/asyncHandler';
 
 const router = Router();
@@ -19,28 +17,18 @@ const ingestLimiter = rateLimit({
   message: 'Too many ingest requests, please try again later.',
 });
 
-const tmvLimiter = rateLimit({
-  windowMs: 60 * 1000,
-  max: 120,
-  standardHeaders: true,
-  legacyHeaders: false,
-  message: 'Too many TMV requests, please try again later.',
-});
-
 // Validation rules
 const createDealValidation = [
   body('title').trim().notEmpty().withMessage('Title is required'),
   body('price').isFloat({ min: 0 }).withMessage('Price must be a positive number'),
-  body('marketValue').isFloat({ min: 0 }).withMessage('Market value must be a positive number'),
   body('category').trim().notEmpty().withMessage('Category is required'),
-  body('marketplace').trim().notEmpty().withMessage('Marketplace is required'),
-  body('itemUrl').isURL().withMessage('Valid item URL is required'),
+  body('marketplace').optional().trim(),
+  body('itemUrl').optional().isURL().withMessage('Valid item URL is required'),
 ];
 
 const updateDealValidation = [
   body('title').optional().trim().notEmpty(),
   body('price').optional().isFloat({ min: 0 }),
-  body('marketValue').optional().isFloat({ min: 0 }),
   body('status').optional().isIn(['active', 'sold', 'expired']),
 ];
 
@@ -53,7 +41,7 @@ const listDealsValidation = [
   query('limit').optional().isInt({ min: 1, max: 100 }).toInt(),
   query('sortBy')
     .optional()
-    .isIn(['dealScore', 'estimatedProfit', 'createdAt', 'price'])
+    .isIn(['createdAt', 'price'])
     .withMessage('Invalid sortBy value'),
   query('sortOrder')
     .optional()
@@ -203,80 +191,6 @@ router.post(
       accepted,
       rejected: errors.length,
       errors,
-    });
-  })
-);
-
-// POST /api/deals/:id/calculate-tmv
-router.post(
-  '/:id/calculate-tmv',
-  authenticate,
-  tmvLimiter,
-  asyncHandler(async (req, res) => {
-    const id = String(req.params.id);
-
-    const deal = await prisma.deal.findUnique({
-      where: { id },
-      include: { samples: true },
-    });
-
-    if (!deal) {
-      res.status(404).json({ error: 'Deal not found' });
-      return;
-    }
-
-    const calculator = new TMVCalculator(tmvConfig);
-    const result = calculator.calculate(deal.samples, {
-      targetCondition: deal.condition,
-      targetRegion: deal.region,
-      targetTitle: deal.title,
-      targetDescription: deal.description,
-      targetCategory: deal.category,
-      targetPrice: deal.price,
-      demandSignals: {
-        views: deal.views,
-        saves: deal.saves,
-        inquiries: deal.inquiries,
-        daysListed: deal.daysListed,
-      },
-    });
-
-    if (!result) {
-      res.status(400).json({ error: 'Insufficient data for TMV' });
-      return;
-    }
-
-    const tmv = await prisma.tMVResult.upsert({
-      where: { dealId: id },
-      create: {
-        dealId: id,
-        tmv: result.tmv,
-        tmvNormalized: result.tmvNormalized,
-        confidence: result.confidence,
-        sampleCount: result.sampleCount,
-        volatility: result.volatility,
-        liquidityScore: result.liquidityScore,
-        estimatedDaysToSell: result.estimatedDaysToSell,
-        seasonalityIndex: result.seasonalityIndex,
-        regionalIndex: result.regionalIndex,
-      },
-      update: {
-        tmv: result.tmv,
-        tmvNormalized: result.tmvNormalized,
-        confidence: result.confidence,
-        sampleCount: result.sampleCount,
-        volatility: result.volatility,
-        liquidityScore: result.liquidityScore,
-        estimatedDaysToSell: result.estimatedDaysToSell,
-        seasonalityIndex: result.seasonalityIndex,
-        regionalIndex: result.regionalIndex,
-      },
-    });
-
-    res.json({
-      tmv,
-      demandScore: result.demandScore,
-      hotDeal: result.hotDeal,
     });
   })
 );

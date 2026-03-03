@@ -41,10 +41,6 @@ describe('Deals API', () => {
         {
           title: 'iPhone 13',
           price: 500,
-          marketValue: 800,
-          estimatedProfit: 200,
-          dealScore: 85,
-          roi: 40,
           category: 'tech',
           condition: 'good',
           itemUrl: 'https://example.com/1',
@@ -54,10 +50,6 @@ describe('Deals API', () => {
         {
           title: 'MacBook Pro',
           price: 1000,
-          marketValue: 1500,
-          estimatedProfit: 400,
-          dealScore: 90,
-          roi: 40,
           category: 'tech',
           condition: 'good',
           itemUrl: 'https://example.com/2',
@@ -97,14 +89,14 @@ describe('Deals API', () => {
       expect(response.body.data.deals[0].marketplace).toBe('craigslist');
     });
 
-    it('should sort deals by dealScore descending', async () => {
+    it('should sort deals by price descending', async () => {
       const response = await request(app)
-        .get('/api/v1/deals?sortBy=dealScore&sortOrder=desc')
+        .get('/api/v1/deals?sortBy=price&sortOrder=desc')
         .expect(200);
 
       expect(response.body.success).toBe(true);
-      expect(response.body.data.deals[0].dealScore).toBeGreaterThanOrEqual(
-        response.body.data.deals[1].dealScore
+      expect(response.body.data.deals[0].price).toBeGreaterThanOrEqual(
+        response.body.data.deals[1].price
       );
     });
 
@@ -158,10 +150,6 @@ describe('Deals API', () => {
     const newDeal = {
       title: 'Test Deal',
       price: 100,
-      marketValue: 200,
-      estimatedProfit: 80,
-      dealScore: 75,
-      roi: 80,
       category: 'test',
       condition: 'good',
       itemUrl: 'https://example.com/test',
@@ -239,8 +227,8 @@ describe('Deals API', () => {
 
       expect(response.body.success).toBe(true);
       expect(response.body.data).toHaveProperty('totalDeals');
-      expect(response.body.data).toHaveProperty('avgDealScore');
-      expect(response.body.data).toHaveProperty('avgProfit');
+      expect(response.body.data).toHaveProperty('avgPrice');
+      expect(response.body.data).toHaveProperty('avgCompositeRank');
       expect(response.body.data).toHaveProperty('topCategories');
     });
   });

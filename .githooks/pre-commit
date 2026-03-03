@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Reject binary files in staged changes.
+# `git diff --cached --numstat` marks binary files with '-' in added/deleted columns.
+if git diff --cached --numstat | awk '{if ($1=="-" || $2=="-") {print $3}}' | grep -q .; then
+  echo "❌ Commit blocked: binary files detected in staged changes."
+  git diff --cached --numstat | awk '{if ($1=="-" || $2=="-") {print "  - "$3}}'
+  echo "If this binary is intentional, commit with --no-verify and document why."
+  exit 1
+fi

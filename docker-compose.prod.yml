@@ -8,6 +8,10 @@ services:
       target: runner
     image: ${REGISTRY:-ghcr.io}/${IMAGE_PREFIX:-deal-hunter}-server:${TAG:-latest}
     restart: always
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /app/logs
     environment:
       - NODE_ENV=production
       - DATABASE_URL=${DATABASE_URL}
@@ -42,6 +46,11 @@ services:
       dockerfile: docker/nginx.Dockerfile
     image: ${REGISTRY:-ghcr.io}/${IMAGE_PREFIX:-deal-hunter}-nginx:${TAG:-latest}
     restart: always
+    read_only: true
+    tmpfs:
+      - /var/cache/nginx
+      - /var/run
+      - /tmp
     ports:
       - "80:80"
       - "443:443"

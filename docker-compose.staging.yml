@@ -7,6 +7,10 @@ services:
       context: .
       dockerfile: docker/server.Dockerfile
     restart: unless-stopped
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /app/logs
     environment:
       - NODE_ENV=staging
       - DATABASE_URL=${DATABASE_URL}
@@ -28,6 +32,11 @@ services:
       context: .
       dockerfile: docker/nginx.Dockerfile
     restart: unless-stopped
+    read_only: true
+    tmpfs:
+      - /var/cache/nginx
+      - /var/run
+      - /tmp
     ports:
       - "80:80"
     depends_on:

@@ -206,7 +206,9 @@ export function Deals() {
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
   const [sourceFilter] = useState<string>('all');
 
-  const deals = apiDeals || mockDeals;
+  const enableMockFallback =
+    import.meta.env.DEV && import.meta.env.VITE_ENABLE_MOCK_FALLBACK === 'true';
+  const deals = apiDeals ?? (enableMockFallback ? mockDeals : []);
 
   // Ticker stats
   const categoryStats = useMemo(() => {
@@ -256,7 +258,7 @@ export function Deals() {
     {
       key: 'condition',
       header: 'Condition',
-      render: (deal: RankedDeal) => <ConditionBadge condition={deal.condition} />,
+      render: (deal: RankedDeal) => <ConditionBadge condition={deal.condition ?? 'Unknown'} />,
     },
     {
       key: 'price',
@@ -382,7 +384,7 @@ export function Deals() {
             columns={columns}
             keyExtractor={(deal) => deal.id}
             loading={loading}
-            onRowClick={(deal) => navigate(`/deals/${deal.id}`)}
+            onRowClick={(deal) => navigate(`/app/deals/${deal.id}`)}
             emptyMessage="No deals match your filters"
           />
         )}

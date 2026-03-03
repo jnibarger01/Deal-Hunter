@@ -10,16 +10,12 @@ generator client {
 }
 
 model Deal {
-  id              String   @id @default(cuid())
+  id              String   @id @default(uuid())
   source          String   @default("manual") // "ebay", "craigslist", etc.
-  sourceId        String   @default(cuid()) // External ID
+  sourceId        String   @default(uuid()) // External ID
   title           String
   description     String?
   price           Decimal
-  marketValue     Decimal?
-  estimatedProfit Decimal?
-  dealScore       Decimal?
-  roi             Decimal?
   condition       String?
   category        String
   marketplace     String?
@@ -51,7 +47,7 @@ model Deal {
 }
 
 model MarketSample {
-  id              String   @id @default(cuid())
+  id              String   @id @default(uuid())
   dealId          String
   deal            Deal     @relation(fields: [dealId], references: [id])
   
@@ -80,34 +76,30 @@ model MarketSample {
 }
 
 model TMVResult {
-  id                  String   @id @default(cuid())
+  id                  String   @id @default(uuid())
   dealId              String   @unique
   deal                Deal     @relation(fields: [dealId], references: [id])
-  
+
   tmv                 Decimal
-  tmvNormalized       Decimal?
   confidence          Decimal  // 0.0 - 1.0
   sampleCount         Int
   volatility          Decimal
   liquidityScore      Decimal
   estimatedDaysToSell Int?
-  seasonalityIndex    Decimal?
-  regionalIndex       Decimal?
   calculatedAt        DateTime @default(now())
 }
 
 model Score {
-  id              String   @id @default(cuid())
+  id              String   @id @default(uuid())
   dealId          String   @unique
   deal            Deal     @relation(fields: [dealId], references: [id])
-  
+
   profitMargin    Decimal
   velocityScore   Decimal
   riskScore       Decimal
   compositeRank   Decimal  // 0-100 deal score
-  demandScore     Decimal?
-  hotDeal         Boolean  @default(false)
-  
+  feesApplied     Decimal  @default(0)
+
   calculatedAt    DateTime @default(now())
 }
 

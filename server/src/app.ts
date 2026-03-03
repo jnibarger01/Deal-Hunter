@@ -14,6 +14,7 @@ import dealRoutes from './routes/deal.routes';
 import watchlistRoutes from './routes/watchlist.routes';
 import portfolioRoutes from './routes/portfolio.routes';
 import alertRoutes from './routes/alert.routes';
+import analysisRoutes from './routes/analysis.routes';
 
 const app: Application = express();
 
@@ -34,7 +35,7 @@ const limiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
 });
-app.use(`/api/${config.apiVersion}`, limiter);
+app.use('/api', limiter);
 
 // Logging
 if (config.isDevelopment) {
@@ -54,8 +55,7 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 // Health check
 app.get('/health', (_req, res) => {
   res.status(200).json({
-    success: true,
-    message: 'Deal Hunter API is running',
+    status: 'ok',
     timestamp: new Date().toISOString(),
     environment: config.env,
   });
@@ -87,8 +87,10 @@ apiRouter.use('/deals', dealRoutes);
 apiRouter.use('/watchlist', watchlistRoutes);
 apiRouter.use('/portfolio', portfolioRoutes);
 apiRouter.use('/alerts', alertRoutes);
+apiRouter.use('/', analysisRoutes);
 
 app.use(`/api/${config.apiVersion}`, apiRouter);
+app.use('/api', apiRouter);
 
 // Error handling
 app.use(notFoundHandler);
