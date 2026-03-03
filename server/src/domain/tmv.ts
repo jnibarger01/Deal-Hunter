@@ -1,10 +1,10 @@
-import { Decimal, JsonValue } from '@prisma/client/runtime/library';
+import { Decimal } from '@prisma/client/runtime/library';
 
 interface MarketSample {
   observedPrice: Decimal;
   observedAt: Date;
   condition?: string | null;
-  status?: 'active' | 'sold' | 'expired' | null;
+  status?: string | null;
   finalPrice?: Decimal | null;
   listedAt?: Date | null;
   soldAt?: Date | null;
@@ -13,7 +13,7 @@ interface MarketSample {
   zipPrefix?: string | null;
   title?: string | null;
   description?: string | null;
-  features?: JsonValue | null;
+  features?: string | null;
   views?: number | null;
   saves?: number | null;
   inquiries?: number | null;
@@ -460,11 +460,18 @@ export class TMVCalculator {
   }
 
   private buildSampleText(sample: MarketSample): string {
-    if (sample.features && typeof sample.features === 'object') {
-      const values = Object.values(sample.features)
-        .map(value => (value ? String(value) : ''))
-        .join(' ');
-      return `${sample.title ?? ''} ${sample.description ?? ''} ${values}`.trim();
+    if (sample.features) {
+      try {
+        const parsed = JSON.parse(sample.features);
+        if (parsed && typeof parsed === 'object') {
+          const values = Object.values(parsed as Record<string, unknown>)
+            .map(value => (value ? String(value) : ''))
+            .join(' ');
+          return `${sample.title ?? ''} ${sample.description ?? ''} ${values}`.trim();
+        }
+      } catch {
+        // ignore invalid JSON and fall back to title/description only
+      }
     }
 
     return `${sample.title ?? ''} ${sample.description ?? ''}`.trim();

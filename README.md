@@ -27,7 +27,7 @@ Deal Hunter is a sophisticated platform designed to help flippers identify, eval
 - **Runtime**: [Node.js](https://nodejs.org/) with [TypeScript](https://www.typescriptlang.org/)
 - **Framework**: [Express.js](https://expressjs.com/)
 - **ORM**: [Prisma](https://www.prisma.io/)
-- **Database**: [PostgreSQL](https://www.postgresql.org/)
+- **Database**: [Prisma](https://www.prisma.io/) + SQLite (local development via `file:./dev.db`)
 - **Validation**: [Zod](https://zod.dev/) & [Express Validator](https://express-validator.github.io/)
 - **Security**: JWT, Helmet, Rate Limiting, Bcrypt
 
@@ -70,27 +70,46 @@ The easiest way to get started is using Docker Compose:
     - Backend: `http://localhost:5000`
     - Nginx Proxy: `http://localhost:8080`
 
-### Local Development (Manual)
+### Local Development (Manual, SQLite)
 
-1.  **Install Dependencies**:
-    ```bash
-    npm install
-    ```
+1. **Install dependencies (root workspace):**
+   ```bash
+   npm install
+   ```
 
-2.  **Environment Setup**:
-    Create `.env` files in both `server` and `frontend` directories (refer to `.env.example` in `server`).
+2. **Environment setup:**
+   ```bash
+   cp server/.env.example server/.env
+   ```
+   `server/.env.example` defaults to:
+   ```env
+   DATABASE_URL="file:./dev.db"
+   ```
 
-3.  **Database Migration**:
-    ```bash
-    cd server
-    npx prisma migrate dev
-    ```
+3. **Prisma client generation:**
+   ```bash
+   cd server
+   npm run prisma:generate
+   ```
 
-4.  **Run Development Servers**:
-    From the root directory:
-    ```bash
-    npm run dev
-    ```
+4. **Initialize/update the SQLite schema (choose one):**
+
+   **Option A (recommended for local SQLite):**
+   ```bash
+   npm run prisma:db:push
+   ```
+
+   **Option B (if you want migration files during local work):**
+   ```bash
+   npm run prisma:migrate -- --name init_sqlite
+   ```
+
+5. **Run backend + frontend:**
+   From the project root:
+   ```bash
+   cd ..
+   npm run dev
+   ```
 
 ## 🏗️ Project Structure
 

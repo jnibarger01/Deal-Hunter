@@ -5,6 +5,10 @@ dist/
 Deal-Hunter.env
 *.env
 
+# Local SQLite files
+*.db
+*.db-journal
+
 # Coverage reports
 coverage/
 *.lcov

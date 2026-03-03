@@ -1,13 +1,12 @@
 // prisma/schema.prisma
 
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
 generator client {
-  provider      = "prisma-client-js"
-  binaryTargets = ["native", "debian-openssl-3.0.x"]
+  provider = "prisma-client-js"
 }
 
 model Deal {
@@ -60,7 +59,7 @@ model MarketSample {
   observedAt      DateTime
   source          String
   condition       String?
-  status          ListingStatus?
+  status          String? // sqlite does not support Prisma enums
   finalPrice      Decimal?
   listedAt        DateTime?
   soldAt          DateTime?
@@ -70,7 +69,7 @@ model MarketSample {
   region          String?
   title           String?
   description     String?
-  features        Json?
+  features        String? // store JSON-serialized data when needed
   views           Int?
   saves           Int?
   inquiries       Int?
@@ -211,8 +210,3 @@ model SeasonalityIndex {
   @@unique([category, month])
 }
 
-enum ListingStatus {
-  active
-  sold
-  expired
-}
