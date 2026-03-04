@@ -68,7 +68,7 @@ The easiest way to get started is using Docker Compose:
 3.  Access the application:
     - Frontend: `http://localhost:5173`
     - Backend: `http://localhost:5000`
-    - Nginx Proxy: `http://localhost:8080`
+    - Nginx Proxy: `http://localhodst:8080`
 
 ### Local Development (Manual, SQLite)
 
