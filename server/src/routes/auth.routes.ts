@@ -13,6 +13,7 @@ const authLimiter = rateLimit({
   message: 'Too many authentication attempts, please try again later.',
   standardHeaders: true,
   legacyHeaders: false,
+  skip: () => config.isTest,
 });
 
 // Validation rules

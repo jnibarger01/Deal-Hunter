@@ -1,4 +1,5 @@
 import request from 'supertest';
+import { ListingStatus } from '@prisma/client';
 import app from '../../src/app';
 import { prisma } from '../setup';
 
@@ -26,7 +27,7 @@ describe('Analysis API', () => {
         observedPrice: 120 + index,
         observedAt: soldAt,
         source: 'ebay',
-        status: 'sold',
+        status: ListingStatus.sold,
         finalPrice: 125 + index,
         listedAt,
         soldAt,

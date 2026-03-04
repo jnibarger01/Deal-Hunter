@@ -4,6 +4,9 @@ import { prisma } from '../setup';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
+const uniqueTestEmail = (prefix: string) =>
+  `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}@example.com`;
+
 describe('Authentication API', () => {
   describe('POST /api/v1/auth/register', () => {
     it('should register a new user successfully', async () => {
@@ -135,16 +138,21 @@ describe('Authentication API', () => {
 
   describe('GET /api/v1/auth/profile', () => {
     let accessToken: string;
+    let email: string;
 
     beforeEach(async () => {
+      email = uniqueTestEmail('profile');
+
       // Register and get token
       const response = await request(app)
         .post('/api/v1/auth/register')
         .send({
-          email: 'test@example.com',
+          email,
           password: 'Test123!',
-        });
+        })
+        .expect(201);
 
+      expect(response.body.data.tokens).toBeDefined();
       accessToken = response.body.data.tokens.accessToken;
     });
 
@@ -156,7 +164,7 @@ describe('Authentication API', () => {
 
       expect(response.body.success).toBe(true);
       expect(response.body.data.user).toHaveProperty('id');
-      expect(response.body.data.user.email).toBe('test@example.com');
+      expect(response.body.data.user.email).toBe(email);
     });
 
     it('should fail without token', async () => {
@@ -179,15 +187,19 @@ describe('Authentication API', () => {
 
   describe('POST /api/v1/auth/refresh', () => {
     let refreshToken: string;
+    let email: string;
 
     beforeEach(async () => {
+      email = uniqueTestEmail('refresh');
       const response = await request(app)
         .post('/api/v1/auth/register')
         .send({
-          email: 'test@example.com',
+          email,
           password: 'Test123!',
-        });
+        })
+        .expect(201);
 
+      expect(response.body.data.tokens).toBeDefined();
       refreshToken = response.body.data.tokens.refreshToken;
     });
 
@@ -214,15 +226,19 @@ describe('Authentication API', () => {
 
   describe('POST /api/v1/auth/logout', () => {
     let refreshToken: string;
+    let email: string;
 
     beforeEach(async () => {
+      email = uniqueTestEmail('logout');
       const response = await request(app)
         .post('/api/v1/auth/register')
         .send({
-          email: 'test@example.com',
+          email,
           password: 'Test123!',
-        });
+        })
+        .expect(201);
 
+      expect(response.body.data.tokens).toBeDefined();
       refreshToken = response.body.data.tokens.refreshToken;
     });
 

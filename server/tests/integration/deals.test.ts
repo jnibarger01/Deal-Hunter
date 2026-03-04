@@ -2,19 +2,26 @@ import request from 'supertest';
 import app from '../../src/app';
 import { prisma } from '../setup';
 
+const uniqueTestEmail = (prefix: string) =>
+  `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}@example.com`;
+
 describe('Deals API', () => {
   let accessToken: string;
   let adminToken: string;
 
   beforeEach(async () => {
+    const email = uniqueTestEmail('deals-user');
+
     // Create regular user
     const userResponse = await request(app)
       .post('/api/v1/auth/register')
       .send({
-        email: 'user@example.com',
+        email,
         password: 'Test123!',
-      });
+      })
+      .expect(201);
 
+    expect(userResponse.body.data.tokens).toBeDefined();
     accessToken = userResponse.body.data.tokens.accessToken;
 
     // Create admin user
