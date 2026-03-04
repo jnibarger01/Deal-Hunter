@@ -5,6 +5,7 @@ import dealController from '../controllers/deal.controller';
 import { validate } from '../middleware/validation';
 import { authenticate, authorize } from '../middleware/auth';
 import prisma from '../config/database';
+import { DealScorer } from '../domain/score';
 import asyncHandler from '../utils/asyncHandler';
 
 const router = Router();
@@ -267,7 +268,136 @@ router.delete(
     });
   })
 );
+// GET /api/deals/ranked - Deals with TMV + Score sorted by compositeRank
+router.get(
+  '/ranked',
+  asyncHandler(async (_req, res) => {
+    const deals = await prisma.deal.findMany({
+      where: {
+        status: 'active',
+        tmvResult: { isNot: null },
+        score: { isNot: null },
+      },
+      include: { tmvResult: true, score: true },
+      orderBy: { score: { compositeRank: 'desc' } },
+      take: 100,
+    });
+
+    const ranked = deals.map((deal) => ({
+      id: deal.id,
+      source: deal.source,
+      sourceId: deal.sourceId,
+      title: deal.title,
+      price: Number(deal.price),
+      condition: deal.condition,
+      category: deal.category,
+      location: deal.location,
+      url: deal.url,
+      createdAt: deal.createdAt.toISOString(),
+      tmv: deal.tmvResult
+        ? {
+            dealId: deal.tmvResult.dealId,
+            tmv: Number(deal.tmvResult.tmv),
+            confidence: Number(deal.tmvResult.confidence),
+            sampleCount: deal.tmvResult.sampleCount,
+            volatility: Number(deal.tmvResult.volatility),
+            liquidityScore: Number(deal.tmvResult.liquidityScore),
+            estimatedDaysToSell: deal.tmvResult.estimatedDaysToSell,
+            calculatedAt: deal.tmvResult.calculatedAt.toISOString(),
+          }
+        : undefined,
+      score: deal.score
+        ? {
+            dealId: deal.score.dealId,
+            profitMargin: Number(deal.score.profitMargin),
+            velocityScore: Number(deal.score.velocityScore),
+            riskScore: Number(deal.score.riskScore),
+            compositeRank: Number(deal.score.compositeRank),
+          }
+        : undefined,
+    }));
+
+    res.json(ranked);
+  })
+);
+
 router.get('/:id', validate(idParamValidation), dealController.getDealById);
+
+// POST /api/deals/:id/score - Score a deal using its TMV result
+router.post(
+  '/:id/score',
+  authenticate,
+  asyncHandler(async (req, res) => {
+    const id = String(req.params.id);
+
+    const deal = await prisma.deal.findUnique({
+      where: { id },
+      include: { tmvResult: true },
+    });
+
+    if (!deal) {
+      res.status(404).json({ error: 'Deal not found' });
+      return;
+    }
+
+    if (!deal.tmvResult) {
+      res.status(400).json({ error: 'TMV must be calculated before scoring' });
+      return;
+    }
+
+    const normalizedSource = deal.source.toLowerCase();
+    const feePct = sourceFeeDefaults[normalizedSource] ?? 10;
+
+    const scorer = new DealScorer();
+    const result = scorer.calculateScore(
+      {
+        price: deal.price,
+        category: deal.category,
+      },
+      {
+        tmv: deal.tmvResult.tmv,
+        confidence: Number(deal.tmvResult.confidence),
+        volatility: deal.tmvResult.volatility,
+        liquidityScore: Number(deal.tmvResult.liquidityScore),
+      },
+      {
+        platformFeeRate: feePct / 100,
+      }
+    );
+
+    const score = await prisma.score.upsert({
+      where: { dealId: id },
+      create: {
+        dealId: id,
+        profitMargin: result.profitMargin,
+        velocityScore: result.velocityScore,
+        riskScore: result.riskScore,
+        compositeRank: result.compositeRank,
+        feesApplied: result.feesApplied,
+      },
+      update: {
+        profitMargin: result.profitMargin,
+        velocityScore: result.velocityScore,
+        riskScore: result.riskScore,
+        compositeRank: result.compositeRank,
+        feesApplied: result.feesApplied,
+        calculatedAt: new Date(),
+      },
+    });
+
+    res.json({
+      success: true,
+      data: {
+        dealId: score.dealId,
+        profitMargin: Number(score.profitMargin),
+        velocityScore: Number(score.velocityScore),
+        riskScore: Number(score.riskScore),
+        compositeRank: Number(score.compositeRank),
+        calculatedAt: score.calculatedAt.toISOString(),
+      },
+    });
+  })
+);
 
 // POST /api/deals/ingest - Ingest new listings
 router.post(
