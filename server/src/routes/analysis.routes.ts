@@ -5,6 +5,7 @@ import prisma from '../config/database';
 import { TMVCalculator } from '../domain/tmv';
 import tmvConfig from '../config/tmv';
 import { DealScorer } from '../domain/score';
+import { analyzeDeal } from '../services/gemini';
 import { validate } from '../middleware/validation';
 import asyncHandler from '../utils/asyncHandler';
 
@@ -247,6 +248,40 @@ router.get(
     }));
 
     res.status(200).json(payload);
+  })
+);
+
+const analyzeValidation = [param('dealId').isString().notEmpty()];
+
+router.get(
+  '/analyze/:dealId',
+  validate(analyzeValidation),
+  asyncHandler(async (req, res) => {
+    const dealId = String(req.params.dealId);
+
+    const deal = await prisma.deal.findUnique({
+      where: { id: dealId },
+      include: { tmvResult: true, score: true },
+    });
+
+    if (!deal) {
+      res.status(404).json({ error: 'Deal not found' });
+      return;
+    }
+
+    const analysis = await analyzeDeal({
+      title: deal.title,
+      price: Number(deal.price),
+      condition: deal.condition,
+      category: deal.category,
+      location: deal.location,
+      tmv: deal.tmvResult ? Number(deal.tmvResult.tmv) : null,
+      confidence: deal.tmvResult ? Number(deal.tmvResult.confidence) : null,
+      profitMargin: deal.score ? Number(deal.score.profitMargin) : null,
+      compositeRank: deal.score ? Number(deal.score.compositeRank) : null,
+    });
+
+    res.status(200).json({ dealId, ...analysis });
   })
 );
 
