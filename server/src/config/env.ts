@@ -23,12 +23,16 @@ const envSchema = z.object({
   EMAIL_VERIFICATION_TOKEN_TTL_HOURS: z.string().default('24'),
   SMTP_HOST: z.string().optional(),
   SMTP_PORT: z.string().optional(),
+  SMTP_SECURE: z.string().default('false'),
   SMTP_USER: z.string().optional(),
   SMTP_PASS: z.string().optional(),
   SMTP_FROM: z.string().optional(),
   RATE_LIMIT_WINDOW_MS: z.string().default('900000'),
   RATE_LIMIT_MAX_REQUESTS: z.string().default('100'),
+  AUTH_RATE_LIMIT_WINDOW_MS: z.string().default('900000'),
+  AUTH_RATE_LIMIT_MAX_REQUESTS: z.string().default('10'),
   CORS_ORIGIN: z.string().default('http://localhost:3000'),
+  TRUST_PROXY: z.string().default('1'),
   LOG_LEVEL: z.string().default('info'),
 });
 
@@ -52,6 +56,14 @@ try {
   }
   throw error;
 }
+
+const trustProxyValue = env.TRUST_PROXY.toLowerCase();
+const trustProxy =
+  trustProxyValue === 'true'
+    ? true
+    : trustProxyValue === 'false'
+      ? false
+      : parseInt(env.TRUST_PROXY, 10);
 
 export const config = {
   env: env.NODE_ENV,
@@ -79,6 +91,7 @@ export const config = {
   smtp: {
     host: env.SMTP_HOST,
     port: env.SMTP_PORT ? parseInt(env.SMTP_PORT, 10) : undefined,
+    secure: env.SMTP_SECURE.toLowerCase() === 'true',
     user: env.SMTP_USER,
     pass: env.SMTP_PASS,
     from: env.SMTP_FROM,
@@ -90,9 +103,14 @@ export const config = {
     windowMs: parseInt(env.RATE_LIMIT_WINDOW_MS, 10),
     max: parseInt(env.RATE_LIMIT_MAX_REQUESTS, 10),
   },
+  authRateLimit: {
+    windowMs: parseInt(env.AUTH_RATE_LIMIT_WINDOW_MS, 10),
+    max: parseInt(env.AUTH_RATE_LIMIT_MAX_REQUESTS, 10),
+  },
   cors: {
     origin: env.CORS_ORIGIN.split(','),
   },
+  trustProxy,
   isDevelopment: env.NODE_ENV === 'development',
   isProduction: env.NODE_ENV === 'production',
   isStaging: env.NODE_ENV === 'staging',

@@ -4,6 +4,7 @@ dist/
 .env.*
 Deal-Hunter.env
 *.env
+server/logs/
 
 # Local SQLite files
 *.db

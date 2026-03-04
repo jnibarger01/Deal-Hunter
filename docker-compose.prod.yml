@@ -1,5 +1,3 @@
-version: "3.9"
-
 services:
   server:
     build:
@@ -9,6 +7,10 @@ services:
     image: ${REGISTRY:-ghcr.io}/${IMAGE_PREFIX:-deal-hunter}-server:${TAG:-latest}
     restart: always
     read_only: true
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
     tmpfs:
       - /tmp
       - /app/logs
@@ -21,9 +23,13 @@ services:
       - FRONTEND_URL=${FRONTEND_URL}
       - SMTP_HOST=${SMTP_HOST}
       - SMTP_PORT=${SMTP_PORT}
+      - SMTP_SECURE=${SMTP_SECURE}
       - SMTP_USER=${SMTP_USER}
       - SMTP_PASS=${SMTP_PASS}
       - SMTP_FROM=${SMTP_FROM}
+      - AUTH_RATE_LIMIT_WINDOW_MS=${AUTH_RATE_LIMIT_WINDOW_MS:-900000}
+      - AUTH_RATE_LIMIT_MAX_REQUESTS=${AUTH_RATE_LIMIT_MAX_REQUESTS:-10}
+      - TRUST_PROXY=${TRUST_PROXY:-1}
     deploy:
       resources:
         limits:
@@ -53,6 +59,10 @@ services:
     image: ${REGISTRY:-ghcr.io}/${IMAGE_PREFIX:-deal-hunter}-nginx:${TAG:-latest}
     restart: always
     read_only: true
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
     tmpfs:
       - /var/cache/nginx
       - /var/run

@@ -14,7 +14,7 @@ services:
     dockerContext: .
     region: oregon
     plan: free
-    healthCheckPath: /health
+    healthCheckPath: /ready
     autoDeploy: true
     envVars:
       - key: NODE_ENV
@@ -33,6 +33,12 @@ services:
         value: 30d
       - key: CORS_ORIGIN
         value: https://deal-hunter-frontend.onrender.com
+      - key: AUTH_RATE_LIMIT_WINDOW_MS
+        value: 900000
+      - key: AUTH_RATE_LIMIT_MAX_REQUESTS
+        value: 10
+      - key: TRUST_PROXY
+        value: 1
       - key: LOG_LEVEL
         value: info
       # Add your API keys in Render dashboard (don't commit them)

@@ -20,6 +20,8 @@ import analysisRoutes from './routes/analysis.routes';
 
 const app: Application = express();
 
+app.set('trust proxy', config.trustProxy);
+
 app.use((req, res, next) => {
   const requestId = req.headers['x-request-id']?.toString() ?? randomUUID();
   req.headers['x-request-id'] = requestId;
@@ -50,7 +52,8 @@ app.use('/api', limiter);
 if (config.isDevelopment) {
   app.use(morgan('dev'));
 } else {
-  app.use(morgan('combined', {
+  morgan.token('request-id', (req) => req.headers['x-request-id']?.toString() ?? '');
+  app.use(morgan(':remote-addr :method :url :status :res[content-length] - :response-time ms req_id=:request-id', {
     stream: {
       write: (message: string) => logger.info(message.trim()),
     },

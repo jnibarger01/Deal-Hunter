@@ -27,7 +27,7 @@ Deal Hunter is a sophisticated platform designed to help flippers identify, eval
 - **Runtime**: [Node.js](https://nodejs.org/) with [TypeScript](https://www.typescriptlang.org/)
 - **Framework**: [Express.js](https://expressjs.com/)
 - **ORM**: [Prisma](https://www.prisma.io/)
-- **Database**: [Prisma](https://www.prisma.io/) + SQLite (local development via `file:./dev.db`)
+- **Database**: PostgreSQL (dev/staging/production)
 - **Validation**: [Zod](https://zod.dev/) & [Express Validator](https://express-validator.github.io/)
 - **Security**: JWT, Helmet, Rate Limiting, Bcrypt
 
@@ -70,7 +70,7 @@ The easiest way to get started is using Docker Compose:
     - Backend: `http://localhost:5000`
     - Nginx Proxy: `http://localhodst:8080`
 
-### Local Development (Manual, SQLite)
+### Local Development (Manual, PostgreSQL)
 
 1. **Install dependencies (root workspace):**
    ```bash
@@ -81,9 +81,9 @@ The easiest way to get started is using Docker Compose:
    ```bash
    cp server/.env.example server/.env
    ```
-   `server/.env.example` defaults to:
+   `server/.env.example` defaults to local Docker Postgres on `localhost:5433`:
    ```env
-   DATABASE_URL="file:./dev.db"
+   DATABASE_URL="postgresql://dealhunter:dealhunter_dev_password@localhost:5433/dealhunter?schema=public"
    ```
 
 3. **Prisma client generation:**
@@ -92,16 +92,9 @@ The easiest way to get started is using Docker Compose:
    npm run prisma:generate
    ```
 
-4. **Initialize/update the SQLite schema (choose one):**
-
-   **Option A (recommended for local SQLite):**
+4. **Initialize/update the PostgreSQL schema:**
    ```bash
-   npm run prisma:db:push
-   ```
-
-   **Option B (if you want migration files during local work):**
-   ```bash
-   npm run prisma:migrate -- --name init_sqlite
+   npm run prisma:migrate
    ```
 
 5. **Run backend + frontend:**
@@ -136,6 +129,11 @@ Legacy routes under `/api/v1/deals` remain available for CRUD and ingest.
   ./scripts/install-git-hooks.sh
   ```
   This enables a pre-commit binary-file guard.
+
+## 🚢 Production Docs
+
+- Deployment and operations runbook: `docs/production.md`
+- Release checklist: `docs/release-checklist.md`
 
 ## 🏗️ Project Structure
 

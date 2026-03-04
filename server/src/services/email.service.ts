@@ -1,5 +1,6 @@
 import logger from '../config/logger';
 import config from '../config/env';
+import nodemailer from 'nodemailer';
 
 interface EmailPayload {
   to: string;
@@ -8,14 +9,36 @@ interface EmailPayload {
 }
 
 class EmailService {
+  private readonly transporter = config.smtp.host && config.smtp.port
+    ? nodemailer.createTransport({
+      host: config.smtp.host,
+      port: config.smtp.port,
+      secure: config.smtp.secure,
+      auth: config.smtp.user && config.smtp.pass ? {
+        user: config.smtp.user,
+        pass: config.smtp.pass,
+      } : undefined,
+    })
+    : null;
+
   async sendEmail({ to, subject, text }: EmailPayload): Promise<void> {
-    // SMTP integration can be added behind this interface without changing auth flows.
-    logger.info('Transactional email queued', {
+    if (config.isTest) {
+      logger.info('Transactional email skipped in test mode', { to, subject });
+      return;
+    }
+
+    if (!this.transporter) {
+      logger.warn('SMTP transport not configured; skipping transactional email', { to, subject });
+      return;
+    }
+
+    await this.transporter.sendMail({
       to,
       subject,
+      text,
       from: config.smtp.from,
-      preview: text,
     });
+    logger.info('Transactional email sent', { to, subject });
   }
 
   async sendEmailVerification(to: string, token: string): Promise<void> {

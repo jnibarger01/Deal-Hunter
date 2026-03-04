@@ -1,10 +1,19 @@
 import { Router } from 'express';
 import { body } from 'express-validator';
+import rateLimit from 'express-rate-limit';
 import authController from '../controllers/auth.controller';
 import { validate } from '../middleware/validation';
 import { authenticate } from '../middleware/auth';
+import config from '../config/env';
 
 const router = Router();
+const authLimiter = rateLimit({
+  windowMs: config.authRateLimit.windowMs,
+  max: config.authRateLimit.max,
+  message: 'Too many authentication attempts, please try again later.',
+  standardHeaders: true,
+  legacyHeaders: false,
+});
 
 // Validation rules
 const registerValidation = [
@@ -45,14 +54,14 @@ const resetPasswordValidation = [
 ];
 
 // Routes
-router.post('/register', validate(registerValidation), authController.register);
-router.post('/login', validate(loginValidation), authController.login);
+router.post('/register', authLimiter, validate(registerValidation), authController.register);
+router.post('/login', authLimiter, validate(loginValidation), authController.login);
 router.post('/refresh', validate(refreshTokenValidation), authController.refreshToken);
 router.post('/logout', validate(refreshTokenValidation), authController.logout);
-router.post('/forgot-password', validate(emailValidation), authController.forgotPassword);
-router.post('/reset-password', validate(resetPasswordValidation), authController.resetPassword);
-router.post('/verify-email', validate(verifyEmailValidation), authController.verifyEmail);
-router.post('/resend-verification', validate(emailValidation), authController.resendVerification);
+router.post('/forgot-password', authLimiter, validate(emailValidation), authController.forgotPassword);
+router.post('/reset-password', authLimiter, validate(resetPasswordValidation), authController.resetPassword);
+router.post('/verify-email', authLimiter, validate(verifyEmailValidation), authController.verifyEmail);
+router.post('/resend-verification', authLimiter, validate(emailValidation), authController.resendVerification);
 router.get('/profile', authenticate, authController.getProfile);
 
 export default router;
