@@ -373,14 +373,12 @@ router.post(
         velocityScore: result.velocityScore,
         riskScore: result.riskScore,
         compositeRank: result.compositeRank,
-        feesApplied: result.feesApplied,
       },
       update: {
         profitMargin: result.profitMargin,
         velocityScore: result.velocityScore,
         riskScore: result.riskScore,
         compositeRank: result.compositeRank,
-        feesApplied: result.feesApplied,
         calculatedAt: new Date(),
       },
     });

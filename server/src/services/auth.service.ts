@@ -6,6 +6,7 @@ import { User } from '@prisma/client';
 import prisma from '../config/database';
 import config from '../config/env';
 import { AppError } from '../middleware/errorHandler';
+import emailService from './email.service';
 
 interface RegisterData {
   email: string;
@@ -25,76 +26,94 @@ interface TokenPayload {
   role: string;
 }
 
+interface OneTimeTokenPayload {
+  purpose: 'verify-email' | 'reset-password';
+  email: string;
+  userId: string;
+}
+
 interface AuthTokens {
   accessToken: string;
   refreshToken: string;
 }
 
+interface RegisterResult {
+  user: Omit<User, 'password'>;
+  tokens?: AuthTokens;
+  verificationRequired: boolean;
+}
+
 export class AuthService {
-  // Register new user
-  async register(data: RegisterData): Promise<{ user: Omit<User, 'password'>; tokens: AuthTokens }> {
-    // Check if user already exists
+  async register(data: RegisterData): Promise<RegisterResult> {
+    const normalizedEmail = data.email.trim().toLowerCase();
     const existingUser = await prisma.user.findUnique({
-      where: { email: data.email },
+      where: { email: normalizedEmail },
     });
 
     if (existingUser) {
       throw new AppError('User with this email already exists', 400);
     }
 
-    // Hash password
     const hashedPassword = await bcrypt.hash(data.password, 10);
 
-    // Create user
     const user = await prisma.user.create({
       data: {
-        email: data.email,
+        email: normalizedEmail,
         password: hashedPassword,
         firstName: data.firstName,
         lastName: data.lastName,
+        isActive: !config.auth.requireVerifiedEmail,
       },
     });
 
-    // Generate tokens
-    const tokens = await this.generateAuthTokens(user);
+    if (config.auth.requireVerifiedEmail) {
+      const verificationToken = this.createOneTimeToken(user, 'verify-email', config.auth.emailVerificationTokenTtlHours * 60 * 60);
+      await emailService.sendEmailVerification(user.email, verificationToken);
+    }
 
-    // Remove password from response
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { password: _password, ...userWithoutPassword } = user;
 
+    if (config.auth.requireVerifiedEmail) {
+      return {
+        user: userWithoutPassword,
+        verificationRequired: true,
+      };
+    }
+
+    const tokens = await this.generateAuthTokens(user);
     return {
       user: userWithoutPassword,
       tokens,
+      verificationRequired: false,
     };
   }
 
-  // Login user
   async login(data: LoginData): Promise<{ user: Omit<User, 'password'>; tokens: AuthTokens }> {
-    // Find user
+    const normalizedEmail = data.email.trim().toLowerCase();
     const user = await prisma.user.findUnique({
-      where: { email: data.email },
+      where: { email: normalizedEmail },
     });
 
     if (!user) {
       throw new AppError('Invalid credentials', 401);
     }
 
-    // Check if user is active
     if (!user.isActive) {
+      if (config.auth.requireVerifiedEmail) {
+        throw new AppError('Email verification required', 403);
+      }
       throw new AppError('Account is deactivated', 401);
     }
 
-    // Verify password
     const isPasswordValid = await bcrypt.compare(data.password, user.password);
 
     if (!isPasswordValid) {
       throw new AppError('Invalid credentials', 401);
     }
 
-    // Generate tokens
     const tokens = await this.generateAuthTokens(user);
 
-    // Remove password from response
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { password: _password, ...userWithoutPassword } = user;
 
@@ -104,13 +123,10 @@ export class AuthService {
     };
   }
 
-  // Refresh access token
   async refreshToken(refreshToken: string): Promise<AuthTokens> {
     try {
-      // Verify refresh token
       jwt.verify(refreshToken, config.jwt.secret) as TokenPayload;
 
-      // Check if refresh token exists in database
       const storedToken = await prisma.refreshToken.findUnique({
         where: { token: refreshToken },
         include: { user: true },
@@ -120,27 +136,17 @@ export class AuthService {
         throw new AppError('Invalid refresh token', 401);
       }
 
-      // Check if token is expired
       if (storedToken.expiresAt < new Date()) {
-        // Delete expired token
-        await prisma.refreshToken.delete({
-          where: { id: storedToken.id },
-        });
+        await prisma.refreshToken.delete({ where: { id: storedToken.id } });
         throw new AppError('Refresh token expired', 401);
       }
 
-      // Check if user is still active
       if (!storedToken.user.isActive) {
         throw new AppError('User account is deactivated', 401);
       }
 
-      // Generate new tokens
       const newTokens = await this.generateAuthTokens(storedToken.user);
-
-      // Delete old refresh token
-      await prisma.refreshToken.delete({
-        where: { id: storedToken.id },
-      });
+      await prisma.refreshToken.delete({ where: { id: storedToken.id } });
 
       return newTokens;
     } catch (error) {
@@ -151,14 +157,99 @@ export class AuthService {
     }
   }
 
-  // Logout user
   async logout(refreshToken: string): Promise<void> {
     await prisma.refreshToken.deleteMany({
       where: { token: refreshToken },
     });
   }
 
-  // Generate access and refresh tokens
+  async verifyEmail(token: string): Promise<void> {
+    let payload: OneTimeTokenPayload;
+
+    try {
+      payload = jwt.verify(token, config.jwt.secret) as OneTimeTokenPayload;
+    } catch {
+      throw new AppError('Invalid or expired verification token', 400);
+    }
+
+    if (payload.purpose !== 'verify-email') {
+      throw new AppError('Invalid verification token', 400);
+    }
+
+    await prisma.user.update({
+      where: { id: payload.userId, email: payload.email },
+      data: { isActive: true },
+    });
+  }
+
+  async resendVerification(email: string): Promise<void> {
+    const normalizedEmail = email.trim().toLowerCase();
+    const user = await prisma.user.findUnique({
+      where: { email: normalizedEmail },
+    });
+
+    if (!user || user.isActive) {
+      return;
+    }
+
+    const token = this.createOneTimeToken(user, 'verify-email', config.auth.emailVerificationTokenTtlHours * 60 * 60);
+    await emailService.sendEmailVerification(user.email, token);
+  }
+
+  async requestPasswordReset(email: string): Promise<void> {
+    const normalizedEmail = email.trim().toLowerCase();
+    const user = await prisma.user.findUnique({
+      where: { email: normalizedEmail },
+    });
+
+    // Generic success response by caller to prevent account enumeration.
+    if (!user) {
+      return;
+    }
+
+    const resetToken = this.createOneTimeToken(user, 'reset-password', config.auth.passwordResetTokenTtlMinutes * 60);
+    await emailService.sendPasswordReset(user.email, resetToken);
+  }
+
+  async resetPassword(token: string, newPassword: string): Promise<void> {
+    let payload: OneTimeTokenPayload;
+
+    try {
+      payload = jwt.verify(token, config.jwt.secret) as OneTimeTokenPayload;
+    } catch {
+      throw new AppError('Invalid or expired reset token', 400);
+    }
+
+    if (payload.purpose !== 'reset-password') {
+      throw new AppError('Invalid reset token', 400);
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    await prisma.$transaction([
+      prisma.user.update({
+        where: { id: payload.userId, email: payload.email },
+        data: { password: hashedPassword },
+      }),
+      prisma.refreshToken.deleteMany({
+        where: { userId: payload.userId },
+      }),
+    ]);
+  }
+
+  private createOneTimeToken(user: User, purpose: OneTimeTokenPayload['purpose'], expiresInSeconds: number): string {
+    const payload: OneTimeTokenPayload = {
+      purpose,
+      userId: user.id,
+      email: user.email,
+    };
+
+    return jwt.sign(payload, config.jwt.secret, {
+      expiresIn: expiresInSeconds,
+      jwtid: randomUUID(),
+    });
+  }
+
   private async generateAuthTokens(user: User): Promise<AuthTokens> {
     const payload: TokenPayload = {
       userId: user.id,
@@ -166,21 +257,18 @@ export class AuthService {
       role: user.role,
     };
 
-    // Generate access token
     const accessToken = jwt.sign(payload, config.jwt.secret, {
       expiresIn: config.jwt.expiresIn as SignOptions['expiresIn'],
       jwtid: randomUUID(),
     });
 
-    // Generate refresh token
     const refreshToken = jwt.sign(payload, config.jwt.secret, {
       expiresIn: config.jwt.refreshExpiresIn as SignOptions['expiresIn'],
       jwtid: randomUUID(),
     });
 
-    // Store refresh token in database
     const expiresAt = new Date();
-    expiresAt.setDate(expiresAt.getDate() + 30); // 30 days
+    expiresAt.setDate(expiresAt.getDate() + 30);
 
     await prisma.refreshToken.create({
       data: {
@@ -194,24 +282,6 @@ export class AuthService {
       accessToken,
       refreshToken,
     };
-  }
-
-  // Verify email (placeholder for future implementation)
-  async verifyEmail(_token: string): Promise<void> {
-    // TODO: Implement email verification logic
-    throw new AppError('Email verification not implemented', 501);
-  }
-
-  // Request password reset (placeholder for future implementation)
-  async requestPasswordReset(_email: string): Promise<void> {
-    // TODO: Implement password reset logic
-    throw new AppError('Password reset not implemented', 501);
-  }
-
-  // Reset password (placeholder for future implementation)
-  async resetPassword(_token: string, _newPassword: string): Promise<void> {
-    // TODO: Implement password reset logic
-    throw new AppError('Password reset not implemented', 501);
   }
 }
 

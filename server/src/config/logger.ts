@@ -1,6 +1,26 @@
 import winston from 'winston';
 
 const logLevel = process.env.LOG_LEVEL || 'info';
+const enableFileLogs = process.env.LOG_TO_FILES === 'true';
+
+const transports: winston.transport[] = [
+  new winston.transports.Console({
+    format: winston.format.combine(
+      winston.format.colorize(),
+      winston.format.printf(
+        ({ timestamp, level, message, ...meta }) =>
+          `${timestamp} [${level}]: ${message} ${
+            Object.keys(meta).length ? JSON.stringify(meta, null, 2) : ''
+          }`
+      )
+    ),
+  }),
+];
+
+if (enableFileLogs) {
+  transports.push(new winston.transports.File({ filename: 'logs/error.log', level: 'error' }));
+  transports.push(new winston.transports.File({ filename: 'logs/combined.log' }));
+}
 
 const logger = winston.createLogger({
   level: logLevel,
@@ -11,24 +31,7 @@ const logger = winston.createLogger({
     winston.format.json()
   ),
   defaultMeta: { service: 'deal-hunter-api' },
-  transports: [
-    // Write all logs to console
-    new winston.transports.Console({
-      format: winston.format.combine(
-        winston.format.colorize(),
-        winston.format.printf(
-          ({ timestamp, level, message, ...meta }) =>
-            `${timestamp} [${level}]: ${message} ${
-              Object.keys(meta).length ? JSON.stringify(meta, null, 2) : ''
-            }`
-        )
-      ),
-    }),
-    // Write all logs with importance level of 'error' or less to error.log
-    new winston.transports.File({ filename: 'logs/error.log', level: 'error' }),
-    // Write all logs to combined.log
-    new winston.transports.File({ filename: 'logs/combined.log' }),
-  ],
+  transports,
 });
 
 export default logger;

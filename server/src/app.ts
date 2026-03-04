@@ -1,4 +1,5 @@
 import express, { Application } from 'express';
+import { randomUUID } from 'crypto';
 import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
@@ -6,6 +7,7 @@ import rateLimit from 'express-rate-limit';
 import config from './config/env';
 import logger from './config/logger';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler';
+import prisma from './config/database';
 
 // Import routes
 import authRoutes from './routes/auth.routes';
@@ -17,6 +19,13 @@ import alertRoutes from './routes/alert.routes';
 import analysisRoutes from './routes/analysis.routes';
 
 const app: Application = express();
+
+app.use((req, res, next) => {
+  const requestId = req.headers['x-request-id']?.toString() ?? randomUUID();
+  req.headers['x-request-id'] = requestId;
+  res.setHeader('x-request-id', requestId);
+  next();
+});
 
 // Security middleware
 app.use(helmet());
@@ -59,6 +68,23 @@ app.get('/health', (_req, res) => {
     timestamp: new Date().toISOString(),
     environment: config.env,
   });
+});
+
+app.get('/ready', async (_req, res) => {
+  try {
+    await prisma.$queryRaw`SELECT 1`;
+    res.status(200).json({
+      status: 'ready',
+      timestamp: new Date().toISOString(),
+      environment: config.env,
+    });
+  } catch {
+    res.status(503).json({
+      status: 'not_ready',
+      timestamp: new Date().toISOString(),
+      environment: config.env,
+    });
+  }
 });
 
 // Webhooks

@@ -2,6 +2,7 @@ import request from 'supertest';
 import app from '../../src/app';
 import { prisma } from '../setup';
 import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
 
 describe('Authentication API', () => {
   describe('POST /api/v1/auth/register', () => {
@@ -240,6 +241,84 @@ describe('Authentication API', () => {
         .expect(401);
 
       expect(refreshResponse.body.success).toBe(false);
+    });
+  });
+
+  describe('Password and verification lifecycle', () => {
+    it('should verify email with a valid token', async () => {
+      const hashedPassword = await bcrypt.hash('Test123!', 10);
+      const user = await prisma.user.create({
+        data: {
+          email: 'verify@example.com',
+          password: hashedPassword,
+          isActive: false,
+        },
+      });
+
+      const rawToken = jwt.sign(
+        { purpose: 'verify-email', userId: user.id, email: user.email },
+        process.env.JWT_SECRET as string,
+        { expiresIn: '1h' }
+      );
+
+      const response = await request(app)
+        .post('/api/v1/auth/verify-email')
+        .send({ token: rawToken })
+        .expect(200);
+
+      expect(response.body.success).toBe(true);
+
+      const verified = await prisma.user.findUnique({ where: { id: user.id } });
+      expect(verified?.isActive).toBe(true);
+    });
+
+    it('should reset password and invalidate existing refresh tokens', async () => {
+      const hashedPassword = await bcrypt.hash('OldPass123', 10);
+      const user = await prisma.user.create({
+        data: {
+          email: 'reset@example.com',
+          password: hashedPassword,
+          isActive: true,
+        },
+      });
+
+      await prisma.refreshToken.create({
+        data: {
+          token: 'legacy-refresh-token',
+          userId: user.id,
+          expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
+        },
+      });
+
+      const rawToken = jwt.sign(
+        { purpose: 'reset-password', userId: user.id, email: user.email },
+        process.env.JWT_SECRET as string,
+        { expiresIn: '30m' }
+      );
+
+      const response = await request(app)
+        .post('/api/v1/auth/reset-password')
+        .send({ token: rawToken, newPassword: 'NewPass123' })
+        .expect(200);
+
+      expect(response.body.success).toBe(true);
+
+      const updated = await prisma.user.findUnique({ where: { id: user.id } });
+      expect(updated).not.toBeNull();
+      expect(await bcrypt.compare('NewPass123', updated!.password)).toBe(true);
+
+      const activeTokens = await prisma.refreshToken.findMany({ where: { userId: user.id } });
+      expect(activeTokens).toHaveLength(0);
+    });
+
+    it('should return generic response for forgot-password with unknown account', async () => {
+      const response = await request(app)
+        .post('/api/v1/auth/forgot-password')
+        .send({ email: 'missing@example.com' })
+        .expect(200);
+
+      expect(response.body.success).toBe(true);
+      expect(response.body.message).toContain('If an account exists');
     });
   });
 });

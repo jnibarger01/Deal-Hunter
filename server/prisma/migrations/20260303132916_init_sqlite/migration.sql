@@ -1,15 +1,18 @@
+-- CreateEnum
+CREATE TYPE "ListingStatus" AS ENUM ('active', 'sold', 'expired');
+
 -- CreateTable
 CREATE TABLE "Deal" (
-    "id" TEXT NOT NULL PRIMARY KEY,
+    "id" TEXT NOT NULL,
     "source" TEXT NOT NULL DEFAULT 'manual',
     "sourceId" TEXT NOT NULL,
     "title" TEXT NOT NULL,
     "description" TEXT,
-    "price" DECIMAL NOT NULL,
-    "marketValue" DECIMAL,
-    "estimatedProfit" DECIMAL,
-    "dealScore" DECIMAL,
-    "roi" DECIMAL,
+    "price" DECIMAL(65,30) NOT NULL,
+    "marketValue" DECIMAL(65,30),
+    "estimatedProfit" DECIMAL(65,30),
+    "dealScore" DECIMAL(65,30),
+    "roi" DECIMAL(65,30),
     "condition" TEXT,
     "category" TEXT NOT NULL,
     "marketplace" TEXT,
@@ -24,154 +27,189 @@ CREATE TABLE "Deal" (
     "saves" INTEGER,
     "inquiries" INTEGER,
     "daysListed" INTEGER,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" DATETIME NOT NULL
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "Deal_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "MarketSample" (
-    "id" TEXT NOT NULL PRIMARY KEY,
+    "id" TEXT NOT NULL,
     "dealId" TEXT NOT NULL,
-    "observedPrice" DECIMAL NOT NULL,
-    "observedAt" DATETIME NOT NULL,
+    "observedPrice" DECIMAL(65,30) NOT NULL,
+    "observedAt" TIMESTAMP(3) NOT NULL,
     "source" TEXT NOT NULL,
     "condition" TEXT,
-    "status" TEXT,
-    "finalPrice" DECIMAL,
-    "listedAt" DATETIME,
-    "soldAt" DATETIME,
+    "status" "ListingStatus",
+    "finalPrice" DECIMAL(65,30),
+    "listedAt" TIMESTAMP(3),
+    "soldAt" TIMESTAMP(3),
     "daysToSell" INTEGER,
     "location" TEXT,
     "zipPrefix" TEXT,
     "region" TEXT,
     "title" TEXT,
     "description" TEXT,
-    "features" TEXT,
+    "features" JSONB,
     "views" INTEGER,
     "saves" INTEGER,
     "inquiries" INTEGER,
-    CONSTRAINT "MarketSample_dealId_fkey" FOREIGN KEY ("dealId") REFERENCES "Deal" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
+
+    CONSTRAINT "MarketSample_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "TMVResult" (
-    "id" TEXT NOT NULL PRIMARY KEY,
+    "id" TEXT NOT NULL,
     "dealId" TEXT NOT NULL,
-    "tmv" DECIMAL NOT NULL,
-    "tmvNormalized" DECIMAL,
-    "confidence" DECIMAL NOT NULL,
+    "tmv" DECIMAL(65,30) NOT NULL,
+    "tmvNormalized" DECIMAL(65,30),
+    "confidence" DECIMAL(65,30) NOT NULL,
     "sampleCount" INTEGER NOT NULL,
-    "volatility" DECIMAL NOT NULL,
-    "liquidityScore" DECIMAL NOT NULL,
+    "volatility" DECIMAL(65,30) NOT NULL,
+    "liquidityScore" DECIMAL(65,30) NOT NULL,
     "estimatedDaysToSell" INTEGER,
-    "seasonalityIndex" DECIMAL,
-    "regionalIndex" DECIMAL,
-    "calculatedAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT "TMVResult_dealId_fkey" FOREIGN KEY ("dealId") REFERENCES "Deal" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
+    "seasonalityIndex" DECIMAL(65,30),
+    "regionalIndex" DECIMAL(65,30),
+    "calculatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "TMVResult_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "Score" (
-    "id" TEXT NOT NULL PRIMARY KEY,
+    "id" TEXT NOT NULL,
     "dealId" TEXT NOT NULL,
-    "profitMargin" DECIMAL NOT NULL,
-    "velocityScore" DECIMAL NOT NULL,
-    "riskScore" DECIMAL NOT NULL,
-    "compositeRank" DECIMAL NOT NULL,
-    "demandScore" DECIMAL,
+    "profitMargin" DECIMAL(65,30) NOT NULL,
+    "velocityScore" DECIMAL(65,30) NOT NULL,
+    "riskScore" DECIMAL(65,30) NOT NULL,
+    "compositeRank" DECIMAL(65,30) NOT NULL,
+    "demandScore" DECIMAL(65,30),
     "hotDeal" BOOLEAN NOT NULL DEFAULT false,
-    "calculatedAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT "Score_dealId_fkey" FOREIGN KEY ("dealId") REFERENCES "Deal" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
+    "calculatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "Score_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "User" (
-    "id" TEXT NOT NULL PRIMARY KEY,
+    "id" TEXT NOT NULL,
     "email" TEXT NOT NULL,
     "password" TEXT NOT NULL,
     "firstName" TEXT,
     "lastName" TEXT,
     "role" TEXT NOT NULL DEFAULT 'user',
     "isActive" BOOLEAN NOT NULL DEFAULT true,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" DATETIME NOT NULL
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "User_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "RefreshToken" (
-    "id" TEXT NOT NULL PRIMARY KEY,
+    "id" TEXT NOT NULL,
     "token" TEXT NOT NULL,
     "userId" TEXT NOT NULL,
-    "expiresAt" DATETIME NOT NULL,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT "RefreshToken_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+    "expiresAt" TIMESTAMP(3) NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "RefreshToken_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "WatchlistItem" (
-    "id" TEXT NOT NULL PRIMARY KEY,
+    "id" TEXT NOT NULL,
     "userId" TEXT NOT NULL,
     "dealId" TEXT NOT NULL,
     "notes" TEXT,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT "WatchlistItem_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
-    CONSTRAINT "WatchlistItem_dealId_fkey" FOREIGN KEY ("dealId") REFERENCES "Deal" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "WatchlistItem_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "PortfolioItem" (
-    "id" TEXT NOT NULL PRIMARY KEY,
+    "id" TEXT NOT NULL,
     "userId" TEXT NOT NULL,
     "dealId" TEXT,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT "PortfolioItem_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
-    CONSTRAINT "PortfolioItem_dealId_fkey" FOREIGN KEY ("dealId") REFERENCES "Deal" ("id") ON DELETE SET NULL ON UPDATE CASCADE
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "PortfolioItem_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "Alert" (
-    "id" TEXT NOT NULL PRIMARY KEY,
+    "id" TEXT NOT NULL,
     "userId" TEXT NOT NULL,
     "dealId" TEXT,
     "message" TEXT,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT "Alert_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
-    CONSTRAINT "Alert_dealId_fkey" FOREIGN KEY ("dealId") REFERENCES "Deal" ("id") ON DELETE SET NULL ON UPDATE CASCADE
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "Alert_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "MarketplaceSync" (
-    "id" TEXT NOT NULL PRIMARY KEY,
+    "id" TEXT NOT NULL,
     "marketplace" TEXT NOT NULL,
-    "lastSyncedAt" DATETIME,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" DATETIME NOT NULL
+    "lastSyncedAt" TIMESTAMP(3),
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "MarketplaceSync_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "CategoryConfig" (
-    "id" TEXT NOT NULL PRIMARY KEY,
+    "id" TEXT NOT NULL,
     "category" TEXT NOT NULL,
-    "decayRate" DECIMAL NOT NULL,
+    "decayRate" DECIMAL(65,30) NOT NULL,
     "minSamples" INTEGER NOT NULL DEFAULT 8,
-    "freshnessWindow" INTEGER NOT NULL DEFAULT 180
+    "freshnessWindow" INTEGER NOT NULL DEFAULT 180,
+
+    CONSTRAINT "CategoryConfig_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "RegionalIndex" (
-    "id" TEXT NOT NULL PRIMARY KEY,
+    "id" TEXT NOT NULL,
     "region" TEXT NOT NULL,
-    "multiplier" DECIMAL NOT NULL,
-    "updatedAt" DATETIME NOT NULL
+    "multiplier" DECIMAL(65,30) NOT NULL,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "RegionalIndex_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "SeasonalityIndex" (
-    "id" TEXT NOT NULL PRIMARY KEY,
+    "id" TEXT NOT NULL,
     "category" TEXT NOT NULL,
     "month" INTEGER NOT NULL,
-    "multiplier" DECIMAL NOT NULL,
-    "updatedAt" DATETIME NOT NULL
+    "multiplier" DECIMAL(65,30) NOT NULL,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "SeasonalityIndex_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "TMVScenario" (
+    "id" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "category" TEXT,
+    "source" TEXT,
+    "buyPrice" DECIMAL(65,30) NOT NULL,
+    "expectedSalePrice" DECIMAL(65,30) NOT NULL,
+    "shippingCost" DECIMAL(65,30) NOT NULL DEFAULT 0,
+    "platformFeePct" DECIMAL(65,30) NOT NULL DEFAULT 0,
+    "prepCost" DECIMAL(65,30) NOT NULL DEFAULT 0,
+    "taxPct" DECIMAL(65,30) NOT NULL DEFAULT 0,
+    "notes" TEXT,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "TMVScenario_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateIndex
@@ -233,3 +271,43 @@ CREATE UNIQUE INDEX "RegionalIndex_region_key" ON "RegionalIndex"("region");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "SeasonalityIndex_category_month_key" ON "SeasonalityIndex"("category", "month");
+
+-- CreateIndex
+CREATE INDEX "TMVScenario_category_idx" ON "TMVScenario"("category");
+
+-- CreateIndex
+CREATE INDEX "TMVScenario_source_idx" ON "TMVScenario"("source");
+
+-- CreateIndex
+CREATE INDEX "TMVScenario_createdAt_idx" ON "TMVScenario"("createdAt");
+
+-- AddForeignKey
+ALTER TABLE "MarketSample" ADD CONSTRAINT "MarketSample_dealId_fkey" FOREIGN KEY ("dealId") REFERENCES "Deal"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "TMVResult" ADD CONSTRAINT "TMVResult_dealId_fkey" FOREIGN KEY ("dealId") REFERENCES "Deal"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Score" ADD CONSTRAINT "Score_dealId_fkey" FOREIGN KEY ("dealId") REFERENCES "Deal"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "RefreshToken" ADD CONSTRAINT "RefreshToken_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "WatchlistItem" ADD CONSTRAINT "WatchlistItem_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "WatchlistItem" ADD CONSTRAINT "WatchlistItem_dealId_fkey" FOREIGN KEY ("dealId") REFERENCES "Deal"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "PortfolioItem" ADD CONSTRAINT "PortfolioItem_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "PortfolioItem" ADD CONSTRAINT "PortfolioItem_dealId_fkey" FOREIGN KEY ("dealId") REFERENCES "Deal"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Alert" ADD CONSTRAINT "Alert_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Alert" ADD CONSTRAINT "Alert_dealId_fkey" FOREIGN KEY ("dealId") REFERENCES "Deal"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+

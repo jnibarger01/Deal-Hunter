@@ -163,14 +163,12 @@ router.post(
         velocityScore: scoreResult.velocityScore,
         riskScore: scoreResult.riskScore,
         compositeRank: scoreResult.compositeRank,
-        feesApplied: scoreResult.feesApplied,
       },
       update: {
         profitMargin: scoreResult.profitMargin,
         velocityScore: scoreResult.velocityScore,
         riskScore: scoreResult.riskScore,
         compositeRank: scoreResult.compositeRank,
-        feesApplied: scoreResult.feesApplied,
       },
     });
 
@@ -180,7 +178,6 @@ router.post(
       velocityScore: decimalToNumber(score.velocityScore),
       riskScore: decimalToNumber(score.riskScore),
       compositeRank: decimalToNumber(score.compositeRank),
-      feesApplied: decimalToNumber(score.feesApplied),
       calculatedAt: score.calculatedAt,
     });
   })
@@ -240,7 +237,6 @@ router.get(
             velocityScore: decimalToNumber(deal.score.velocityScore),
             riskScore: decimalToNumber(deal.score.riskScore),
             compositeRank: decimalToNumber(deal.score.compositeRank),
-            feesApplied: decimalToNumber(deal.score.feesApplied),
             calculatedAt: deal.score.calculatedAt,
           }
         : undefined,

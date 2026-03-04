@@ -40,6 +40,9 @@ COPY --from=builder /app/server/prisma ./prisma
 # Create logs directory
 RUN mkdir -p logs
 
+# Run as non-root in runtime container
+USER node
+
 # Expose port
 EXPOSE 5000
 

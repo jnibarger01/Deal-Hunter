@@ -21,9 +21,12 @@ export class AuthController {
         success: true,
         data: {
           user: result.user,
-          tokens: result.tokens,
+          ...(result.tokens ? { tokens: result.tokens } : {}),
+          verificationRequired: result.verificationRequired,
         },
-        message: 'User registered successfully',
+        message: result.verificationRequired
+          ? 'User registered. Verify your email to continue.'
+          : 'User registered successfully',
       });
     } catch (error) {
       next(error);
@@ -104,6 +107,62 @@ export class AuthController {
       res.status(200).json({
         success: true,
         data: { user: req.user },
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async forgotPassword(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { email } = req.body;
+      await authService.requestPasswordReset(email);
+
+      res.status(200).json({
+        success: true,
+        message: 'If an account exists, a reset email has been sent.',
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async resetPassword(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { token, newPassword } = req.body;
+      await authService.resetPassword(token, newPassword);
+
+      res.status(200).json({
+        success: true,
+        message: 'Password reset successful',
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async verifyEmail(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { token } = req.body;
+      await authService.verifyEmail(token);
+
+      res.status(200).json({
+        success: true,
+        message: 'Email verified successfully',
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async resendVerification(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { email } = req.body;
+      await authService.resendVerification(email);
+
+      res.status(200).json({
+        success: true,
+        message: 'If an account exists, a verification email has been sent.',
       });
     } catch (error) {
       next(error);

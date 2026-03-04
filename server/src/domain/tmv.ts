@@ -13,7 +13,7 @@ interface MarketSample {
   zipPrefix?: string | null;
   title?: string | null;
   description?: string | null;
-  features?: string | null;
+  features?: unknown;
   views?: number | null;
   saves?: number | null;
   inquiries?: number | null;
@@ -335,7 +335,8 @@ export class TMVCalculator {
   private buildSampleText(sample: MarketSample): string {
     if (sample.features) {
       try {
-        const parsed = JSON.parse(sample.features);
+        const parsed =
+          typeof sample.features === 'string' ? JSON.parse(sample.features) : sample.features;
         if (parsed && typeof parsed === 'object') {
           const values = Object.values(parsed as Record<string, unknown>)
             .map(value => (value ? String(value) : ''))
