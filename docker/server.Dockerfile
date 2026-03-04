@@ -46,5 +46,5 @@ USER node
 # Expose port
 EXPOSE 5000
 
-# Run migrations and start application
-CMD ["sh", "-c", "npx prisma migrate deploy && npm start"]
+# Start application (run migrations as a separate pre-deploy step)
+CMD ["npm", "start"]
