@@ -2,6 +2,7 @@ import app from './app';
 import config from './config/env';
 import logger from './config/logger';
 import prisma from './config/database';
+import { ingestCraigslistFromFeeds } from './services/craigslist';
 
 const startServer = async () => {
   try {
@@ -15,6 +16,52 @@ const startServer = async () => {
       logger.info(`📡 API: http://localhost:${config.port}/api/${config.apiVersion}`);
       logger.info(`🏥 Health: http://localhost:${config.port}/health`);
     });
+
+    if (config.craigslist.schedulerEnabled && config.craigslist.rssUrls.length > 0) {
+      const intervalMs = Math.max(1, config.craigslist.ingestIntervalMinutes) * 60_000;
+      let ingestInProgress = false;
+
+      const runCraigslistIngest = async () => {
+        if (ingestInProgress) {
+          logger.warn('Craigslist ingest skipped (previous run still in progress)');
+          return;
+        }
+
+        ingestInProgress = true;
+        try {
+          const results = await ingestCraigslistFromFeeds(
+            config.craigslist.rssUrls,
+            config.craigslist.maxPerFeed
+          );
+
+          const summary = results.reduce(
+            (acc, item) => {
+              acc.fetched += item.fetched;
+              acc.accepted += item.accepted;
+              acc.rejected += item.rejected;
+              return acc;
+            },
+            { fetched: 0, accepted: 0, rejected: 0 }
+          );
+
+          logger.info('Craigslist ingest completed', summary);
+        } catch (error) {
+          logger.error('Craigslist ingest failed', error);
+        } finally {
+          ingestInProgress = false;
+        }
+      };
+
+      logger.info(
+        `Craigslist scheduler enabled: ${config.craigslist.rssUrls.length} feed(s), every ${config.craigslist.ingestIntervalMinutes} minute(s)`
+      );
+
+      setInterval(() => {
+        void runCraigslistIngest();
+      }, intervalMs);
+
+      void runCraigslistIngest();
+    }
 
     // Graceful shutdown
     const gracefulShutdown = async (signal: string) => {

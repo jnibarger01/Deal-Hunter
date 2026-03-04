@@ -7,6 +7,7 @@ import { authenticate, authorize } from '../middleware/auth';
 import prisma from '../config/database';
 import { DealScorer } from '../domain/score';
 import asyncHandler from '../utils/asyncHandler';
+import { ingestCraigslistFromFeeds } from '../services/craigslist';
 
 const router = Router();
 
@@ -392,6 +393,58 @@ router.post(
         riskScore: Number(score.riskScore),
         compositeRank: Number(score.compositeRank),
         calculatedAt: score.calculatedAt.toISOString(),
+      },
+    });
+  })
+);
+
+// POST /api/deals/ingest/craigslist - Ingest Craigslist RSS feeds
+router.post(
+  '/ingest/craigslist',
+  authenticate,
+  authorize('admin'),
+  ingestLimiter,
+  validate([
+    body('rssUrls').optional().isArray({ min: 1 }),
+    body('rssUrls.*').optional().isString().isURL(),
+    body('maxPerFeed').optional().isInt({ min: 1, max: 200 }).toInt(),
+  ]),
+  asyncHandler(async (req, res) => {
+    const bodyUrls = Array.isArray(req.body.rssUrls)
+      ? (req.body.rssUrls as string[]).map((item) => item.trim()).filter(Boolean)
+      : [];
+
+    const feedUrls = bodyUrls.length > 0 ? bodyUrls : [];
+
+    if (feedUrls.length === 0) {
+      res.status(400).json({
+        success: false,
+        message: 'Provide rssUrls array with one or more Craigslist feed URLs',
+      });
+      return;
+    }
+
+    const maxPerFeed = Number.isFinite(Number(req.body.maxPerFeed))
+      ? Number(req.body.maxPerFeed)
+      : 50;
+
+    const results = await ingestCraigslistFromFeeds(feedUrls, maxPerFeed);
+
+    const summary = results.reduce(
+      (acc, item) => {
+        acc.fetched += item.fetched;
+        acc.accepted += item.accepted;
+        acc.rejected += item.rejected;
+        return acc;
+      },
+      { fetched: 0, accepted: 0, rejected: 0 }
+    );
+
+    res.json({
+      success: true,
+      data: {
+        ...summary,
+        results,
       },
     });
   })

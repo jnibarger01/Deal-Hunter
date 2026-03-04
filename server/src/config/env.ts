@@ -34,6 +34,10 @@ const envSchema = z.object({
   CORS_ORIGIN: z.string().default('http://localhost:3000'),
   TRUST_PROXY: z.string().default('1'),
   LOG_LEVEL: z.string().default('info'),
+  CRAIGSLIST_RSS_URLS: z.string().optional(),
+  CRAIGSLIST_INGEST_INTERVAL_MINUTES: z.string().default('30'),
+  CRAIGSLIST_MAX_PER_FEED: z.string().default('50'),
+  CRAIGSLIST_SCHEDULER_ENABLED: z.string().default('false'),
 });
 
 let env: z.infer<typeof envSchema>;
@@ -109,6 +113,15 @@ export const config = {
   },
   cors: {
     origin: env.CORS_ORIGIN.split(','),
+  },
+  craigslist: {
+    rssUrls: (env.CRAIGSLIST_RSS_URLS ?? '')
+      .split(',')
+      .map((item) => item.trim())
+      .filter(Boolean),
+    ingestIntervalMinutes: parseInt(env.CRAIGSLIST_INGEST_INTERVAL_MINUTES, 10),
+    maxPerFeed: parseInt(env.CRAIGSLIST_MAX_PER_FEED, 10),
+    schedulerEnabled: env.CRAIGSLIST_SCHEDULER_ENABLED.toLowerCase() === 'true',
   },
   trustProxy,
   isDevelopment: env.NODE_ENV === 'development',

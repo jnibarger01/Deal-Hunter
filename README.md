@@ -122,6 +122,41 @@ Base URL: `http://localhost:5000/api/v1`
 
 Legacy routes under `/api/v1/deals` remain available for CRUD and ingest.
 
+## 🦾 Craigslist RSS Ingest (No official API required)
+
+Deal-Hunter supports Craigslist via RSS feed ingest.
+
+### One-shot ingest
+
+```bash
+cd server
+CRAIGSLIST_RSS_URLS="https://kansascity.craigslist.org/search/sss?format=rss" npm run ingest:craigslist
+```
+
+### API-triggered ingest (admin auth)
+
+- `POST /api/v1/deals/ingest/craigslist`
+- Body:
+  ```json
+  {
+    "rssUrls": ["https://kansascity.craigslist.org/search/sss?format=rss"],
+    "maxPerFeed": 50
+  }
+  ```
+
+### Scheduler pattern (optional)
+
+Set in `server/.env`:
+
+```env
+CRAIGSLIST_RSS_URLS=https://kansascity.craigslist.org/search/sss?format=rss
+CRAIGSLIST_MAX_PER_FEED=50
+CRAIGSLIST_INGEST_INTERVAL_MINUTES=30
+CRAIGSLIST_SCHEDULER_ENABLED=true
+```
+
+When enabled, the backend runs periodic Craigslist ingest on startup.
+
 ## 🔒 Developer Hardening
 
 - Normalize line endings/encoding via `.gitattributes` (UTF-8 + LF)
