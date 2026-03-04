@@ -14,7 +14,6 @@ const envSchema = z.object({
   JWT_REFRESH_EXPIRES_IN: z.string().default('30d'),
   GEMINI_API_KEY: z.string().optional(),
   EBAY_API_KEY: z.string().optional(),
-  EBAY_APP_ID: z.string().optional(),
   FACEBOOK_API_KEY: z.string().optional(),
   MARKETPLACE_DELETE_TOKEN: z.string().optional(),
   FRONTEND_URL: z.string().url().default('http://localhost:5173'),
@@ -79,7 +78,7 @@ export const config = {
   },
   apiKeys: {
     gemini: env.GEMINI_API_KEY,
-    ebay: env.EBAY_API_KEY ?? env.EBAY_APP_ID,
+    ebay: env.EBAY_API_KEY,
     facebook: env.FACEBOOK_API_KEY,
   },
   auth: {

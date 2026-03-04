@@ -1,26 +1,49 @@
-# Release Checklist
+# Release Checklist (Launch-safe MVP)
 
-## Pre-Release
+## 1) Quality gates
 
 - [ ] `npm --prefix server run lint`
 - [ ] `npm --prefix server run build`
 - [ ] `npm --prefix frontend run build`
-- [ ] `npm --prefix server test` against reachable PostgreSQL
+- [ ] `npm --prefix server test`
+- [ ] CI checks green on `main`
+
+## 2) Config and secrets
+
+- [ ] `DATABASE_URL` points to **Supabase production**
+- [ ] `JWT_SECRET` length >= 32
+- [ ] SMTP vars present and validated
+- [ ] `CORS_ORIGIN` + `FRONTEND_URL` match production domain(s)
+- [ ] `TRUST_PROXY` set correctly for nginx/reverse proxy
+- [ ] No dev/test secrets in production env files
+
+## 3) DB and migrations
+
+- [ ] Migration set reviewed
+- [ ] `prisma migrate deploy` path verified
+- [ ] Rollback path documented for this release
+- [ ] Latest backup exists
+- [ ] Restore drill passed in non-prod
+
+## 4) Deployment smoke (Docker host)
+
 - [ ] `docker compose -f docker-compose.prod.yml config`
-- [ ] Verify required production secrets are present
-- [ ] Confirm database backup for release day exists
+- [ ] `docker compose -f docker-compose.prod.yml up -d --build`
+- [ ] `GET /health` returns 200
+- [ ] `GET /ready` returns 200 (DB connected)
+- [ ] Login works
+- [ ] Deals read works
+- [ ] One write path works (watchlist/portfolio/etc.)
 
-## Deploy
+## 5) Ops readiness
 
-- [ ] Merge approved changes to `main`
-- [ ] CI pipeline succeeds (lint/test/build/docker)
-- [ ] Deploy production stack
-- [ ] Confirm `/health` and `/ready`
-- [ ] Smoke test login, deal listing, and one write path
+- [ ] Monitor `/ready` uptime + API 5xx + container restart count
+- [ ] Alert owner/channel set
+- [ ] `docs/production.md` current
 
-## Post-Deploy
+## 6) Governance
 
-- [ ] Monitor logs and 5xx rates for 30 minutes
-- [ ] Confirm auth email delivery (verification and reset)
-- [ ] Confirm no migration errors
-- [ ] Record release version and timestamp in ops notes
+- [ ] Branch protection on `main`
+- [ ] Required checks set (`Lint`, `Test`, `Build`, `Docker Build`)
+- [ ] Deploy blocked until required checks pass
+- [ ] Release tag/version captured in ops notes

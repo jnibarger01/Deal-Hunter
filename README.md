@@ -40,7 +40,8 @@ Deal Hunter is a sophisticated platform designed to help flippers identify, eval
 - **Containerization**: [Docker](https://www.docker.com/) & Docker Compose
 - **Proxy/Web Server**: [Nginx](https://www.nginx.com/)
 - **CI/CD**: GitHub Actions
-- **PaaS**: [Render](https://render.com/)
+- **Primary production target**: Docker host + Supabase Postgres
+- **Optional deployment path**: [Render](https://render.com/) (non-primary)
 
 ## 🚀 Getting Started
 
@@ -134,6 +135,12 @@ Legacy routes under `/api/v1/deals` remain available for CRUD and ingest.
 
 - Deployment and operations runbook: `docs/production.md`
 - Release checklist: `docs/release-checklist.md`
+
+Quick env/deploy sanity check:
+
+```bash
+./scripts/verify-production.sh --health-url https://<your-api-domain>/ready
+```
 
 ## 🏗️ Project Structure
 

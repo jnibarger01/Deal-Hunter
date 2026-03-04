@@ -1,12 +1,8 @@
-databases:
-  - name: deal-hunter-db
-    plan: free
-    databaseName: dealhunter
-    user: dealhunter
-    region: oregon
+# Optional deployment manifest (non-primary path).
+# Primary production contract is Docker host + Supabase Postgres.
 
 services:
-  # Backend API
+  # Backend API (uses external Supabase Postgres via DATABASE_URL)
   - type: web
     name: deal-hunter-api
     runtime: docker
@@ -22,9 +18,7 @@ services:
       - key: PORT
         value: 5000
       - key: DATABASE_URL
-        fromDatabase:
-          name: deal-hunter-db
-          property: connectionString
+        sync: false
       - key: JWT_SECRET
         generateValue: true
       - key: JWT_EXPIRES_IN
@@ -41,8 +35,10 @@ services:
         value: 1
       - key: LOG_LEVEL
         value: info
-      # Add your API keys in Render dashboard (don't commit them)
+      # Optional integrations/secrets in Render dashboard (do not commit)
       # - key: EBAY_API_KEY
+      #   sync: false
+      # - key: GEMINI_API_KEY
       #   sync: false
 
   # Frontend (static site)

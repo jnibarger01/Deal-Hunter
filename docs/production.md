@@ -1,84 +1,85 @@
-# Production Runbook
+# Production Runbook (Docker Host + Supabase)
 
-## Environment
+This is the primary production contract.
 
-Required server environment variables:
+- Runtime: `docker-compose.prod.yml` on your host
+- Database: Supabase Postgres (`DATABASE_URL`)
+- Health: `/health` (liveness), `/ready` (DB readiness)
+
+## 1) Required server env vars
 
 - `NODE_ENV=production`
 - `PORT=5000`
-- `DATABASE_URL` (PostgreSQL)
-- `JWT_SECRET` (minimum 32 chars)
-- `JWT_EXPIRES_IN`
-- `JWT_REFRESH_EXPIRES_IN`
-- `FRONTEND_URL`
-- `CORS_ORIGIN`
-- `TRUST_PROXY`
-- `RATE_LIMIT_WINDOW_MS`
-- `RATE_LIMIT_MAX_REQUESTS`
-- `AUTH_RATE_LIMIT_WINDOW_MS`
-- `AUTH_RATE_LIMIT_MAX_REQUESTS`
-- `SMTP_HOST`
-- `SMTP_PORT`
-- `SMTP_SECURE`
-- `SMTP_USER`
-- `SMTP_PASS`
-- `SMTP_FROM`
+- `DATABASE_URL=<supabase postgres uri>`
+- `JWT_SECRET=<32+ chars>`
+- `JWT_EXPIRES_IN=7d`
+- `JWT_REFRESH_EXPIRES_IN=30d`
+- `FRONTEND_URL=https://<frontend-domain>`
+- `CORS_ORIGIN=https://<frontend-domain>`
+- `TRUST_PROXY=1`
+- `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USER`, `SMTP_PASS`, `SMTP_FROM`
 
 Optional:
-
 - `EBAY_API_KEY`
 - `GEMINI_API_KEY`
 - `MARKETPLACE_DELETE_TOKEN`
 
-## Deploy (Docker Compose)
+## 2) Supabase connection string
 
-1. Pull latest images:
-   ```bash
-   docker compose -f docker-compose.prod.yml pull
-   ```
-2. Apply migrations and restart services:
-   ```bash
-   docker compose -f docker-compose.prod.yml up -d
-   ```
-3. Verify service status:
-   ```bash
-   docker compose -f docker-compose.prod.yml ps
-   ```
-4. Verify health endpoints:
-   ```bash
-   curl -fsS http://<server>/health
-   curl -fsS http://<server>/ready
-   ```
+Get from Supabase:
+- Project Settings → Database → Connection string
 
-## Rollback
+Example shape:
 
-1. Set image tags to previous known-good release (`TAG=<previous-tag>`).
+```env
+DATABASE_URL="postgresql://postgres.<project-ref>:<password>@aws-0-<region>.pooler.supabase.com:6543/postgres?pgbouncer=true&connection_limit=1"
+```
+
+## 3) Deployment steps (host)
+
+```bash
+cd <deploy-path>
+docker compose -f docker-compose.prod.yml config >/tmp/deal-hunter.compose
+
+docker compose -f docker-compose.prod.yml up -d --build
+
+docker compose -f docker-compose.prod.yml ps
+curl -fsS http://<server>/health
+curl -fsS http://<server>/ready
+```
+
+## 4) Migration policy
+
+App startup runs:
+
+```bash
+npx prisma migrate deploy && npm start
+```
+
+For multi-instance rollouts, run migrations as a one-shot pre-step before scaling app containers.
+
+## 5) Rollback
+
+1. Set `TAG=<previous-known-good>`
 2. Redeploy:
    ```bash
-   TAG=<previous-tag> docker compose -f docker-compose.prod.yml up -d
+   TAG=<previous-known-good> docker compose -f docker-compose.prod.yml up -d
    ```
-3. Verify readiness and critical API endpoints.
+3. Verify `/health` and `/ready`.
 
-## Database Backup and Restore
+## 6) Backup and restore (Supabase)
 
-Backup example:
+- Enable Supabase backups/PITR per plan.
+- Retention target: 14–30 days.
+- Run restore drill in non-prod before launch and quarterly.
+- Release day check: confirm latest backup exists.
+
+## 7) Incident triage
 
 ```bash
-docker exec -t <postgres-container> pg_dump -U <user> -d <database> > backup-$(date +%F-%H%M).sql
+docker compose -f docker-compose.prod.yml ps
+docker compose -f docker-compose.prod.yml logs --tail=200 server
+curl -i http://<server>/ready
 ```
 
-Restore example:
-
-```bash
-cat backup.sql | docker exec -i <postgres-container> psql -U <user> -d <database>
-```
-
-At minimum, schedule daily backups and keep retention for 14-30 days.
-
-## On-Call Triage
-
-1. Check `/ready` and container health.
-2. Check recent server logs for 5xx or database/auth errors.
-3. Validate database connectivity and migration status.
-4. If auth/email related, validate SMTP credentials and provider availability.
-5. If unresolved within 15 minutes, roll back to previous release.
+If unresolved within 15 minutes and customer-impacting, rollback.
