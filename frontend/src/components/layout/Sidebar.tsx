@@ -13,13 +13,14 @@ interface NavItem {
   path: string;
   label: string;
   icon: React.ReactNode;
+  end?: boolean;
 }
 
 const navItems: NavItem[] = [
-  { path: '/', label: 'Dashboard', icon: <LayoutDashboard size={20} /> },
-  { path: '/deals', label: 'All Deals', icon: <Tags size={20} /> },
-  { path: '/ranked', label: 'Top Ranked', icon: <TrendingUp size={20} /> },
-  { path: '/calculator', label: 'TMV Calculator', icon: <Calculator size={20} /> },
+  { path: '/app', label: 'Dashboard', icon: <LayoutDashboard size={20} />, end: true },
+  { path: '/app/deals', label: 'All Deals', icon: <Tags size={20} /> },
+  { path: '/app/ranked', label: 'Top Ranked', icon: <TrendingUp size={20} /> },
+  { path: '/app/calculator', label: 'TMV Calculator', icon: <Calculator size={20} /> },
 ];
 
 export function Sidebar() {
@@ -27,7 +28,6 @@ export function Sidebar() {
 
   return (
     <aside className={styles.sidebar}>
-      {/* Logo */}
       <div className={styles.logo}>
         <div className={styles.logoIcon}>
           <Activity size={24} />
@@ -38,7 +38,6 @@ export function Sidebar() {
         </div>
       </div>
 
-      {/* Navigation */}
       <nav className={styles.nav}>
         <ul className={styles.navList}>
           {navItems.map((item, index) => (
@@ -49,22 +48,20 @@ export function Sidebar() {
             >
               <NavLink
                 to={item.path}
+                end={item.end}
                 className={({ isActive }) =>
                   `${styles.navLink} ${isActive ? styles.navLinkActive : ''}`
                 }
               >
                 <span className={styles.navIcon}>{item.icon}</span>
                 <span className={styles.navLabel}>{item.label}</span>
-                {location.pathname === item.path && (
-                  <span className={styles.activeIndicator} />
-                )}
+                {location.pathname === item.path && <span className={styles.activeIndicator} />}
               </NavLink>
             </li>
           ))}
         </ul>
       </nav>
 
-      {/* Status indicator */}
       <div className={styles.statusSection}>
         <div className={styles.statusCard}>
           <div className={styles.statusHeader}>
@@ -75,9 +72,8 @@ export function Sidebar() {
         </div>
       </div>
 
-      {/* Footer */}
       <div className={styles.footer}>
-        <NavLink to="/settings" className={styles.footerLink}>
+        <NavLink to="/app/settings" className={styles.footerLink}>
           <Settings size={18} />
           <span>Settings</span>
         </NavLink>
