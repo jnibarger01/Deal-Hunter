@@ -103,6 +103,19 @@ const toOptionalNumber = (value: unknown): number | undefined => {
   return Number.isFinite(parsed) ? parsed : undefined;
 };
 
+const toNumber = (value: unknown, fallback = 0): number => {
+  const parsed = typeof value === 'number' ? value : Number(value);
+  return Number.isFinite(parsed) ? parsed : fallback;
+};
+
+const sourceFeeDefaults: Record<string, number> = {
+  ebay: 13,
+  'fb market': 5,
+  'fb marketplace': 5,
+  craigslist: 3,
+  offerup: 8,
+};
+
 const getListingId = (listing: unknown): string | undefined => {
   if (!listing || typeof listing !== 'object') {
     return undefined;
@@ -116,6 +129,144 @@ router.get('/', validate(listDealsValidation), dealController.getAllDeals);
 router.get('/categories', dealController.getCategories);
 router.get('/marketplaces', dealController.getMarketplaces);
 router.get('/stats', dealController.getStats);
+router.get(
+  '/tmv-assumptions',
+  asyncHandler(async (req, res) => {
+    const category = typeof req.query.category === 'string' ? req.query.category.trim() : undefined;
+    const source = typeof req.query.source === 'string' ? req.query.source.trim() : undefined;
+
+    const deals = await prisma.deal.findMany({
+      where: {
+        status: 'active',
+        ...(category ? { category } : {}),
+        ...(source ? { source } : {}),
+        tmvResult: { isNot: null },
+      },
+      include: {
+        tmvResult: true,
+        score: true,
+      },
+      take: 100,
+      orderBy: { createdAt: 'desc' },
+    });
+
+    const margins = deals
+      .filter((deal) => Number(deal.price) > 0 && deal.tmvResult)
+      .map((deal) => (Number(deal.tmvResult!.tmv) - Number(deal.price)) / Number(deal.price));
+    const daysToSell = deals
+      .filter((deal) => deal.tmvResult?.estimatedDaysToSell !== null && deal.tmvResult?.estimatedDaysToSell !== undefined)
+      .map((deal) => Number(deal.tmvResult!.estimatedDaysToSell));
+    const confidenceScores = deals
+      .filter((deal) => deal.tmvResult)
+      .map((deal) => Number(deal.tmvResult!.confidence));
+
+    const average = (values: number[]) =>
+      values.length ? values.reduce((sum, value) => sum + value, 0) / values.length : 0;
+
+    const normalizedSource = source?.toLowerCase();
+    const defaultFeePct = normalizedSource
+      ? sourceFeeDefaults[normalizedSource] ?? 10
+      : 10;
+
+    const markupPct = Math.max(0, average(margins) * 100);
+    const recommendedFeePct = deals.length ? Math.max(defaultFeePct, Math.min(20, markupPct * 0.35)) : defaultFeePct;
+    const recommendedDaysToSell = daysToSell.length ? Math.max(1, Math.round(average(daysToSell))) : 7;
+    const confidence = confidenceScores.length ? Math.max(0.4, Math.min(0.95, average(confidenceScores))) : 0.65;
+
+    res.json({
+      success: true,
+      data: {
+        category: category || null,
+        source: source || null,
+        sampleSize: deals.length,
+        recommendedMarkupPct: Number(markupPct.toFixed(2)),
+        recommendedFeePct: Number(recommendedFeePct.toFixed(2)),
+        recommendedDaysToSell,
+        confidence: Number(confidence.toFixed(2)),
+      },
+    });
+  })
+);
+router.get(
+  '/tmv-scenarios',
+  asyncHandler(async (_req, res) => {
+    const scenarios = await prisma.tMVScenario.findMany({
+      orderBy: { createdAt: 'desc' },
+      take: 100,
+    });
+
+    res.json({
+      success: true,
+      data: scenarios.map((scenario) => ({
+        ...scenario,
+        buyPrice: Number(scenario.buyPrice),
+        expectedSalePrice: Number(scenario.expectedSalePrice),
+        shippingCost: Number(scenario.shippingCost),
+        platformFeePct: Number(scenario.platformFeePct),
+        prepCost: Number(scenario.prepCost),
+        taxPct: Number(scenario.taxPct),
+      })),
+    });
+  })
+);
+router.post(
+  '/tmv-scenarios',
+  validate([
+    body('name').isString().trim().notEmpty().withMessage('name is required'),
+    body('buyPrice').isFloat({ min: 0 }).withMessage('buyPrice must be >= 0'),
+    body('expectedSalePrice').isFloat({ min: 0 }).withMessage('expectedSalePrice must be >= 0'),
+    body('shippingCost').optional().isFloat({ min: 0 }),
+    body('platformFeePct').optional().isFloat({ min: 0 }),
+    body('prepCost').optional().isFloat({ min: 0 }),
+    body('taxPct').optional().isFloat({ min: 0 }),
+    body('category').optional().isString(),
+    body('source').optional().isString(),
+    body('notes').optional().isString(),
+  ]),
+  asyncHandler(async (req, res) => {
+    const created = await prisma.tMVScenario.create({
+      data: {
+        name: String(req.body.name),
+        category: toOptionalString(req.body.category),
+        source: toOptionalString(req.body.source),
+        buyPrice: toNumber(req.body.buyPrice),
+        expectedSalePrice: toNumber(req.body.expectedSalePrice),
+        shippingCost: toNumber(req.body.shippingCost),
+        platformFeePct: toNumber(req.body.platformFeePct),
+        prepCost: toNumber(req.body.prepCost),
+        taxPct: toNumber(req.body.taxPct),
+        notes: toOptionalString(req.body.notes),
+      },
+    });
+
+    res.status(201).json({
+      success: true,
+      data: {
+        ...created,
+        buyPrice: Number(created.buyPrice),
+        expectedSalePrice: Number(created.expectedSalePrice),
+        shippingCost: Number(created.shippingCost),
+        platformFeePct: Number(created.platformFeePct),
+        prepCost: Number(created.prepCost),
+        taxPct: Number(created.taxPct),
+      },
+    });
+  })
+);
+router.delete(
+  '/tmv-scenarios/:id',
+  validate([param('id').isString().notEmpty().withMessage('Valid scenario ID is required')]),
+  asyncHandler(async (req, res) => {
+    await prisma.tMVScenario.delete({
+      where: { id: String(req.params.id) },
+    });
+
+    res.json({
+      success: true,
+      message: 'TMV scenario deleted',
+    });
+  })
+);
 router.get('/:id', validate(idParamValidation), dealController.getDealById);
 
 // POST /api/deals/ingest - Ingest new listings

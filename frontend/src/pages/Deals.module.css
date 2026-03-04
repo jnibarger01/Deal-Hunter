@@ -70,6 +70,26 @@
   color: var(--color-text-primary);
 }
 
+.sortDirectionButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-2);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.sortDirectionButton:hover {
+  border-color: var(--color-border-default);
+  color: var(--color-text-primary);
+  background: var(--color-bg-hover);
+}
+
 /* View Toggle */
 .viewToggle {
   display: flex;

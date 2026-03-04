@@ -55,6 +55,32 @@ export interface HealthStatus {
   environment?: string;
 }
 
+export interface TMVAssumptions {
+  category: string | null;
+  source: string | null;
+  sampleSize: number;
+  recommendedMarkupPct: number;
+  recommendedFeePct: number;
+  recommendedDaysToSell: number;
+  confidence: number;
+}
+
+export interface TMVScenario {
+  id: string;
+  name: string;
+  category?: string | null;
+  source?: string | null;
+  buyPrice: number;
+  expectedSalePrice: number;
+  shippingCost: number;
+  platformFeePct: number;
+  prepCost: number;
+  taxPct: number;
+  notes?: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
 // UI State types
 export type SortDirection = 'asc' | 'desc';
 

@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import {
   TrendingUp,
   DollarSign,
@@ -10,6 +10,7 @@ import {
 import { Header } from '../components/layout';
 import { MetricCard, MetricGrid, DealCard, DealGrid, Card, CardHeader, CardContent } from '../components/ui';
 import { useRankedDeals } from '../hooks/useDeals';
+import { useAppSettings } from '../context/AppSettingsContext';
 import type { RankedDeal } from '../types';
 import styles from './Dashboard.module.css';
 
@@ -135,6 +136,7 @@ const mockRankedDeals: RankedDeal[] = [
 
 export function Dashboard() {
   const { data: rankedDeals, loading: rankedLoading, refetch } = useRankedDeals();
+  const { settings } = useAppSettings();
 
   const enableMockFallback =
     import.meta.env.DEV && import.meta.env.VITE_ENABLE_MOCK_FALLBACK === 'true';
@@ -172,6 +174,15 @@ export function Dashboard() {
   }, [deals]);
 
   const topDeals = deals.slice(0, 6);
+
+  useEffect(() => {
+    if (!settings.autoRefreshSec || settings.autoRefreshSec < 15) return;
+    const id = window.setInterval(() => {
+      refetch();
+    }, settings.autoRefreshSec * 1000);
+
+    return () => window.clearInterval(id);
+  }, [refetch, settings.autoRefreshSec]);
 
   return (
     <div className={styles.page}>
@@ -249,7 +260,7 @@ export function Dashboard() {
                   key={deal.id}
                   deal={deal}
                   rank={index + 1}
-                  variant={index === 0 ? 'featured' : 'default'}
+                  variant={settings.compactMode ? 'compact' : index === 0 ? 'featured' : 'default'}
                 />
               ))}
             </DealGrid>

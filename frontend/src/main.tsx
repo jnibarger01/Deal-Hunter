@@ -1,10 +1,13 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './App'
+import { AppSettingsProvider } from './context/AppSettingsContext'
 import './index.css'
 
 ReactDOM.createRoot(document.getElementById('app')!).render(
   <React.StrictMode>
-    <App />
+    <AppSettingsProvider>
+      <App />
+    </AppSettingsProvider>
   </React.StrictMode>,
 )

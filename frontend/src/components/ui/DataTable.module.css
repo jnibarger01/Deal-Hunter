@@ -8,6 +8,14 @@
   border-radius: var(--radius-lg);
 }
 
+.compact .th {
+  padding: var(--space-2) var(--space-3);
+}
+
+.compact .td {
+  padding: var(--space-2) var(--space-3);
+}
+
 .table {
   width: 100%;
   border-collapse: collapse;

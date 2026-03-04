@@ -202,3 +202,28 @@ model SeasonalityIndex {
   @@unique([category, month])
 }
 
+model TMVScenario {
+  id                String   @id @default(cuid())
+  name              String
+  category          String?
+  source            String?
+  buyPrice          Decimal
+  expectedSalePrice Decimal
+  shippingCost      Decimal  @default(0)
+  platformFeePct    Decimal  @default(0)
+  prepCost          Decimal  @default(0)
+  taxPct            Decimal  @default(0)
+  notes             String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@index([category])
+  @@index([source])
+  @@index([createdAt])
+}
+
+enum ListingStatus {
+  active
+  sold
+  expired
+}

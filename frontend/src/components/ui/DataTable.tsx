@@ -19,6 +19,7 @@ interface DataTableProps<T> {
   keyExtractor: (item: T) => string;
   onSort?: (key: string, direction: SortDirection) => void;
   loading?: boolean;
+  compact?: boolean;
   emptyMessage?: string;
   onRowClick?: (item: T) => void;
 }
@@ -29,6 +30,7 @@ export function DataTable<T>({
   keyExtractor,
   onSort,
   loading = false,
+  compact = false,
   emptyMessage = 'No data available',
   onRowClick,
 }: DataTableProps<T>) {
@@ -66,7 +68,7 @@ export function DataTable<T>({
 
   if (loading) {
     return (
-      <div className={styles.tableWrapper}>
+      <div className={`${styles.tableWrapper} ${compact ? styles.compact : ''}`}>
         <table className={styles.table}>
           <thead className={styles.thead}>
             <tr>
@@ -106,7 +108,7 @@ export function DataTable<T>({
   }
 
   return (
-    <div className={styles.tableWrapper}>
+    <div className={`${styles.tableWrapper} ${compact ? styles.compact : ''}`}>
       <table className={styles.table}>
         <thead className={styles.thead}>
           <tr>
