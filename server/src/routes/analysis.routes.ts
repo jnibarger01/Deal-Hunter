@@ -47,10 +47,6 @@ router.post(
 
     const calculator = new TMVCalculator(tmvConfig);
     const result = calculator.calculate(deal.samples, {
-      targetCondition: deal.condition,
-      targetRegion: deal.region,
-      targetTitle: deal.title,
-      targetDescription: deal.description,
       targetCategory: deal.category,
     });
 
@@ -151,6 +147,7 @@ router.post(
         confidence: Number(tmv.confidence),
         volatility: tmv.volatility,
         liquidityScore: Number(tmv.liquidityScore),
+        estimatedDaysToSell: tmv.estimatedDaysToSell,
       },
       feeAssumptions
     );

@@ -8,6 +8,7 @@ on:
 
 env:
   NODE_VERSION: '20'
+  DATABASE_URL: postgresql://test:test@localhost:5432/test?schema=public
 
 jobs:
   lint:
@@ -37,7 +38,7 @@ jobs:
     runs-on: ubuntu-latest
     services:
       postgres:
-        image: postgres:15
+        image: postgres:16
         env:
           POSTGRES_USER: test
           POSTGRES_PASSWORD: test
@@ -73,15 +74,10 @@ jobs:
 
       - name: Run database migrations
         working-directory: ./server
-        env:
-          DATABASE_URL: "postgresql://test:test@localhost:5432/test?schema=public"
         run: npx prisma migrate deploy
 
       - name: Run tests with coverage
         working-directory: ./server
-        env:
-          DATABASE_URL: "postgresql://test:test@localhost:5432/test?schema=public"
-          JWT_SECRET: "test-jwt-secret-for-ci-32-characters-long"
         run: npm test
 
       - name: Upload coverage report

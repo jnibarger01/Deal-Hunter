@@ -5,6 +5,8 @@ FROM node:20-bookworm-slim AS builder
 
 WORKDIR /app
 
+RUN apt-get update && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
+
 # Copy configuration files
 COPY server/package*.json ./server/
 COPY server/tsconfig.json ./server/

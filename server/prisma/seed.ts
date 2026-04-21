@@ -19,9 +19,8 @@ async function main() {
   });
 
   await prisma.marketplaceSync.upsert({
-    where: { id: 'seed-marketplace-sync' },
+    where: { marketplace: 'ebay' },
     create: {
-      id: 'seed-marketplace-sync',
       marketplace: 'ebay',
       lastSyncedAt: new Date(0),
     },

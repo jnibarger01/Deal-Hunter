@@ -1,4 +1,4 @@
-import { Search, Bell, RefreshCw } from 'lucide-react';
+import { RefreshCw } from 'lucide-react';
 import { useHealth } from '../../hooks/useDeals';
 import styles from './Header.module.css';
 
@@ -20,18 +20,6 @@ export function Header({ title, subtitle, onRefresh, refreshing }: HeaderProps) 
       </div>
 
       <div className={styles.actions}>
-        {/* Search */}
-        <div className={styles.searchContainer}>
-          <Search size={18} className={styles.searchIcon} />
-          <input
-            type="text"
-            placeholder="Search deals..."
-            className={styles.searchInput}
-          />
-          <kbd className={styles.searchKbd}>/</kbd>
-        </div>
-
-        {/* Refresh */}
         {onRefresh && (
           <button
             className={styles.iconButton}
@@ -46,13 +34,6 @@ export function Header({ title, subtitle, onRefresh, refreshing }: HeaderProps) 
           </button>
         )}
 
-        {/* Notifications */}
-        <button className={styles.iconButton} aria-label="Notifications">
-          <Bell size={18} />
-          <span className={styles.notificationDot} />
-        </button>
-
-        {/* API Status */}
         <div className={styles.apiStatus}>
           <span
             className={`${styles.statusDot} ${

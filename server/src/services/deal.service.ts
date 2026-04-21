@@ -1,14 +1,14 @@
-import { Deal, Prisma } from '@prisma/client';
+import { Deal, ListingStatus, Prisma } from '@prisma/client';
 import prisma from '../config/database';
 import { AppError } from '../middleware/errorHandler';
 
 interface DealFilters {
   category?: string;
-  marketplace?: string;
+  source?: string;
   minDealScore?: number;
   maxPrice?: number;
   search?: string;
-  status?: string;
+  status?: ListingStatus;
 }
 
 interface DealSortOptions {
@@ -29,7 +29,7 @@ export class DealService {
   ) {
     const {
       category,
-      marketplace,
+      source,
       minDealScore,
       maxPrice,
       search,
@@ -45,7 +45,7 @@ export class DealService {
     const where: Prisma.DealWhereInput = {
       status,
       ...(category && { category }),
-      ...(marketplace && { marketplace }),
+      ...(source && { source }),
       ...(minDealScore !== undefined && minDealScore !== null && {
         score: {
           compositeRank: { gte: minDealScore },
@@ -92,90 +92,6 @@ export class DealService {
     }
 
     return deal;
-  }
-
-  async createDeal(data: Prisma.DealCreateInput): Promise<Deal> {
-    // Check if deal with marketplace ID already exists
-    if (data.marketplaceId) {
-      const existing = await prisma.deal.findUnique({
-        where: { marketplaceId: data.marketplaceId },
-      });
-
-      if (existing) {
-        throw new AppError('Deal with this marketplace ID already exists', 400);
-      }
-    }
-
-    const deal = await prisma.deal.create({
-      data,
-    });
-
-    return deal;
-  }
-
-  async updateDeal(id: string, data: Prisma.DealUpdateInput): Promise<Deal> {
-    const deal = await prisma.deal.update({
-      where: { id },
-      data,
-    });
-
-    return deal;
-  }
-
-  async deleteDeal(id: string): Promise<void> {
-    await prisma.deal.delete({
-      where: { id },
-    });
-  }
-
-  async getCategories(): Promise<string[]> {
-    const categories = await prisma.deal.findMany({
-      where: { status: 'active' },
-      select: { category: true },
-      distinct: ['category'],
-    });
-
-    return categories.map((c) => c.category);
-  }
-
-  async getMarketplaces(): Promise<string[]> {
-    const marketplaces = await prisma.deal.findMany({
-      where: { status: 'active' },
-      select: { marketplace: true },
-      distinct: ['marketplace'],
-    });
-
-    return marketplaces.map((m) => m.marketplace);
-  }
-
-  async getDealStats() {
-    const [totalDeals, avgPrice, avgRank, topCategories] = await Promise.all([
-      prisma.deal.count({ where: { status: 'active' } }),
-      prisma.deal.aggregate({
-        where: { status: 'active' },
-        _avg: { price: true },
-      }),
-      prisma.score.aggregate({
-        _avg: { compositeRank: true },
-      }),
-      prisma.deal.groupBy({
-        by: ['category'],
-        where: { status: 'active' },
-        _count: { category: true },
-        orderBy: { _count: { category: 'desc' } },
-        take: 5,
-      }),
-    ]);
-
-    return {
-      totalDeals,
-      avgPrice: avgPrice._avg.price || 0,
-      avgCompositeRank: avgRank._avg.compositeRank || 0,
-      topCategories: topCategories.map((c) => ({
-        category: c.category,
-        count: c._count.category,
-      })),
-    };
   }
 }
 

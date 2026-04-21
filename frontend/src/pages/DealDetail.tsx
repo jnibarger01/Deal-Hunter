@@ -1,63 +1,22 @@
-import { useParams, useNavigate } from 'react-router-dom';
-import {
-  ArrowLeft,
-  ExternalLink,
-  TrendingUp,
-  Clock,
-  Shield,
-  BarChart3,
-  Target,
-  Activity,
-  DollarSign,
-  RefreshCw,
-} from 'lucide-react';
+import { useMemo } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { ArrowLeft, BarChart3, Clock, ExternalLink, RefreshCw, Shield, Target, TrendingUp } from 'lucide-react';
 import { Header } from '../components/layout';
 import {
-  Card,
-  CardHeader,
-  CardContent,
+  Badge,
   Button,
+  Card,
+  CardContent,
+  CardHeader,
+  ConditionBadge,
+  ConfidenceBadge,
   MetricCard,
   MetricGrid,
-  Badge,
-  ConfidenceBadge,
   RiskBadge,
-  ConditionBadge,
 } from '../components/ui';
-import { useDeal, useCalculateTMV } from '../hooks/useDeals';
+import { useAnalyzeDeal, useDeal, useRankedDeal, useTMV } from '../hooks/useDeals';
 import type { RankedDeal } from '../types';
 import styles from './DealDetail.module.css';
-
-// Mock data for when API is unavailable
-const mockDeal: RankedDeal = {
-  id: '1',
-  source: 'eBay',
-  sourceId: 'eb-123456',
-  title: 'Sony PlayStation 5 Console - Digital Edition with Extra Controller',
-  price: 350,
-  condition: 'Like New',
-  category: 'Gaming',
-  location: 'Los Angeles, CA',
-  url: 'https://example.com/deal/1',
-  createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
-  tmv: {
-    dealId: '1',
-    tmv: 450,
-    confidence: 0.87,
-    sampleCount: 124,
-    volatility: 0.12,
-    liquidityScore: 0.89,
-    estimatedDaysToSell: 3,
-    calculatedAt: new Date().toISOString(),
-  },
-  score: {
-    dealId: '1',
-    profitMargin: 0.286,
-    velocityScore: 0.92,
-    riskScore: 0.15,
-    compositeRank: 94,
-  },
-};
 
 function formatCurrency(value: number): string {
   return new Intl.NumberFormat('en-US', {
@@ -72,8 +31,8 @@ function formatPercent(value: number): string {
   return `${(value * 100).toFixed(1)}%`;
 }
 
-function formatDate(dateString: string): string {
-  return new Date(dateString).toLocaleDateString('en-US', {
+function formatDate(value: string): string {
+  return new Date(value).toLocaleString('en-US', {
     month: 'short',
     day: 'numeric',
     year: 'numeric',
@@ -83,30 +42,38 @@ function formatDate(dateString: string): string {
 }
 
 export function DealDetail() {
-  const { id } = useParams<{ id: string }>();
+  const { id = '' } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { data: apiDeal, loading: dealLoading } = useDeal(id || '');
-  const { calculate, loading: calculating } = useCalculateTMV();
+  const { data: deal, loading: dealLoading, error: dealError, refetch: refetchDeal } = useDeal(id);
+  const { data: rankedDeal, loading: rankedLoading, refetch: refetchRanked } = useRankedDeal(id);
+  const { data: tmv, loading: tmvLoading, error: tmvError, refetch: refetchTMV } = useTMV(id);
+  const { analyze, loading: analyzing, error: analyzeError } = useAnalyzeDeal();
 
-  const enableMockFallback =
-    import.meta.env.DEV && import.meta.env.VITE_ENABLE_MOCK_FALLBACK === 'true';
-  const deal = (apiDeal as RankedDeal) ?? (enableMockFallback ? mockDeal : undefined);
-  const loading = dealLoading && !deal;
+  const detail = useMemo(() => {
+    if (!deal) return null;
+    if (!rankedDeal && !tmv) return deal;
 
-  const hasTMV = deal.tmv !== undefined;
-  const hasScore = deal.score !== undefined;
-  const profitAmount = hasTMV ? deal.tmv.tmv - deal.price : 0;
+    return {
+      ...deal,
+      tmv: rankedDeal?.tmv ?? tmv ?? undefined,
+      score: rankedDeal?.score,
+    } as RankedDeal | typeof deal;
+  }, [deal, rankedDeal, tmv]);
 
-  const handleRecalculate = async () => {
-    if (id) {
-      await calculate(id);
+  const handleAnalyze = async () => {
+    if (!id) return;
+    const result = await analyze(id);
+    if (result) {
+      refetchTMV();
+      refetchRanked();
+      refetchDeal();
     }
   };
 
-  if (loading) {
+  if (dealLoading || rankedLoading || tmvLoading) {
     return (
       <div className={styles.page}>
-        <Header title="Loading..." />
+        <Header title="Loading deal..." />
         <div className={styles.content}>
           <div className={styles.skeleton} />
         </div>
@@ -114,228 +81,180 @@ export function DealDetail() {
     );
   }
 
-  if (!deal) {
+  if (!detail) {
     return (
       <div className={styles.page}>
-        <Header title="Deal not found" subtitle="No deal data available" />
+        <Header title="Deal not found" subtitle={dealError ?? 'No deal data available'} />
       </div>
     );
   }
 
+  const hasTMV = detail.tmv !== undefined;
+  const hasScore = detail.score !== undefined;
+  const tmvData = detail.tmv;
+  const scoreData = detail.score;
+  const spread = tmvData ? tmvData.tmv - detail.price : null;
+  const errorMessage = analyzeError ?? tmvError ?? null;
+
   return (
     <div className={styles.page}>
       <Header
-        title="Deal Analysis"
-        subtitle={deal.category}
-        onRefresh={handleRecalculate}
-        refreshing={calculating}
+        title="Deal Detail"
+        subtitle={detail.category}
+        onRefresh={handleAnalyze}
+        refreshing={analyzing}
       />
 
       <div className={styles.content}>
-        {/* Back navigation */}
         <button onClick={() => navigate(-1)} className={styles.backButton}>
           <ArrowLeft size={18} />
           Back to Deals
         </button>
 
-        {/* Main content grid */}
+        {errorMessage ? (
+          <Card>
+            <CardContent>{errorMessage}</CardContent>
+          </Card>
+        ) : null}
+
         <div className={styles.grid}>
-          {/* Left column - Deal info */}
           <div className={styles.mainColumn}>
-            {/* Deal Header */}
             <Card padding="lg" className={styles.dealHeader}>
               <div className={styles.headerContent}>
                 <div className={styles.badges}>
-                  <Badge variant="default">{deal.source}</Badge>
-                  <ConditionBadge condition={deal.condition ?? 'Unknown'} />
-                  {hasScore && (
+                  <Badge variant="default">{detail.source}</Badge>
+                  <ConditionBadge condition={detail.condition ?? 'Unknown'} />
+                  {hasScore ? (
                     <Badge variant="accent" glow>
-                      Rank #{deal.score.compositeRank}
+                      Rank #{Math.round(scoreData!.compositeRank)}
                     </Badge>
+                  ) : (
+                    <Badge variant="warning">Unranked</Badge>
                   )}
                 </div>
-                <h1 className={styles.title}>{deal.title}</h1>
+                <h1 className={styles.title}>{detail.title}</h1>
                 <div className={styles.meta}>
-                  <span className={styles.location}>{deal.location ?? 'Unknown location'}</span>
+                  <span>{detail.location ?? 'Unknown location'}</span>
                   <span className={styles.separator}>·</span>
-                  <span className={styles.date}>Listed {formatDate(deal.createdAt)}</span>
+                  <span>Listed {formatDate(detail.createdAt)}</span>
                 </div>
               </div>
             </Card>
 
-            {/* Price Analysis */}
             <Card padding="lg">
-              <CardHeader title="Price Analysis" subtitle="TMV comparison and profit potential" />
+              <CardHeader title="Price Analysis" subtitle="Current ask versus modeled market value" />
               <CardContent>
                 <div className={styles.priceComparison}>
                   <div className={styles.priceBlock}>
                     <span className={styles.priceLabel}>Asking Price</span>
-                    <span className={styles.askingPrice}>{formatCurrency(deal.price)}</span>
+                    <span className={styles.askingPrice}>{formatCurrency(detail.price)}</span>
                   </div>
 
-                  {hasTMV && (
+                  {hasTMV ? (
                     <>
                       <div className={styles.priceArrow}>
                         <TrendingUp size={24} />
                       </div>
                       <div className={styles.priceBlock}>
                         <span className={styles.priceLabel}>True Market Value</span>
-                        <span className={styles.tmvPrice}>{formatCurrency(deal.tmv.tmv)}</span>
+                        <span className={styles.tmvPrice}>{formatCurrency(tmvData!.tmv)}</span>
                       </div>
                     </>
-                  )}
+                  ) : null}
                 </div>
 
-                {hasTMV && profitAmount > 0 && (
+                {spread !== null ? (
                   <div className={styles.profitBanner}>
                     <div className={styles.profitContent}>
-                      <span className={styles.profitLabel}>Potential Profit</span>
+                      <span className={styles.profitLabel}>Current Spread</span>
                       <div className={styles.profitValues}>
-                        <span className={styles.profitAmount}>
-                          +{formatCurrency(profitAmount)}
-                        </span>
-                        <span className={styles.profitPercent}>
-                          ({formatPercent(deal.score?.profitMargin || 0)} margin)
-                        </span>
+                        <span className={styles.profitAmount}>{spread >= 0 ? '+' : ''}{formatCurrency(spread)}</span>
+                        {hasScore ? (
+                          <span className={styles.profitPercent}>({formatPercent(scoreData!.profitMargin)} margin)</span>
+                        ) : null}
                       </div>
                     </div>
                   </div>
+                ) : (
+                  <Button variant="primary" onClick={handleAnalyze} loading={analyzing} icon={<RefreshCw size={16} />}>
+                    Run TMV Analysis
+                  </Button>
                 )}
               </CardContent>
             </Card>
 
-            {/* TMV Details */}
-            {hasTMV && (
+            {hasTMV ? (
               <Card padding="lg">
-                <CardHeader
-                  title="TMV Engine Analysis"
-                  subtitle={`Calculated ${formatDate(deal.tmv.calculatedAt)}`}
-                  action={
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      icon={<RefreshCw size={14} />}
-                      onClick={handleRecalculate}
-                      loading={calculating}
-                    >
-                      Recalculate
-                    </Button>
-                  }
-                />
+                <CardHeader title="TMV Engine Analysis" subtitle={`Calculated ${formatDate(tmvData!.calculatedAt)}`} />
                 <CardContent>
                   <MetricGrid columns={3}>
-                    <MetricCard
-                      label="Sample Count"
-                      value={deal.tmv.sampleCount}
-                      icon={<BarChart3 size={16} />}
-                      subtitle="Market data points"
-                    />
-                    <MetricCard
-                      label="Volatility"
-                      value={formatPercent(deal.tmv.volatility)}
-                      icon={<Activity size={16} />}
-                      variant={deal.tmv.volatility > 0.2 ? 'warning' : 'default'}
-                      subtitle="Price variation"
-                    />
-                    <MetricCard
-                      label="Liquidity"
-                      value={formatPercent(deal.tmv.liquidityScore)}
-                      icon={<Target size={16} />}
-                      variant={deal.tmv.liquidityScore > 0.7 ? 'profit' : 'default'}
-                      subtitle="Market activity"
-                    />
+                    <MetricCard label="Sample Count" value={tmvData!.sampleCount} icon={<BarChart3 size={16} />} subtitle="Sold comps used" />
+                    <MetricCard label="Volatility" value={formatPercent(tmvData!.volatility)} icon={<TrendingUp size={16} />} subtitle="Relative price dispersion" />
+                    <MetricCard label="Liquidity" value={formatPercent(tmvData!.liquidityScore)} icon={<Target size={16} />} subtitle="Estimated market activity" />
                   </MetricGrid>
                 </CardContent>
               </Card>
-            )}
+            ) : null}
           </div>
 
-          {/* Right column - Quick stats & actions */}
           <div className={styles.sideColumn}>
-            {/* Quick Stats */}
-            {hasScore && (
-              <Card padding="lg">
-                <CardHeader title="Quick Stats" />
-                <CardContent>
-                  <div className={styles.statsList}>
-                    <div className={styles.statItem}>
-                      <span className={styles.statLabel}>
-                        <Target size={14} />
-                        Confidence
-                      </span>
-                      <ConfidenceBadge confidence={deal.tmv.confidence} />
-                    </div>
-                    <div className={styles.statItem}>
-                      <span className={styles.statLabel}>
-                        <Shield size={14} />
-                        Risk Level
-                      </span>
-                      <RiskBadge riskScore={deal.score.riskScore} />
-                    </div>
-                    <div className={styles.statItem}>
-                      <span className={styles.statLabel}>
-                        <Clock size={14} />
-                        Est. Sell Time
-                      </span>
-                      <span className={styles.statValue}>
-                        {deal.tmv.estimatedDaysToSell} days
-                      </span>
-                    </div>
-                    <div className={styles.statItem}>
-                      <span className={styles.statLabel}>
-                        <TrendingUp size={14} />
-                        Velocity Score
-                      </span>
-                      <span className={styles.statValue}>
-                        {formatPercent(deal.score.velocityScore)}
-                      </span>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-
-            {/* Actions */}
             <Card padding="lg">
-              <CardHeader title="Actions" />
+              <CardHeader title="Quick Stats" />
               <CardContent>
-                <div className={styles.actions}>
-                  <Button
-                    variant="primary"
-                    fullWidth
-                    icon={<ExternalLink size={16} />}
-                    iconPosition="right"
-                    onClick={() => deal.url && window.open(deal.url, '_blank')}
-                  >
-                    View Original Listing
-                  </Button>
-                  <Button
-                    variant="secondary"
-                    fullWidth
-                    icon={<DollarSign size={16} />}
-                  >
-                    Track This Deal
-                  </Button>
+                <div className={styles.statsList}>
+                  <div className={styles.statItem}>
+                    <span className={styles.statLabel}><Target size={14} />Confidence</span>
+                    {hasTMV ? <ConfidenceBadge confidence={tmvData!.confidence} /> : <span className={styles.statValue}>Not calculated</span>}
+                  </div>
+                  <div className={styles.statItem}>
+                    <span className={styles.statLabel}><Shield size={14} />Risk</span>
+                    {hasScore ? <RiskBadge riskScore={scoreData!.riskScore} /> : <span className={styles.statValue}>Unavailable</span>}
+                  </div>
+                  <div className={styles.statItem}>
+                    <span className={styles.statLabel}><Clock size={14} />Est. Sell Time</span>
+                    <span className={styles.statValue}>{hasTMV && tmvData!.estimatedDaysToSell != null ? `${tmvData!.estimatedDaysToSell} days` : 'Unavailable'}</span>
+                  </div>
                 </div>
               </CardContent>
             </Card>
 
-            {/* Source Info */}
+            <Card padding="lg">
+              <CardHeader title="Actions" />
+              <CardContent>
+                <div className={styles.actions}>
+                  <Button variant="primary" fullWidth icon={<RefreshCw size={16} />} onClick={handleAnalyze} loading={analyzing}>
+                    {hasTMV ? 'Re-run Analysis' : 'Analyze Deal'}
+                  </Button>
+                  {detail.url ? (
+                    <Button
+                      variant="secondary"
+                      fullWidth
+                      icon={<ExternalLink size={16} />}
+                      iconPosition="right"
+                      onClick={() => window.open(detail.url!, '_blank', 'noopener,noreferrer')}
+                    >
+                      View Original Listing
+                    </Button>
+                  ) : null}
+                </div>
+              </CardContent>
+            </Card>
+
             <Card padding="lg">
               <CardHeader title="Source Details" />
               <CardContent>
                 <div className={styles.sourceInfo}>
                   <div className={styles.sourceRow}>
                     <span className={styles.sourceLabel}>Platform</span>
-                    <span className={styles.sourceValue}>{deal.source}</span>
+                    <span className={styles.sourceValue}>{detail.source}</span>
                   </div>
                   <div className={styles.sourceRow}>
                     <span className={styles.sourceLabel}>Source ID</span>
-                    <span className={styles.sourceValue}>{deal.sourceId}</span>
+                    <span className={styles.sourceValue}>{detail.sourceId}</span>
                   </div>
                   <div className={styles.sourceRow}>
                     <span className={styles.sourceLabel}>Category</span>
-                    <span className={styles.sourceValue}>{deal.category}</span>
+                    <span className={styles.sourceValue}>{detail.category}</span>
                   </div>
                 </div>
               </CardContent>

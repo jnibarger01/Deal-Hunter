@@ -1,256 +1,112 @@
 import { useEffect, useMemo } from 'react';
-import {
-  TrendingUp,
-  DollarSign,
-  Activity,
-  Target,
-  Zap,
-  BarChart3,
-} from 'lucide-react';
+import { Activity, DollarSign, Target, TrendingUp, Zap } from 'lucide-react';
 import { Header } from '../components/layout';
-import { MetricCard, MetricGrid, DealCard, DealGrid, Card, CardHeader, CardContent } from '../components/ui';
+import { Card, CardContent, CardHeader, DealCard, DealGrid, MetricCard, MetricGrid } from '../components/ui';
 import { useRankedDeals } from '../hooks/useDeals';
 import { useAppSettings } from '../context/AppSettingsContext';
-import type { RankedDeal } from '../types';
 import styles from './Dashboard.module.css';
 
-// Mock data for demonstration when API is not available
-const mockRankedDeals: RankedDeal[] = [
-  {
-    id: '1',
-    source: 'eBay',
-    sourceId: 'eb-123',
-    title: 'Sony PlayStation 5 Console - Digital Edition',
-    price: 350,
-    condition: 'Like New',
-    category: 'Gaming',
-    location: 'Los Angeles, CA',
-    url: 'https://example.com/1',
-    createdAt: new Date().toISOString(),
-    tmv: {
-      dealId: '1',
-      tmv: 450,
-      confidence: 0.87,
-      sampleCount: 124,
-      volatility: 0.12,
-      liquidityScore: 0.89,
-      estimatedDaysToSell: 3,
-      calculatedAt: new Date().toISOString(),
-    },
-    score: {
-      dealId: '1',
-      profitMargin: 0.286,
-      velocityScore: 0.92,
-      riskScore: 0.15,
-      compositeRank: 94,
-    },
-  },
-  {
-    id: '2',
-    source: 'FB Market',
-    sourceId: 'fb-456',
-    title: 'Apple MacBook Pro 14" M3 Pro - 18GB RAM 512GB SSD',
-    price: 1450,
-    condition: 'Excellent',
-    category: 'Computers',
-    location: 'San Francisco, CA',
-    url: 'https://example.com/2',
-    createdAt: new Date().toISOString(),
-    tmv: {
-      dealId: '2',
-      tmv: 1850,
-      confidence: 0.92,
-      sampleCount: 89,
-      volatility: 0.08,
-      liquidityScore: 0.78,
-      estimatedDaysToSell: 5,
-      calculatedAt: new Date().toISOString(),
-    },
-    score: {
-      dealId: '2',
-      profitMargin: 0.276,
-      velocityScore: 0.85,
-      riskScore: 0.12,
-      compositeRank: 91,
-    },
-  },
-  {
-    id: '3',
-    source: 'Craigslist',
-    sourceId: 'cl-789',
-    title: 'Nintendo Switch OLED - White with 5 Games',
-    price: 220,
-    condition: 'Good',
-    category: 'Gaming',
-    location: 'Austin, TX',
-    url: 'https://example.com/3',
-    createdAt: new Date().toISOString(),
-    tmv: {
-      dealId: '3',
-      tmv: 310,
-      confidence: 0.75,
-      sampleCount: 67,
-      volatility: 0.18,
-      liquidityScore: 0.82,
-      estimatedDaysToSell: 4,
-      calculatedAt: new Date().toISOString(),
-    },
-    score: {
-      dealId: '3',
-      profitMargin: 0.409,
-      velocityScore: 0.88,
-      riskScore: 0.28,
-      compositeRank: 87,
-    },
-  },
-  {
-    id: '4',
-    source: 'OfferUp',
-    sourceId: 'ou-101',
-    title: 'DJI Mavic Air 2 Drone - Fly More Combo',
-    price: 480,
-    condition: 'Like New',
-    category: 'Electronics',
-    location: 'Seattle, WA',
-    url: 'https://example.com/4',
-    createdAt: new Date().toISOString(),
-    tmv: {
-      dealId: '4',
-      tmv: 620,
-      confidence: 0.81,
-      sampleCount: 45,
-      volatility: 0.15,
-      liquidityScore: 0.71,
-      estimatedDaysToSell: 7,
-      calculatedAt: new Date().toISOString(),
-    },
-    score: {
-      dealId: '4',
-      profitMargin: 0.292,
-      velocityScore: 0.75,
-      riskScore: 0.22,
-      compositeRank: 82,
-    },
-  },
-];
-
 export function Dashboard() {
-  const { data: rankedDeals, loading: rankedLoading, refetch } = useRankedDeals();
+  const { data: deals, loading, error, refetch } = useRankedDeals();
   const { settings } = useAppSettings();
-
-  const enableMockFallback =
-    import.meta.env.DEV && import.meta.env.VITE_ENABLE_MOCK_FALLBACK === 'true';
-  const deals = rankedDeals ?? (enableMockFallback ? mockRankedDeals : []);
-  const loading = rankedLoading && deals.length === 0;
-
-  // Calculate summary metrics
-  const metrics = useMemo(() => {
-    if (!deals.length) {
-      return {
-        totalDeals: 0,
-        avgProfit: 0,
-        totalPotential: 0,
-        avgConfidence: 0,
-        topDeal: null,
-      };
-    }
-
-    const totalPotential = deals.reduce(
-      (sum, d) => sum + (d.tmv.tmv - d.price),
-      0
-    );
-    const avgProfit =
-      deals.reduce((sum, d) => sum + d.score.profitMargin, 0) / deals.length;
-    const avgConfidence =
-      deals.reduce((sum, d) => sum + d.tmv.confidence, 0) / deals.length;
-
-    return {
-      totalDeals: deals.length,
-      avgProfit,
-      totalPotential,
-      avgConfidence,
-      topDeal: deals[0],
-    };
-  }, [deals]);
-
-  const topDeals = deals.slice(0, 6);
 
   useEffect(() => {
     if (!settings.autoRefreshSec || settings.autoRefreshSec < 15) return;
-    const id = window.setInterval(() => {
-      refetch();
-    }, settings.autoRefreshSec * 1000);
-
+    const id = window.setInterval(refetch, settings.autoRefreshSec * 1000);
     return () => window.clearInterval(id);
   }, [refetch, settings.autoRefreshSec]);
+
+  const rankedDeals = deals ?? [];
+
+  const metrics = useMemo(() => {
+    if (!rankedDeals.length) {
+      return {
+        totalDeals: 0,
+        avgProfitMargin: 0,
+        totalSpread: 0,
+        avgConfidence: 0,
+      };
+    }
+
+    return {
+      totalDeals: rankedDeals.length,
+      avgProfitMargin:
+        rankedDeals.reduce((sum, deal) => sum + deal.score.profitMargin, 0) / rankedDeals.length,
+      totalSpread: rankedDeals.reduce((sum, deal) => sum + (deal.tmv.tmv - deal.price), 0),
+      avgConfidence:
+        rankedDeals.reduce((sum, deal) => sum + deal.tmv.confidence, 0) / rankedDeals.length,
+    };
+  }, [rankedDeals]);
+
+  const topDeals = rankedDeals.slice(0, 4);
+
+  const sourceBreakdown = useMemo(() => {
+    const counts = new Map<string, number>();
+    rankedDeals.forEach((deal) => counts.set(deal.source, (counts.get(deal.source) ?? 0) + 1));
+    return Array.from(counts.entries())
+      .map(([name, count]) => ({ name, count }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 5);
+  }, [rankedDeals]);
+
+  const categoryBreakdown = useMemo(() => {
+    const totals = new Map<string, { count: number; avgMargin: number }>();
+
+    rankedDeals.forEach((deal) => {
+      const current = totals.get(deal.category) ?? { count: 0, avgMargin: 0 };
+      totals.set(deal.category, {
+        count: current.count + 1,
+        avgMargin: current.avgMargin + deal.score.profitMargin,
+      });
+    });
+
+    return Array.from(totals.entries())
+      .map(([name, value]) => ({
+        name,
+        count: value.count,
+        profit: value.avgMargin / value.count,
+      }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 5);
+  }, [rankedDeals]);
 
   return (
     <div className={styles.page}>
       <Header
         title="Dashboard"
-        subtitle="Real-time deal analysis and rankings"
+        subtitle="PRD-v1 overview of currently ranked opportunities"
         onRefresh={refetch}
         refreshing={loading}
       />
 
       <div className={styles.content}>
-        {/* Summary Metrics */}
+        {error ? (
+          <Card>
+            <CardContent>{error}</CardContent>
+          </Card>
+        ) : null}
+
         <section className={styles.section}>
           <MetricGrid columns={4}>
-            <MetricCard
-              label="Active Deals"
-              value={metrics.totalDeals}
-              icon={<Activity size={16} />}
-              variant="accent"
-              loading={loading}
-            />
-            <MetricCard
-              label="Avg Profit Margin"
-              value={(metrics.avgProfit * 100).toFixed(1)}
-              suffix="%"
-              icon={<TrendingUp size={16} />}
-              variant="profit"
-              trend="up"
-              trendValue="+2.3%"
-              loading={loading}
-            />
-            <MetricCard
-              label="Total Potential"
-              value={metrics.totalPotential.toLocaleString()}
-              prefix="$"
-              icon={<DollarSign size={16} />}
-              variant="profit"
-              loading={loading}
-            />
-            <MetricCard
-              label="Avg Confidence"
-              value={(metrics.avgConfidence * 100).toFixed(0)}
-              suffix="%"
-              icon={<Target size={16} />}
-              variant="default"
-              loading={loading}
-            />
+            <MetricCard label="Ranked Deals" value={metrics.totalDeals} icon={<Activity size={16} />} variant="accent" loading={loading} />
+            <MetricCard label="Avg Profit Margin" value={(metrics.avgProfitMargin * 100).toFixed(1)} suffix="%" icon={<TrendingUp size={16} />} variant="profit" loading={loading} />
+            <MetricCard label="Total Spread" value={metrics.totalSpread.toLocaleString(undefined, { maximumFractionDigits: 0 })} prefix="$" icon={<DollarSign size={16} />} variant="profit" loading={loading} />
+            <MetricCard label="Avg Confidence" value={(metrics.avgConfidence * 100).toFixed(0)} suffix="%" icon={<Target size={16} />} loading={loading} />
           </MetricGrid>
         </section>
 
-        {/* Top Ranked Deals */}
         <section className={styles.section}>
           <div className={styles.sectionHeader}>
             <div>
-              <h2 className={styles.sectionTitle}>
-                <Zap size={20} className={styles.sectionIcon} />
-                Top Ranked Deals
-              </h2>
-              <p className={styles.sectionSubtitle}>
-                Highest composite score opportunities
-              </p>
+              <h2 className={styles.sectionTitle}><Zap size={20} className={styles.sectionIcon} />Top Ranked Deals</h2>
+              <p className={styles.sectionSubtitle}>Highest composite rank from the current feed</p>
             </div>
           </div>
 
           {loading ? (
             <DealGrid columns={2}>
-              {Array.from({ length: 4 }).map((_, i) => (
-                <div key={i} className={styles.skeletonCard} />
+              {Array.from({ length: 4 }).map((_, index) => (
+                <div key={index} className={styles.skeletonCard} />
               ))}
             </DealGrid>
           ) : (
@@ -267,29 +123,19 @@ export function Dashboard() {
           )}
         </section>
 
-        {/* Quick Stats */}
         <section className={styles.section}>
           <div className={styles.statsGrid}>
             <Card>
               <CardHeader title="Category Breakdown" />
               <CardContent>
                 <div className={styles.categoryList}>
-                  {[
-                    { name: 'Gaming', count: 12, profit: 28.5 },
-                    { name: 'Electronics', count: 8, profit: 24.2 },
-                    { name: 'Computers', count: 6, profit: 31.4 },
-                    { name: 'Audio', count: 4, profit: 19.8 },
-                  ].map((cat) => (
-                    <div key={cat.name} className={styles.categoryItem}>
+                  {categoryBreakdown.map((category) => (
+                    <div key={category.name} className={styles.categoryItem}>
                       <div className={styles.categoryInfo}>
-                        <span className={styles.categoryName}>{cat.name}</span>
-                        <span className={styles.categoryCount}>
-                          {cat.count} deals
-                        </span>
+                        <span className={styles.categoryName}>{category.name}</span>
+                        <span className={styles.categoryCount}>{category.count} ranked deals</span>
                       </div>
-                      <span className={styles.categoryProfit}>
-                        +{cat.profit}%
-                      </span>
+                      <span className={styles.categoryProfit}>+{(category.profit * 100).toFixed(1)}%</span>
                     </div>
                   ))}
                 </div>
@@ -297,25 +143,17 @@ export function Dashboard() {
             </Card>
 
             <Card>
-              <CardHeader title="Source Performance" />
+              <CardHeader title="Source Breakdown" />
               <CardContent>
                 <div className={styles.sourceList}>
-                  {[
-                    { name: 'eBay', deals: 15, score: 87 },
-                    { name: 'FB Marketplace', deals: 12, score: 82 },
-                    { name: 'Craigslist', deals: 8, score: 74 },
-                    { name: 'OfferUp', deals: 5, score: 71 },
-                  ].map((source) => (
+                  {sourceBreakdown.map((source) => (
                     <div key={source.name} className={styles.sourceItem}>
                       <div className={styles.sourceInfo}>
                         <span className={styles.sourceName}>{source.name}</span>
-                        <span className={styles.sourceDeals}>
-                          {source.deals} active
-                        </span>
+                        <span className={styles.sourceDeals}>{source.count} active ranked</span>
                       </div>
                       <div className={styles.sourceScore}>
-                        <BarChart3 size={14} />
-                        <span>{source.score}</span>
+                        <span>{source.count}</span>
                       </div>
                     </div>
                   ))}

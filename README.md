@@ -1,190 +1,171 @@
 # Deal Hunter
 
-> **The Bloomberg Terminal for Flippers.**
+Deal Hunter is a Docker-first deal discovery and valuation platform for resellers. The current rebuild centers on **TMV Engine v1**: ingest listings, store sold-market samples, calculate a true market value, score deals for profitability and risk, and surface ranked opportunities through a React SPA.
 
-Deal Hunter is a sophisticated platform designed to help flippers identify, evaluate, and track high-margin opportunities across various marketplaces. It combines real-time data integration, AI-driven analysis, and comprehensive portfolio management to give flippers a competitive edge.
+## Current Product Surface
 
-## 🚀 Features
+Active frontend pages:
+- Dashboard
+- All Deals
+- Top Ranked Deals
+- Deal Detail with on-demand TMV analysis
 
-- **📊 Intelligent Dashboard**: Get a bird's-eye view of your flipping operations, including active deals, profit potential, and portfolio performance.
-- **🔍 Deal Discovery & Ranking**: Advanced algorithms to rank deals based on profitability, liquidity, and risk.
-- **🤖 AI-Powered Analysis**: Integrated with Google Gemini AI to provide deeper insights into item value and market trends.
-- **🔌 Marketplace Integration**: Seamlessly connects with major platforms (e.g., eBay) to fetch live pricing and listing data.
-- **📈 Portfolio Tracking**: Manage your inventory, track costs, and monitor realized profits.
-- **🔔 Real-time Alerts**: Never miss a deal with customizable alerts based on your specific criteria.
-- **🧮 TMV Calculator**: (Coming Soon) True Market Value calculator to estimate selling price with high precision.
+Active backend endpoints:
+- `GET /health`
+- `GET /deals`
+- `GET /deals/:id`
+- `POST /tmv/calculate`
+- `GET /tmv/:dealId`
+- `POST /score`
+- `GET /ranked`
 
-## 🛠️ Tech Stack
+Not in v1:
+- auth
+- watchlist
+- portfolio
+- alerts
+- calculator scenarios
 
-### Frontend
-- **Framework**: [React](https://reactjs.org/) with [TypeScript](https://www.typescriptlang.org/)
-- **Build Tool**: [Vite](https://vitejs.dev/)
-- **Routing**: [React Router](https://reactrouter.com/)
-- **Icons**: [Lucide React](https://lucide.dev/)
-- **Styling**: Modern CSS with CSS Modules
+## Tech Stack
 
-### Backend
-- **Runtime**: [Node.js](https://nodejs.org/) with [TypeScript](https://www.typescriptlang.org/)
-- **Framework**: [Express.js](https://expressjs.com/)
-- **ORM**: [Prisma](https://www.prisma.io/)
-- **Database**: PostgreSQL (dev/staging/production)
-- **Validation**: [Zod](https://zod.dev/) & [Express Validator](https://express-validator.github.io/)
-- **Security**: JWT, Helmet, Rate Limiting, Bcrypt
+Backend:
+- Node.js 20
+- TypeScript
+- Express
+- Prisma
+- PostgreSQL 16
 
-### AI & Integrations
-- **AI Engine**: [Google Gemini AI](https://ai.google.dev/)
-- **External APIs**: eBay Integration
+Frontend:
+- React 18
+- Vite
+- TypeScript
+- React Router
+- CSS Modules
 
-## 📦 Infrastructure & Deployment
+Infrastructure:
+- Docker and Docker Compose
+- Nginx
+- GitHub Actions
 
-- **Containerization**: [Docker](https://www.docker.com/) & Docker Compose
-- **Proxy/Web Server**: [Nginx](https://www.nginx.com/)
-- **CI/CD**: GitHub Actions
-- **Primary production target**: Docker host + Supabase Postgres
-- **Optional deployment path**: [Render](https://render.com/) (non-primary)
+## Repository Layout
 
-## 🚀 Getting Started
+```text
+deal-hunter/
+├── server/      # Express + Prisma API
+├── frontend/    # React + Vite SPA
+├── docker/      # Dockerfiles
+├── nginx/       # Nginx config
+├── docs/        # Runbooks and release docs
+└── .github/     # CI/CD workflows
+```
+
+## Local Development
 
 ### Prerequisites
 
-- Node.js (v18+)
-- Docker and Docker Compose
-- PostgreSQL (if running locally without Docker)
+- Node.js 20
+- Docker
 
-### Local Development (with Docker)
+### Install dependencies
 
-The easiest way to get started is using Docker Compose:
+```bash
+npm install
+```
 
-1.  Clone the repository:
-    ```bash
-    git clone https://github.com/jnibarger01/Deal-Hunter.git
-    cd Deal-Hunter
-    ```
+### Run with Docker
 
-2.  Start the services:
-    ```bash
-    npm run docker:up
-    ```
+```bash
+npm run docker:up
+```
 
-3.  Access the application:
-    - Frontend: `http://localhost:5173`
-    - Backend: `http://localhost:5000`
-    - Nginx Proxy: `http://localhodst:8080`
+Expected local ports:
+- frontend preview: `http://localhost:5173`
+- API: `http://localhost:5000`
+- nginx: `http://localhost:8080`
+- Postgres: `localhost:5433`
 
-### Local Development (Manual, PostgreSQL)
+### Run without Docker
 
-1. **Install dependencies (root workspace):**
-   ```bash
-   npm install
-   ```
-
-2. **Environment setup:**
-   ```bash
-   cp server/.env.example server/.env
-   ```
-   `server/.env.example` defaults to local Docker Postgres on `localhost:5433`:
-   ```env
-   DATABASE_URL="postgresql://dealhunter:dealhunter_dev_password@localhost:5433/dealhunter?schema=public"
-   ```
-
-3. **Prisma client generation:**
-   ```bash
-   cd server
-   npm run prisma:generate
-   ```
-
-4. **Initialize/update the PostgreSQL schema:**
-   ```bash
-   npm run prisma:migrate
-   ```
-
-5. **Run backend + frontend:**
-   From the project root:
-   ```bash
-   cd ..
-   npm run dev
-   ```
-
-## 🔌 API Contract (MVP)
-
-Base URL: `http://localhost:5000/api/v1`
-
-- `POST /tmv/calculate`
-  - Body: `{ "dealId": "<uuid>" }`
-  - Response: `{ dealId, tmv, confidence, sampleCount, volatility, liquidityScore, estimatedDaysToSell, calculatedAt }`
-- `GET /tmv/:dealId`
-  - Response: same shape as TMV calculate
-- `POST /score`
-  - Body: `{ "dealId": "<uuid>", "feeAssumptions": { "platformFeeRate": 0.13, "shippingCost": 12, "fixedFees": 1.5 } }`
-  - Response: `{ dealId, profitMargin, velocityScore, riskScore, compositeRank, feesApplied, calculatedAt }`
-- `GET /ranked?limit=50`
-  - Response: `RankedDeal[]` with embedded `tmv` and `score`
-
-Legacy routes under `/api/v1/deals` remain available for CRUD and ingest.
-
-## 🦾 Craigslist RSS Ingest (No official API required)
-
-Deal-Hunter supports Craigslist via RSS feed ingest.
-
-### One-shot ingest
+1. Start a Postgres database reachable at `DATABASE_URL`
+2. Generate Prisma client and apply migrations
 
 ```bash
 cd server
-CRAIGSLIST_RSS_URLS="https://kansascity.craigslist.org/search/sss?format=rss" npm run ingest:craigslist
+npm run prisma:generate
+npx prisma migrate deploy
 ```
 
-### API-triggered ingest (admin auth)
-
-- `POST /api/v1/deals/ingest/craigslist`
-- Body:
-  ```json
-  {
-    "rssUrls": ["https://kansascity.craigslist.org/search/sss?format=rss"],
-    "maxPerFeed": 50
-  }
-  ```
-
-### Scheduler pattern (optional)
-
-Set in `server/.env`:
-
-```env
-CRAIGSLIST_RSS_URLS=https://kansascity.craigslist.org/search/sss?format=rss
-CRAIGSLIST_MAX_PER_FEED=50
-CRAIGSLIST_INGEST_INTERVAL_MINUTES=30
-CRAIGSLIST_SCHEDULER_ENABLED=true
-```
-
-When enabled, the backend runs periodic Craigslist ingest on startup.
-
-## 🔒 Developer Hardening
-
-- Normalize line endings/encoding via `.gitattributes` (UTF-8 + LF)
-- Install local git hooks:
-  ```bash
-  ./scripts/install-git-hooks.sh
-  ```
-  This enables a pre-commit binary-file guard.
-
-## 🚢 Production Docs
-
-- Deployment and operations runbook: `docs/production.md`
-- Release checklist: `docs/release-checklist.md`
-
-Quick env/deploy sanity check:
+3. Start the app from the repo root
 
 ```bash
-./scripts/verify-production.sh --health-url https://<your-api-domain>/ready
+npm run dev
 ```
 
-## 🏗️ Project Structure
+## Verification Commands
 
-- `frontend/`: React application (Vite-based)
-- `server/`: Express backend with Prisma ORM
-- `docker/`: Dockerfiles for server, frontend, and nginx
-- `nginx/`: Nginx configuration files
-- `.github/`: CI/CD workflows
+Root build:
 
-## 📄 License
+```bash
+npm run build
+```
 
-This project is licensed under the MIT License - see the `LICENSE` file for details (if applicable).
+Backend tests with coverage:
+
+```bash
+cd server
+npm test
+```
+
+Frontend production build:
+
+```bash
+cd frontend
+npm run build
+```
+
+Compose config validation:
+
+```bash
+docker compose config
+```
+
+## Data Model
+
+Core persisted models:
+- `Deal`
+- `MarketSample`
+- `TMVResult`
+- `Score`
+
+Supporting models still used in v1:
+- `CategoryConfig`
+- `MarketplaceSync`
+
+## TMV Engine v1
+
+The TMV engine currently applies:
+- sold-sample filtering
+- freshness window filtering
+- IQR outlier rejection
+- exponential time decay weighting
+- weighted median valuation
+- confidence scoring from sample count, volatility, and recency
+- liquidity and estimated days-to-sell calculation
+- hard rejection for insufficient samples or confidence below threshold
+
+## Deployment
+
+Main operational docs:
+- `docs/production.md`
+- `docs/release-checklist.md`
+
+Staging and production deploys use:
+- Docker images built in GitHub Actions
+- `prisma migrate deploy` before app rollout
+- `/health` and `/ready` smoke checks after deploy
+
+## Notes
+
+- This rebuild intentionally removes non-v1 product modules from the active UI and API surface.
+- Prisma migrations now include a fresh baseline for the rebuilt schema.
+- Nginx logs are written to stdout/stderr to support read-only containers.

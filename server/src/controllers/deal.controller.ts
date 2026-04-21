@@ -1,8 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
-import { Deal } from '@prisma/client';
+import { Deal, ListingStatus } from '@prisma/client';
 import { Decimal } from '@prisma/client/runtime/library';
 import dealService from '../services/deal.service';
-import logger from '../config/logger';
 
 type DecimalField = Decimal | null | undefined;
 type DealSortOptions = {
@@ -42,17 +41,20 @@ const parseInteger = (value: unknown): number | undefined => {
 
 const allowedSortBy = new Set(['createdAt', 'price']);
 const allowedSortOrder = new Set(['asc', 'desc']);
+const allowedStatuses = new Set<ListingStatus>(['active', 'sold', 'expired']);
 
 export class DealController {
   async getAllDeals(req: Request, res: Response, next: NextFunction) {
     try {
       const filters = {
         category: req.query.category as string,
-        marketplace: req.query.marketplace as string,
+        source: req.query.source as string,
         minDealScore: parseNumber(req.query.minDealScore),
         maxPrice: parseNumber(req.query.maxPrice),
         search: req.query.search as string,
-        status: req.query.status as string,
+        status: allowedStatuses.has(req.query.status as ListingStatus)
+          ? (req.query.status as ListingStatus)
+          : undefined,
       };
 
       const sortBy = req.query.sortBy as string | undefined;
@@ -99,93 +101,6 @@ export class DealController {
     }
   }
 
-  async createDeal(req: Request, res: Response, next: NextFunction) {
-    try {
-      const deal = await dealService.createDeal(req.body);
-
-      logger.info(`Deal created: ${deal.id}`);
-
-      res.status(201).json({
-        success: true,
-        data: { deal: normalizeDeal(deal) },
-        message: 'Deal created successfully',
-      });
-    } catch (error) {
-      next(error);
-    }
-  }
-
-  async updateDeal(req: Request, res: Response, next: NextFunction) {
-    try {
-      const id = String(req.params.id);
-      const deal = await dealService.updateDeal(id, req.body);
-
-      logger.info(`Deal updated: ${id}`);
-
-      res.status(200).json({
-        success: true,
-        data: { deal: normalizeDeal(deal) },
-        message: 'Deal updated successfully',
-      });
-    } catch (error) {
-      next(error);
-    }
-  }
-
-  async deleteDeal(req: Request, res: Response, next: NextFunction) {
-    try {
-      const id = String(req.params.id);
-      await dealService.deleteDeal(id);
-
-      logger.info(`Deal deleted: ${id}`);
-
-      res.status(200).json({
-        success: true,
-        message: 'Deal deleted successfully',
-      });
-    } catch (error) {
-      next(error);
-    }
-  }
-
-  async getCategories(req: Request, res: Response, next: NextFunction) {
-    try {
-      const categories = await dealService.getCategories();
-
-      res.status(200).json({
-        success: true,
-        data: { categories },
-      });
-    } catch (error) {
-      next(error);
-    }
-  }
-
-  async getMarketplaces(req: Request, res: Response, next: NextFunction) {
-    try {
-      const marketplaces = await dealService.getMarketplaces();
-
-      res.status(200).json({
-        success: true,
-        data: { marketplaces },
-      });
-    } catch (error) {
-      next(error);
-    }
-  }
-
-  async getStats(req: Request, res: Response, next: NextFunction) {
-    try {
-      const stats = await dealService.getDealStats();
-
-      res.status(200).json({
-        success: true,
-        data: stats,
-      });
-    } catch (error) {
-      next(error);
-    }
-  }
 }
 
 export default new DealController();

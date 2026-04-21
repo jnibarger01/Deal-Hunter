@@ -1,1 +1,0 @@
--- No-op: baseline consolidated into 20260303132916_init_sqlite for PostgreSQL provider.

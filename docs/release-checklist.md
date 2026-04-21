@@ -11,9 +11,7 @@
 ## 2) Config and secrets
 
 - [ ] `DATABASE_URL` points to **Supabase production**
-- [ ] `JWT_SECRET` length >= 32
-- [ ] SMTP vars present and validated
-- [ ] `CORS_ORIGIN` + `FRONTEND_URL` match production domain(s)
+- [ ] `CORS_ORIGIN` matches production domain(s)
 - [ ] `TRUST_PROXY` set correctly for nginx/reverse proxy
 - [ ] No dev/test secrets in production env files
 
@@ -31,9 +29,9 @@
 - [ ] `docker compose -f docker-compose.prod.yml up -d --build`
 - [ ] `GET /health` returns 200
 - [ ] `GET /ready` returns 200 (DB connected)
-- [ ] Login works
 - [ ] Deals read works
-- [ ] One write path works (watchlist/portfolio/etc.)
+- [ ] TMV calculation works for a seeded deal with sufficient samples
+- [ ] Ranking works for an analyzed deal
 
 ## 5) Ops readiness
 

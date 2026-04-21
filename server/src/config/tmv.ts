@@ -5,8 +5,6 @@ export interface TMVConfig {
   freshnessWindow: number;
   halfLifeDays: number;
   minConfidence: number;
-  comparableSimilarityThreshold: number;
-  conditionFactors: Record<string, number>;
 }
 
 const parseIntEnv = (key: string, defaultValue: number): number => {
@@ -28,15 +26,6 @@ export const tmvConfig: TMVConfig = {
   freshnessWindow: parseIntEnv('TMV_FRESHNESS_WINDOW', 180),
   halfLifeDays: parseIntEnv('TMV_HALF_LIFE_DAYS', 7),
   minConfidence: parseFloatEnv('TMV_MIN_CONFIDENCE', 0.4),
-  comparableSimilarityThreshold: parseFloatEnv('TMV_COMPARABLE_SIMILARITY_THRESHOLD', 0.8),
-  conditionFactors: {
-    new: 1.0,
-    like_new: 0.92,
-    excellent: 0.85,
-    good: 0.75,
-    fair: 0.6,
-    parts: 0.3,
-  },
 };
 
 export default tmvConfig;
