@@ -5,8 +5,6 @@ import type {
   TMVResult,
   Score,
   HealthStatus,
-  TMVAssumptions,
-  TMVScenario,
 } from '../types';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
@@ -32,7 +30,7 @@ interface DealsResponse {
     page: number;
     limit: number;
     total: number;
-    pages: number;
+    totalPages: number;
   };
 }
 
@@ -52,7 +50,22 @@ async function request<T>(endpoint: string, options?: RequestInit): Promise<T> {
   });
 
   if (!response.ok) {
-    throw new ApiError(response.status, `API Error: ${response.statusText}`);
+    let message = `API Error: ${response.statusText}`;
+
+    try {
+      const payload = (await response.json()) as {
+        error?: { message?: string } | string;
+      };
+      if (typeof payload.error === 'string') {
+        message = payload.error;
+      } else if (payload.error?.message) {
+        message = payload.error.message;
+      }
+    } catch {
+      // Fall back to status text when response is not JSON.
+    }
+
+    throw new ApiError(response.status, message);
   }
 
   return response.json() as Promise<T>;
@@ -77,44 +90,25 @@ export const api = {
       body: JSON.stringify({ dealId }),
     }),
 
-  getTMV: (dealId: string) => request<TMVResult>(`/deals/${dealId}/tmv`),
+  getTMV: (dealId: string) => request<TMVResult>(`/tmv/${dealId}`),
 
   calculateScore: (dealId: string) =>
-    request<Score>(`/deals/${dealId}/score`, { method: 'POST' }),
-
-  getRankedDeals: () => request<RankedDeal[]>('/deals/ranked'),
-
-  // Calculator helpers
-  getTMVAssumptions: async (params: { category?: string; source?: string } = {}): Promise<TMVAssumptions> => {
-    const search = new URLSearchParams();
-    if (params.category) search.set('category', params.category);
-    if (params.source) search.set('source', params.source);
-    const queryString = search.toString();
-    const res = await request<ApiResponse<TMVAssumptions>>(
-      `/deals/tmv-assumptions${queryString ? `?${queryString}` : ''}`
-    );
-    return res.data;
-  },
-
-  getTMVScenarios: async (): Promise<TMVScenario[]> => {
-    const res = await request<ApiResponse<TMVScenario[]>>('/deals/tmv-scenarios');
-    return res.data || [];
-  },
-
-  createTMVScenario: async (
-    payload: Omit<TMVScenario, 'id' | 'createdAt' | 'updatedAt'>
-  ): Promise<TMVScenario> => {
-    const res = await request<ApiResponse<TMVScenario>>('/deals/tmv-scenarios', {
+    request<Score>('/score', {
       method: 'POST',
-      body: JSON.stringify(payload),
-    });
-    return res.data;
+      body: JSON.stringify({ dealId }),
+    }),
+
+  getRankedDeals: () => request<RankedDeal[]>('/ranked'),
+
+  getRankedDeal: async (id: string): Promise<RankedDeal | null> => {
+    const deals = await request<RankedDeal[]>('/ranked');
+    return deals.find((deal) => deal.id === id) ?? null;
   },
 
-  deleteTMVScenario: async (id: string): Promise<void> => {
-    await request<ApiResponse<null>>(`/deals/tmv-scenarios/${id}`, {
-      method: 'DELETE',
-    });
+  analyzeDeal: async (dealId: string): Promise<{ tmv: TMVResult; score: Score }> => {
+    const tmv = await api.calculateTMV(dealId);
+    const score = await api.calculateScore(dealId);
+    return { tmv, score };
   },
 };
 

@@ -3,8 +3,6 @@ import {
   LayoutDashboard,
   Tags,
   TrendingUp,
-  Calculator,
-  Settings,
   Activity,
 } from 'lucide-react';
 import styles from './Sidebar.module.css';
@@ -17,10 +15,9 @@ interface NavItem {
 }
 
 const navItems: NavItem[] = [
-  { path: '/app', label: 'Dashboard', icon: <LayoutDashboard size={20} />, end: true },
-  { path: '/app/deals', label: 'All Deals', icon: <Tags size={20} /> },
-  { path: '/app/ranked', label: 'Top Ranked', icon: <TrendingUp size={20} /> },
-  { path: '/app/calculator', label: 'TMV Calculator', icon: <Calculator size={20} /> },
+  { path: '/', label: 'Dashboard', icon: <LayoutDashboard size={20} />, end: true },
+  { path: '/deals', label: 'All Deals', icon: <Tags size={20} /> },
+  { path: '/ranked', label: 'Top Ranked', icon: <TrendingUp size={20} /> },
 ];
 
 export function Sidebar() {
@@ -70,13 +67,6 @@ export function Sidebar() {
           </div>
           <span className={styles.statusValue}>Online</span>
         </div>
-      </div>
-
-      <div className={styles.footer}>
-        <NavLink to="/app/settings" className={styles.footerLink}>
-          <Settings size={18} />
-          <span>Settings</span>
-        </NavLink>
       </div>
     </aside>
   );

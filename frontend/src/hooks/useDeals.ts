@@ -5,8 +5,7 @@ import type {
   RankedDeal,
   TMVResult,
   HealthStatus,
-  TMVAssumptions,
-  TMVScenario,
+  Score,
 } from '../types';
 
 interface UseDataState<T> {
@@ -62,39 +61,31 @@ export function useRankedDeals(): UseDataState<RankedDeal[]> {
   return useApiData(api.getRankedDeals);
 }
 
+export function useRankedDeal(id: string): UseDataState<RankedDeal | null> {
+  const fetcher = useCallback(() => api.getRankedDeal(id), [id]);
+  return useApiData(fetcher);
+}
+
 export function useTMV(dealId: string): UseDataState<TMVResult> {
   const fetcher = useCallback(() => api.getTMV(dealId), [dealId]);
   return useApiData(fetcher);
 }
 
-export function useTMVAssumptions(category?: string, source?: string): UseDataState<TMVAssumptions> {
-  const fetcher = useCallback(
-    () => api.getTMVAssumptions({ category, source }),
-    [category, source]
-  );
-  return useApiData(fetcher);
-}
-
-export function useTMVScenarios(): UseDataState<TMVScenario[]> {
-  return useApiData(api.getTMVScenarios);
-}
-
-// Action hooks for mutations
-export function useCalculateTMV() {
+export function useAnalyzeDeal() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const calculate = useCallback(async (dealId: string): Promise<TMVResult | null> => {
+  const analyze = useCallback(async (dealId: string): Promise<{ tmv: TMVResult; score: Score } | null> => {
     setLoading(true);
     setError(null);
     try {
-      const result = await api.calculateTMV(dealId);
+      const result = await api.analyzeDeal(dealId);
       return result;
     } catch (err) {
       if (err instanceof ApiError) {
         setError(err.message);
       } else {
-        setError('Failed to calculate TMV');
+        setError('Failed to analyze deal');
       }
       return null;
     } finally {
@@ -102,47 +93,5 @@ export function useCalculateTMV() {
     }
   }, []);
 
-  return { calculate, loading, error };
-}
-
-export function useTMVScenarioActions() {
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const create = useCallback(async (payload: Omit<TMVScenario, 'id' | 'createdAt' | 'updatedAt'>) => {
-    setLoading(true);
-    setError(null);
-    try {
-      return await api.createTMVScenario(payload);
-    } catch (err) {
-      if (err instanceof ApiError) {
-        setError(err.message);
-      } else {
-        setError('Failed to save scenario');
-      }
-      return null;
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  const remove = useCallback(async (id: string) => {
-    setLoading(true);
-    setError(null);
-    try {
-      await api.deleteTMVScenario(id);
-      return true;
-    } catch (err) {
-      if (err instanceof ApiError) {
-        setError(err.message);
-      } else {
-        setError('Failed to delete scenario');
-      }
-      return false;
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  return { create, remove, loading, error };
+  return { analyze, loading, error };
 }

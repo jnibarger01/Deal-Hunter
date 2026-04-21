@@ -9,7 +9,10 @@ export interface Deal {
   condition: string | null;
   category: string;
   location: string | null;
+   region?: string | null;
   url: string | null;
+   description?: string | null;
+   status?: 'active' | 'sold' | 'expired';
   createdAt: string;
   tmv?: TMVResult;
   score?: Score;
@@ -30,7 +33,7 @@ export interface TMVResult {
   sampleCount: number;
   volatility: number;
   liquidityScore: number;
-  estimatedDaysToSell: number;
+  estimatedDaysToSell: number | null;
   calculatedAt: string;
 }
 
@@ -50,35 +53,9 @@ export interface RankedDeal extends Deal {
 }
 
 export interface HealthStatus {
-  status: 'ok' | 'error';
+  status: 'ok' | 'error' | 'ready' | 'not_ready';
   timestamp: string;
   environment?: string;
-}
-
-export interface TMVAssumptions {
-  category: string | null;
-  source: string | null;
-  sampleSize: number;
-  recommendedMarkupPct: number;
-  recommendedFeePct: number;
-  recommendedDaysToSell: number;
-  confidence: number;
-}
-
-export interface TMVScenario {
-  id: string;
-  name: string;
-  category?: string | null;
-  source?: string | null;
-  buyPrice: number;
-  expectedSalePrice: number;
-  shippingCost: number;
-  platformFeePct: number;
-  prepCost: number;
-  taxPct: number;
-  notes?: string | null;
-  createdAt: string;
-  updatedAt: string;
 }
 
 // UI State types

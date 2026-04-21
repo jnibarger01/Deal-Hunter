@@ -1,43 +1,29 @@
 import { Decimal } from '@prisma/client/runtime/library';
 
-interface MarketSample {
-  observedPrice: Decimal;
+type DecimalLike = Decimal | number;
+
+export interface MarketSample {
+  observedPrice: DecimalLike;
   observedAt: Date;
-  condition?: string | null;
+  source: string;
   status?: string | null;
-  finalPrice?: Decimal | null;
   listedAt?: Date | null;
   soldAt?: Date | null;
   daysToSell?: number | null;
-  region?: string | null;
-  zipPrefix?: string | null;
-  title?: string | null;
-  description?: string | null;
-  features?: unknown;
-  views?: number | null;
-  saves?: number | null;
-  inquiries?: number | null;
 }
 
-interface TMVConfig {
+export interface TMVConfig {
   minSamples: number;
-  freshnessWindow: number; // days
-  decayRate?: number;
-  halfLifeDays?: number;
+  freshnessWindow: number;
+  halfLifeDays: number;
   minConfidence: number;
-  conditionFactors?: Record<string, number>;
-  comparableSimilarityThreshold?: number;
 }
 
-interface TMVContext {
-  targetCondition?: string | null;
-  targetRegion?: string | null;
-  targetTitle?: string | null;
-  targetDescription?: string | null;
+export interface TMVContext {
   targetCategory?: string | null;
 }
 
-interface TMVResult {
+export interface TMVResult {
   tmv: Decimal;
   confidence: number;
   sampleCount: number;
@@ -46,371 +32,239 @@ interface TMVResult {
   estimatedDaysToSell: number | null;
 }
 
-const DEFAULT_CONDITION_FACTORS: Record<string, number> = {
-  new: 1.0,
-  like_new: 0.92,
-  excellent: 0.85,
-  good: 0.75,
-  fair: 0.6,
-  parts: 0.3,
+type WeightedSample = {
+  price: number;
+  soldDate: Date;
+  daysOld: number;
+  weight: number;
+  daysToSell: number | null;
 };
 
 const MS_PER_DAY = 1000 * 60 * 60 * 24;
 const LN_2 = Math.log(2);
 
-type PreparedSample = {
-  sample: MarketSample;
-  normalizedPrice: number;
-  rawPrice: number;
-  weightBase: number;
-  date: Date;
-  region?: string | null;
-  text: string;
+const clamp = (value: number, min: number, max: number): number => {
+  return Math.min(Math.max(value, min), max);
+};
+
+const toNumber = (value: DecimalLike): number => {
+  return value instanceof Decimal ? value.toNumber() : value;
 };
 
 export class TMVCalculator {
-  constructor(private config: TMVConfig) {}
+  constructor(private readonly config: TMVConfig) {}
 
-  calculate(samples: MarketSample[], context: TMVContext = {}): TMVResult | null {
+  calculate(samples: MarketSample[], _context: TMVContext = {}): TMVResult | null {
     const soldSamples = this.filterSoldSamples(samples);
-
-    if (soldSamples.length < this.config.minSamples) {
-      return null;
-    }
-
     const freshSamples = this.filterFreshSamples(soldSamples);
 
     if (freshSamples.length < this.config.minSamples) {
       return null;
     }
 
-    const prepared = this.prepareSamples(freshSamples);
-    const filtered = this.removeOutliers(prepared);
+    const filteredPrices = this.removeOutliers(freshSamples);
 
-    if (filtered.length < this.config.minSamples) {
+    if (filteredPrices.length < this.config.minSamples) {
       return null;
     }
 
-    const comparable = this.filterComparables(filtered, context);
+    const weightedSamples = this.applyTimeWeights(filteredPrices);
+    const tmv = this.weightedMedian(weightedSamples) ?? this.weightedMean(weightedSamples);
 
-    if (comparable.length < this.config.minSamples) {
+    if (tmv === null || !Number.isFinite(tmv) || tmv <= 0) {
       return null;
     }
 
-    const weighted = this.applyWeights(comparable);
-    const weightedMedian = this.weightedMedian(weighted);
-    const weightedMean = this.weightedMean(weighted);
-    const weightedTmv = this.isFiniteNumber(weightedMedian) && weightedMedian > 0
-      ? weightedMedian
-      : weightedMean;
-
-    if (!this.isFiniteNumber(weightedTmv) || weightedTmv <= 0) {
-      return null;
-    }
-
-    const volatility = this.calculateVolatility(
-      weighted.map(w => w.normalizedPrice),
-      weightedTmv
-    );
-
-    const confidence = this.calculateConfidence(
-      weighted.length,
-      volatility,
-      weighted.map(w => w.weight)
-    );
+    const volatility = this.calculateVolatility(weightedSamples, tmv);
+    const confidence = this.calculateConfidence(weightedSamples, volatility);
 
     if (confidence < this.config.minConfidence) {
       return null;
     }
 
-    const { liquidityScore, estimatedDaysToSell } =
-      this.calculateLiquidity(weighted.map(w => w.sample));
-
-    const conditionFactor = this.getConditionFactor(context.targetCondition);
-    const tmv = new Decimal(weightedTmv * conditionFactor);
+    const { liquidityScore, estimatedDaysToSell } = this.calculateLiquidity(weightedSamples);
 
     return {
-      tmv,
+      tmv: new Decimal(Number(tmv.toFixed(2))),
       confidence,
-      sampleCount: weighted.length,
-      volatility,
+      sampleCount: weightedSamples.length,
+      volatility: new Decimal(Number(volatility.toFixed(4))),
       liquidityScore,
       estimatedDaysToSell,
     };
   }
 
   private filterSoldSamples(samples: MarketSample[]): MarketSample[] {
-    return samples.filter(sample => sample.status === 'sold');
+    return samples.filter((sample) => (sample.status ?? 'sold') === 'sold');
   }
 
   private filterFreshSamples(samples: MarketSample[]): MarketSample[] {
-    const cutoffDate = new Date();
-    cutoffDate.setDate(cutoffDate.getDate() - this.config.freshnessWindow);
+    const cutoff = Date.now() - this.config.freshnessWindow * MS_PER_DAY;
 
-    return samples.filter(sample => this.getSampleDate(sample) >= cutoffDate);
+    return samples.filter((sample) => this.getSoldDate(sample).getTime() >= cutoff);
   }
 
-  private prepareSamples(samples: MarketSample[]): PreparedSample[] {
-    return samples.map(sample => {
-      const price = this.getSamplePrice(sample);
-      const conditionFactor = this.getConditionFactor(sample.condition);
-      const normalizedPrice = price / conditionFactor;
-      const date = this.getSampleDate(sample);
-      const weightBase = this.calculateTimeWeight(date);
-      const text = this.buildSampleText(sample);
+  private removeOutliers(samples: MarketSample[]): MarketSample[] {
+    const prices = samples.map((sample) => toNumber(sample.observedPrice)).sort((a, b) => a - b);
+    const q1 = this.percentile(prices, 0.25);
+    const q3 = this.percentile(prices, 0.75);
+    const iqr = q3 - q1;
+
+    const lowerBound = q1 - 1.5 * iqr;
+    const upperBound = q3 + 1.5 * iqr;
+
+    return samples.filter((sample) => {
+      const price = toNumber(sample.observedPrice);
+      return price >= lowerBound && price <= upperBound;
+    });
+  }
+
+  private applyTimeWeights(samples: MarketSample[]): WeightedSample[] {
+    const decayRate = this.config.halfLifeDays > 0 ? LN_2 / this.config.halfLifeDays : 0;
+
+    return samples.map((sample) => {
+      const soldDate = this.getSoldDate(sample);
+      const daysOld = Math.max(0, (Date.now() - soldDate.getTime()) / MS_PER_DAY);
+      const weight = Math.exp(-decayRate * daysOld);
+      const daysToSell = this.resolveDaysToSell(sample);
 
       return {
-        sample,
-        normalizedPrice,
-        rawPrice: price,
-        weightBase,
-        date,
-        region: sample.region,
-        text,
+        price: toNumber(sample.observedPrice),
+        soldDate,
+        daysOld,
+        weight,
+        daysToSell,
       };
     });
   }
 
-  private removeOutliers(samples: PreparedSample[]): PreparedSample[] {
-    const prices = samples
-      .map(s => s.normalizedPrice)
-      .sort((a, b) => a - b);
-
-    const q1 = this.percentile(prices, 25);
-    const q3 = this.percentile(prices, 75);
-    const iqr = q3 - q1;
-    const lowerBound = q1 - 1.5 * iqr;
-    const upperBound = q3 + 1.5 * iqr;
-
-    return samples.filter(s => s.normalizedPrice >= lowerBound && s.normalizedPrice <= upperBound);
-  }
-
-  private filterComparables(samples: PreparedSample[], context: TMVContext): PreparedSample[] {
-    const threshold = this.config.comparableSimilarityThreshold ?? 0.8;
-    const targetText = this.buildTargetText(context);
-
-    if (!targetText) {
-      return samples;
-    }
-
-    const targetVector = this.textToVector(targetText);
-
-    return samples.filter(sample => {
-      if (!sample.text) {
-        return true;
-      }
-      const sampleVector = this.textToVector(sample.text);
-      const similarity = this.cosineSimilarity(targetVector, sampleVector);
-      return similarity >= threshold;
-    });
-  }
-
-  private applyWeights(samples: PreparedSample[]): Array<PreparedSample & { weight: number }> {
-    return samples.map(sample => ({
-      ...sample,
-      weight: sample.weightBase,
-    }));
-  }
-
-  private weightedMedian(samples: Array<PreparedSample & { weight: number }>): number {
-    const sorted = [...samples].sort((a, b) => a.normalizedPrice - b.normalizedPrice);
+  private weightedMedian(samples: WeightedSample[]): number | null {
+    const sorted = [...samples].sort((a, b) => a.price - b.price);
     const totalWeight = sorted.reduce((sum, sample) => sum + sample.weight, 0);
 
     if (totalWeight <= 0) {
-      return 0;
+      return null;
     }
 
-    let cumulativeWeight = 0;
+    let runningWeight = 0;
     for (const sample of sorted) {
-      cumulativeWeight += sample.weight;
-      if (cumulativeWeight >= totalWeight / 2) {
-        return sample.normalizedPrice;
+      runningWeight += sample.weight;
+      if (runningWeight >= totalWeight / 2) {
+        return sample.price;
       }
     }
 
-    return sorted[sorted.length - 1]?.normalizedPrice ?? 0;
+    return sorted.at(-1)?.price ?? null;
   }
 
-  private weightedMean(samples: Array<PreparedSample & { weight: number }>): number {
-    const totalWeight = samples.reduce((sum, s) => sum + s.weight, 0);
+  private weightedMean(samples: WeightedSample[]): number | null {
+    const totalWeight = samples.reduce((sum, sample) => sum + sample.weight, 0);
 
     if (totalWeight <= 0) {
-      return 0;
+      return null;
     }
 
-    const weightedSum = samples.reduce(
-      (sum, s) => sum + s.normalizedPrice * s.weight,
-      0
-    );
-
+    const weightedSum = samples.reduce((sum, sample) => sum + sample.price * sample.weight, 0);
     return weightedSum / totalWeight;
   }
 
-  private calculateVolatility(prices: number[], tmv: number): Decimal {
-    if (prices.length === 0 || tmv === 0) {
-      return new Decimal(0);
+  private calculateVolatility(samples: WeightedSample[], tmv: number): number {
+    if (samples.length === 0 || tmv <= 0) {
+      return 0;
     }
 
-    const mean = prices.reduce((sum, p) => sum + p, 0) / prices.length;
-    const variance = prices.reduce((sum, p) => sum + Math.pow(p - mean, 2), 0) / prices.length;
-    const stdDev = Math.sqrt(variance);
-    const cv = stdDev / tmv;
+    const totalWeight = samples.reduce((sum, sample) => sum + sample.weight, 0);
+    const weightedVariance =
+      samples.reduce((sum, sample) => sum + sample.weight * Math.pow(sample.price - tmv, 2), 0) /
+      totalWeight;
 
-    return new Decimal(cv);
+    return Math.sqrt(weightedVariance) / tmv;
   }
 
-  private calculateConfidence(sampleCount: number, volatility: Decimal, weights: number[]): number {
-    const sampleFactor = Math.min(sampleCount / 30, 1.0);
-    const volPenalty = 1 / (1 + volatility.toNumber());
-    const avgWeight = weights.reduce((sum, w) => sum + w, 0) / weights.length;
-    const recencyFactor = Math.min(avgWeight, 1.0);
+  private calculateConfidence(samples: WeightedSample[], volatility: number): number {
+    const sampleCountScore = clamp(samples.length / (this.config.minSamples * 3), 0, 1);
+    const volatilityScore = clamp(1 - volatility / 0.6, 0, 1);
+    const recencyScore = clamp(
+      samples.reduce((sum, sample) => sum + sample.weight, 0) / samples.length,
+      0,
+      1
+    );
 
-    return sampleFactor * 0.4 + volPenalty * 0.4 + recencyFactor * 0.2;
+    const confidence = sampleCountScore * 0.45 + volatilityScore * 0.35 + recencyScore * 0.2;
+    return Number(confidence.toFixed(4));
   }
 
-  private calculateLiquidity(samples: MarketSample[]): {
+  private calculateLiquidity(samples: WeightedSample[]): {
     liquidityScore: number;
     estimatedDaysToSell: number | null;
   } {
-    const durations: number[] = [];
+    const soldDates = [...samples].map((sample) => sample.soldDate).sort((a, b) => a.getTime() - b.getTime());
+    const windowDays = Math.max(
+      1,
+      (soldDates.at(-1)!.getTime() - soldDates[0]!.getTime()) / MS_PER_DAY || 1
+    );
+    const salesPer30Days = samples.length / Math.max(windowDays / 30, 1);
+    const liquidityScore = Number(clamp(salesPer30Days / 12, 0, 1).toFixed(4));
 
-    for (const sample of samples) {
-      if (sample.daysToSell != null) {
-        durations.push(sample.daysToSell);
-        continue;
-      }
+    const explicitDaysToSell = samples
+      .map((sample) => sample.daysToSell)
+      .filter((value): value is number => value !== null && value > 0)
+      .sort((a, b) => a - b);
 
-      if (sample.soldAt && sample.listedAt) {
-        const days = (sample.soldAt.getTime() - sample.listedAt.getTime()) / MS_PER_DAY;
-        durations.push(days);
-      }
+    if (explicitDaysToSell.length > 0) {
+      return {
+        liquidityScore,
+        estimatedDaysToSell: Math.round(this.percentile(explicitDaysToSell, 0.5)),
+      };
     }
 
-    if (durations.length < 2) {
-      return { liquidityScore: 0, estimatedDaysToSell: null };
+    if (soldDates.length < 2) {
+      return { liquidityScore, estimatedDaysToSell: null };
     }
 
-    durations.sort((a, b) => a - b);
-    const medianInterval = this.percentile(durations, 50);
-    const avgInterval = durations.reduce((sum, i) => sum + i, 0) / durations.length;
-    const liquidityScore = 1 / (1 + medianInterval / 30);
+    const gaps = soldDates
+      .slice(1)
+      .map((date, index) => (date.getTime() - soldDates[index]!.getTime()) / MS_PER_DAY)
+      .filter((gap) => gap > 0)
+      .sort((a, b) => a - b);
 
     return {
       liquidityScore,
-      estimatedDaysToSell: Math.round(avgInterval),
+      estimatedDaysToSell: gaps.length > 0 ? Math.round(this.percentile(gaps, 0.5)) : null,
     };
   }
 
-  private calculateTimeWeight(date: Date): number {
-    const ageInDays = (Date.now() - date.getTime()) / MS_PER_DAY;
-    const halfLifeDays = this.config.halfLifeDays ?? 7;
-
-    if (halfLifeDays <= 0) {
-      return 1;
+  private resolveDaysToSell(sample: MarketSample): number | null {
+    if (sample.daysToSell != null && sample.daysToSell > 0) {
+      return sample.daysToSell;
     }
 
-    const decayRate = this.config.decayRate ?? (LN_2 / halfLifeDays);
-    return Math.exp(-decayRate * ageInDays);
-  }
-
-  private getConditionFactor(condition?: string | null): number {
-    if (!condition) {
-      return DEFAULT_CONDITION_FACTORS.good;
+    if (sample.listedAt && sample.soldAt) {
+      const days = (sample.soldAt.getTime() - sample.listedAt.getTime()) / MS_PER_DAY;
+      return days > 0 ? days : null;
     }
 
-    const key = condition.toLowerCase().replace(/\s+/g, '_');
-    return this.config.conditionFactors?.[key] ?? DEFAULT_CONDITION_FACTORS[key] ?? DEFAULT_CONDITION_FACTORS.good;
+    return null;
   }
 
-  private getSamplePrice(sample: MarketSample): number {
-    const soldPrice = sample.status === 'sold' && sample.finalPrice ? sample.finalPrice : null;
-    const price = soldPrice ?? sample.observedPrice;
-    return price.toNumber();
+  private getSoldDate(sample: MarketSample): Date {
+    return sample.soldAt ?? sample.observedAt;
   }
 
-  private getSampleDate(sample: MarketSample): Date {
-    return sample.soldAt ?? sample.observedAt ?? sample.listedAt ?? new Date(0);
-  }
-
-  private buildSampleText(sample: MarketSample): string {
-    if (sample.features) {
-      try {
-        const parsed =
-          typeof sample.features === 'string' ? JSON.parse(sample.features) : sample.features;
-        if (parsed && typeof parsed === 'object') {
-          const values = Object.values(parsed as Record<string, unknown>)
-            .map(value => (value ? String(value) : ''))
-            .join(' ');
-          return `${sample.title ?? ''} ${sample.description ?? ''} ${values}`.trim();
-        }
-      } catch {
-        // ignore invalid JSON and fall back to title/description only
-      }
-    }
-
-    return `${sample.title ?? ''} ${sample.description ?? ''}`.trim();
-  }
-
-  private buildTargetText(context: TMVContext): string {
-    return `${context.targetTitle ?? ''} ${context.targetDescription ?? ''}`.trim();
-  }
-
-  private textToVector(text: string): Map<string, number> {
-    const vector = new Map<string, number>();
-    const tokens = text
-      .toLowerCase()
-      .split(/[^a-z0-9]+/)
-      .filter(Boolean);
-
-    for (const token of tokens) {
-      vector.set(token, (vector.get(token) ?? 0) + 1);
-    }
-
-    return vector;
-  }
-
-  private cosineSimilarity(a: Map<string, number>, b: Map<string, number>): number {
-    let dot = 0;
-    let normA = 0;
-    let normB = 0;
-
-    for (const [key, value] of a.entries()) {
-      normA += value * value;
-      const bValue = b.get(key);
-      if (bValue) {
-        dot += value * bValue;
-      }
-    }
-
-    for (const value of b.values()) {
-      normB += value * value;
-    }
-
-    if (normA === 0 || normB === 0) {
+  private percentile(values: number[], percentile: number): number {
+    if (values.length === 0) {
       return 0;
     }
 
-    return dot / (Math.sqrt(normA) * Math.sqrt(normB));
-  }
-
-  private percentile(sorted: number[], p: number): number {
-    if (sorted.length === 0) {
-      return 0;
-    }
-
-    const index = (p / 100) * (sorted.length - 1);
+    const index = (values.length - 1) * percentile;
     const lower = Math.floor(index);
     const upper = Math.ceil(index);
-    const weight = index - lower;
 
-    if (upper >= sorted.length) {
-      return sorted[lower];
+    if (lower === upper) {
+      return values[lower]!;
     }
 
-    return sorted[lower] * (1 - weight) + sorted[upper] * weight;
-  }
-
-  private isFiniteNumber(value: number): boolean {
-    return Number.isFinite(value);
+    const weight = index - lower;
+    return values[lower]! * (1 - weight) + values[upper]! * weight;
   }
 }

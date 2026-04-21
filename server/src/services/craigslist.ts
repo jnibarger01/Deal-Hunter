@@ -171,8 +171,6 @@ export const ingestCraigslistFromFeeds = async (
               location: listing.location,
               region,
               url: listing.url,
-              marketplace: 'Craigslist',
-              itemUrl: listing.url,
             },
             update: {
               title: listing.title,
@@ -181,7 +179,6 @@ export const ingestCraigslistFromFeeds = async (
               location: listing.location,
               region,
               url: listing.url,
-              itemUrl: listing.url,
             },
           });
 

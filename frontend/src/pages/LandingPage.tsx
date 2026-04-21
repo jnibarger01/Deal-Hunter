@@ -1,11 +1,9 @@
 import {
   ArrowRight,
   Search,
-  BellRing,
   LineChart,
   ShieldCheck,
   Zap,
-  Clock3,
   Wallet,
   CheckCircle2,
 } from 'lucide-react';
@@ -29,22 +27,10 @@ const features = [
     highlight: 'Confidence-scored valuation',
   },
   {
-    title: 'Real-time alerts',
-    description: 'Get notified when a listing drops into your target buy range.',
-    icon: <BellRing size={18} />,
-    highlight: 'Move before competition',
-  },
-  {
     title: 'Risk-aware ranking',
     description: 'Prioritize deals by upside, liquidity, and estimated time-to-sell.',
     icon: <ShieldCheck size={18} />,
     highlight: 'Balanced for real profit',
-  },
-  {
-    title: 'Deal workflow tracking',
-    description: 'Track sourced, contacted, purchased, and sold status for every flip.',
-    icon: <Clock3 size={18} />,
-    highlight: 'Stay organized at scale',
   },
   {
     title: 'Profit-first dashboard',
@@ -84,7 +70,7 @@ const testimonials = [
   },
   {
     quote:
-      'The alert system catches underpriced listings before they disappear. It paid for itself in week one.',
+      'The ranked feed cuts through noise fast. I can focus on the two or three listings that actually deserve a message.',
     author: 'Luis R.',
     role: 'Sneaker and collectibles seller',
   },
@@ -104,12 +90,12 @@ const faqs = [
   {
     question: 'Is this only for full-time resellers?',
     answer:
-      'No. It is designed for both side-hustle sellers and full-time operators. You can run lightweight alerts or manage higher-volume sourcing workflows.',
+      'No. It is designed for both side-hustle sellers and full-time operators who need cleaner deal selection and valuation support.',
   },
   {
     question: 'Can I test it before committing?',
     answer:
-      'Yes. Start by exploring ranked deals and core dashboards, then scale into alerts and deeper workflow tracking as you validate your process.',
+      'Yes. Start by exploring the ranked feed, run TMV analysis on a deal, and verify whether the scoring matches your sourcing process.',
   },
 ];
 
@@ -125,10 +111,10 @@ export function LandingPage() {
             market value, and focus on opportunities with real margin.
           </p>
           <div className={styles.heroActions}>
-            <Link to="/app" className={styles.primaryCta}>
+            <Link to="/" className={styles.primaryCta}>
               Open Dashboard <ArrowRight size={16} />
             </Link>
-            <Link to="/app/deals" className={styles.secondaryCta}>
+            <Link to="/deals" className={styles.secondaryCta}>
               Browse Deals
             </Link>
           </div>
@@ -226,7 +212,7 @@ export function LandingPage() {
             </div>
             <div>
               <strong>24/7</strong>
-              <span>Automated deal monitoring</span>
+              <span>Always-on ranked opportunity review</span>
             </div>
           </div>
         </div>
@@ -265,7 +251,7 @@ export function LandingPage() {
           <h2>Turn market noise into clear buy signals.</h2>
           <p>Open Deal Hunter now and review your highest-ranked opportunities in minutes.</p>
         </div>
-        <Link to="/app" className={styles.finalButton}>
+        <Link to="/" className={styles.finalButton}>
           Launch Deal Hunter <Zap size={16} />
         </Link>
       </section>

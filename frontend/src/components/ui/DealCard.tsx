@@ -43,7 +43,7 @@ export function DealCard({ deal, rank, variant = 'default' }: DealCardProps) {
 
       {/* Header with title and source */}
       <div className={styles.header}>
-        <Link to={`/app/deals/${deal.id}`} className={styles.title}>
+        <Link to={`/deals/${deal.id}`} className={styles.title}>
           {deal.title}
         </Link>
         <div className={styles.meta}>
@@ -109,7 +109,7 @@ export function DealCard({ deal, rank, variant = 'default' }: DealCardProps) {
       <div className={styles.footer}>
         <span className={styles.location}>{deal.location ?? 'Unknown location'}</span>
         <div className={styles.actions}>
-          <Link to={`/app/deals/${deal.id}`} className={styles.actionLink}>
+          <Link to={`/deals/${deal.id}`} className={styles.actionLink}>
             View Details
           </Link>
           {deal.url ? (

@@ -28,7 +28,6 @@ describe('Analysis API', () => {
         observedAt: soldAt,
         source: 'ebay',
         status: ListingStatus.sold,
-        finalPrice: 125 + index,
         listedAt,
         soldAt,
       };

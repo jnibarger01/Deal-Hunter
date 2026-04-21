@@ -10,12 +10,7 @@ import { errorHandler, notFoundHandler } from './middleware/errorHandler';
 import prisma from './config/database';
 
 // Import routes
-import authRoutes from './routes/auth.routes';
-import userRoutes from './routes/user.routes';
 import dealRoutes from './routes/deal.routes';
-import watchlistRoutes from './routes/watchlist.routes';
-import portfolioRoutes from './routes/portfolio.routes';
-import alertRoutes from './routes/alert.routes';
 import analysisRoutes from './routes/analysis.routes';
 
 const app: Application = express();
@@ -90,32 +85,9 @@ app.get('/ready', async (_req, res) => {
   }
 });
 
-// Webhooks
-app.post('/webhooks/marketplace-account-deletion', (req, res) => {
-  const headerToken =
-    req.headers['x-verification-token'] ?? req.headers['x-hub-verify-token'];
-  const token =
-    (typeof req.query.verification_token === 'string'
-      ? req.query.verification_token
-      : undefined) ??
-    (typeof headerToken === 'string' ? headerToken : undefined);
-
-  if (!config.marketplace.deleteToken || token !== config.marketplace.deleteToken) {
-    return res.status(401).send('Invalid token');
-  }
-
-  logger.info('Account deletion webhook received', { body: req.body });
-  return res.status(200).send('OK');
-});
-
 // API Routes
 const apiRouter = express.Router();
-apiRouter.use('/auth', authRoutes);
-apiRouter.use('/users', userRoutes);
 apiRouter.use('/deals', dealRoutes);
-apiRouter.use('/watchlist', watchlistRoutes);
-apiRouter.use('/portfolio', portfolioRoutes);
-apiRouter.use('/alerts', alertRoutes);
 apiRouter.use('/', analysisRoutes);
 
 app.use(`/api/${config.apiVersion}`, apiRouter);
