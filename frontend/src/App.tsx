@@ -10,7 +10,6 @@ function App() {
           <Route path="/" element={<Dashboard />} />
           <Route path="/deals" element={<Deals />} />
           <Route path="/deals/:id" element={<DealDetail />} />
-          <Route path="/ranked" element={<Deals />} />
           <Route path="/calculator" element={<Calculator />} />
           <Route path="/settings" element={<Settings />} />
           <Route path="*" element={<Navigate to="/" replace />} />

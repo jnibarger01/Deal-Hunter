@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
   TrendingUp,
   DollarSign,
@@ -9,141 +9,57 @@ import {
 } from 'lucide-react';
 import { Header } from '../components/layout';
 import { MetricCard, MetricGrid, DealCard, DealGrid, Card, CardHeader, CardContent } from '../components/ui';
-import { useRankedDeals } from '../hooks/useDeals';
+import { useLiveEbayDeals, useRankedDeals } from '../hooks/useDeals';
 import { useAppSettings } from '../context/AppSettingsContext';
 import type { RankedDeal } from '../types';
 import styles from './Dashboard.module.css';
 
-// Mock data for demonstration when API is not available
-const mockRankedDeals: RankedDeal[] = [
-  {
-    id: '1',
-    source: 'eBay',
-    sourceId: 'eb-123',
-    title: 'Sony PlayStation 5 Console - Digital Edition',
-    price: 350,
-    condition: 'Like New',
-    category: 'Gaming',
-    location: 'Los Angeles, CA',
-    url: 'https://example.com/1',
-    createdAt: new Date().toISOString(),
-    tmv: {
-      dealId: '1',
-      tmv: 450,
-      confidence: 0.87,
-      sampleCount: 124,
-      volatility: 0.12,
-      liquidityScore: 0.89,
-      estimatedDaysToSell: 3,
-      calculatedAt: new Date().toISOString(),
-    },
-    score: {
-      dealId: '1',
-      profitMargin: 0.286,
-      velocityScore: 0.92,
-      riskScore: 0.15,
-      compositeRank: 94,
-    },
-  },
-  {
-    id: '2',
-    source: 'FB Market',
-    sourceId: 'fb-456',
-    title: 'Apple MacBook Pro 14" M3 Pro - 18GB RAM 512GB SSD',
-    price: 1450,
-    condition: 'Excellent',
-    category: 'Computers',
-    location: 'San Francisco, CA',
-    url: 'https://example.com/2',
-    createdAt: new Date().toISOString(),
-    tmv: {
-      dealId: '2',
-      tmv: 1850,
-      confidence: 0.92,
-      sampleCount: 89,
-      volatility: 0.08,
-      liquidityScore: 0.78,
-      estimatedDaysToSell: 5,
-      calculatedAt: new Date().toISOString(),
-    },
-    score: {
-      dealId: '2',
-      profitMargin: 0.276,
-      velocityScore: 0.85,
-      riskScore: 0.12,
-      compositeRank: 91,
-    },
-  },
-  {
-    id: '3',
-    source: 'Craigslist',
-    sourceId: 'cl-789',
-    title: 'Nintendo Switch OLED - White with 5 Games',
-    price: 220,
-    condition: 'Good',
-    category: 'Gaming',
-    location: 'Austin, TX',
-    url: 'https://example.com/3',
-    createdAt: new Date().toISOString(),
-    tmv: {
-      dealId: '3',
-      tmv: 310,
-      confidence: 0.75,
-      sampleCount: 67,
-      volatility: 0.18,
-      liquidityScore: 0.82,
-      estimatedDaysToSell: 4,
-      calculatedAt: new Date().toISOString(),
-    },
-    score: {
-      dealId: '3',
-      profitMargin: 0.409,
-      velocityScore: 0.88,
-      riskScore: 0.28,
-      compositeRank: 87,
-    },
-  },
-  {
-    id: '4',
-    source: 'OfferUp',
-    sourceId: 'ou-101',
-    title: 'DJI Mavic Air 2 Drone - Fly More Combo',
-    price: 480,
-    condition: 'Like New',
-    category: 'Electronics',
-    location: 'Seattle, WA',
-    url: 'https://example.com/4',
-    createdAt: new Date().toISOString(),
-    tmv: {
-      dealId: '4',
-      tmv: 620,
-      confidence: 0.81,
-      sampleCount: 45,
-      volatility: 0.15,
-      liquidityScore: 0.71,
-      estimatedDaysToSell: 7,
-      calculatedAt: new Date().toISOString(),
-    },
-    score: {
-      dealId: '4',
-      profitMargin: 0.292,
-      velocityScore: 0.75,
-      riskScore: 0.22,
-      compositeRank: 82,
-    },
-  },
-];
+interface CategoryStat {
+  name: string;
+  count: number;
+  avgProfitMargin: number;
+}
+
+interface SourceStat {
+  name: string;
+  count: number;
+  avgRank: number;
+}
+
+const LIVE_EBAY_CATEGORIES = ['automotive', 'gaming', 'tech', 'tvs', 'speakers', 'tools'] as const;
+
+function aggregateByKey<T extends keyof RankedDeal>(
+  deals: RankedDeal[],
+  key: T,
+  project: (deal: RankedDeal) => number
+) {
+  const groups = new Map<string, { count: number; total: number }>();
+  for (const deal of deals) {
+    const bucket = String(deal[key] ?? 'Unknown');
+    const existing = groups.get(bucket) ?? { count: 0, total: 0 };
+    existing.count += 1;
+    existing.total += project(deal);
+    groups.set(bucket, existing);
+  }
+  return Array.from(groups.entries())
+    .map(([name, { count, total }]) => ({ name, count, avg: count > 0 ? total / count : 0 }))
+    .sort((a, b) => b.count - a.count);
+}
 
 export function Dashboard() {
   const { data: rankedDeals, loading: rankedLoading, refetch } = useRankedDeals();
   const { settings } = useAppSettings();
+  const [liveCategory, setLiveCategory] = useState<(typeof LIVE_EBAY_CATEGORIES)[number]>('tech');
+  const [liveFeedEnabled, setLiveFeedEnabled] = useState(false);
+  const {
+    data: liveEbayDeals,
+    loading: liveEbayLoading,
+    refetch: refetchLiveEbayDeals,
+  } = useLiveEbayDeals(liveCategory, liveFeedEnabled);
 
-  const enableMockFallback =
-    import.meta.env.DEV && import.meta.env.VITE_ENABLE_MOCK_FALLBACK === 'true';
-  const deals = rankedDeals ?? (enableMockFallback ? mockRankedDeals : []);
+  const deals = rankedDeals ?? [];
   const loading = rankedLoading && deals.length === 0;
 
-  // Calculate summary metrics
   const metrics = useMemo(() => {
     if (!deals.length) {
       return {
@@ -151,26 +67,31 @@ export function Dashboard() {
         avgProfit: 0,
         totalPotential: 0,
         avgConfidence: 0,
-        topDeal: null,
       };
     }
 
-    const totalPotential = deals.reduce(
-      (sum, d) => sum + (d.tmv.tmv - d.price),
-      0
-    );
-    const avgProfit =
-      deals.reduce((sum, d) => sum + d.score.profitMargin, 0) / deals.length;
-    const avgConfidence =
-      deals.reduce((sum, d) => sum + d.tmv.confidence, 0) / deals.length;
+    const totalPotential = deals.reduce((sum, d) => sum + (d.tmv.tmv - d.price), 0);
+    const avgProfit = deals.reduce((sum, d) => sum + d.score.profitMargin, 0) / deals.length;
+    const avgConfidence = deals.reduce((sum, d) => sum + d.tmv.confidence, 0) / deals.length;
 
     return {
       totalDeals: deals.length,
       avgProfit,
       totalPotential,
       avgConfidence,
-      topDeal: deals[0],
     };
+  }, [deals]);
+
+  const categoryStats: CategoryStat[] = useMemo(() => {
+    return aggregateByKey(deals, 'category', (d) => d.score.profitMargin).map(
+      ({ name, count, avg }) => ({ name, count, avgProfitMargin: avg })
+    );
+  }, [deals]);
+
+  const sourceStats: SourceStat[] = useMemo(() => {
+    return aggregateByKey(deals, 'source', (d) => d.score.compositeRank).map(
+      ({ name, count, avg }) => ({ name, count, avgRank: Math.round(avg) })
+    );
   }, [deals]);
 
   const topDeals = deals.slice(0, 6);
@@ -189,12 +110,16 @@ export function Dashboard() {
       <Header
         title="Dashboard"
         subtitle="Real-time deal analysis and rankings"
-        onRefresh={refetch}
-        refreshing={loading}
+        onRefresh={() => {
+          refetch();
+          if (liveFeedEnabled) {
+            refetchLiveEbayDeals();
+          }
+        }}
+        refreshing={loading || (liveFeedEnabled && liveEbayLoading)}
       />
 
       <div className={styles.content}>
-        {/* Summary Metrics */}
         <section className={styles.section}>
           <MetricGrid columns={4}>
             <MetricCard
@@ -210,8 +135,6 @@ export function Dashboard() {
               suffix="%"
               icon={<TrendingUp size={16} />}
               variant="profit"
-              trend="up"
-              trendValue="+2.3%"
               loading={loading}
             />
             <MetricCard
@@ -233,7 +156,72 @@ export function Dashboard() {
           </MetricGrid>
         </section>
 
-        {/* Top Ranked Deals */}
+        <section className={styles.section}>
+          <div className={styles.sectionHeader}>
+            <div>
+              <h2 className={styles.sectionTitle}>
+                <Zap size={20} className={styles.sectionIcon} />
+                Live eBay Feed
+              </h2>
+              <p className={styles.sectionSubtitle}>
+                Fresh listings by category preset while we wire the rest of the marketplaces.
+              </p>
+            </div>
+          </div>
+
+          <div className={styles.liveCategoryRow}>
+            {LIVE_EBAY_CATEGORIES.map((category) => (
+              <button
+                key={category}
+                type="button"
+                className={`${styles.liveCategoryButton} ${
+                  liveCategory === category ? styles.liveCategoryButtonActive : ''
+                }`}
+                onClick={() => setLiveCategory(category)}
+              >
+                {category}
+              </button>
+            ))}
+          </div>
+
+          {!liveFeedEnabled ? (
+            <Card>
+              <CardContent>
+                <p className={styles.sectionSubtitle}>
+                  Live eBay pulls hit external APIs and persist data, so they stay manual by design.
+                </p>
+                <button
+                  type="button"
+                  className={styles.loadLiveButton}
+                  onClick={() => setLiveFeedEnabled(true)}
+                >
+                  Load Live eBay Deals
+                </button>
+              </CardContent>
+            </Card>
+          ) : liveEbayLoading ? (
+            <DealGrid columns={2}>
+              {Array.from({ length: 4 }).map((_, i) => (
+                <div key={i} className={styles.skeletonCard} />
+              ))}
+            </DealGrid>
+          ) : (liveEbayDeals ?? []).length === 0 ? (
+            <Card>
+              <CardContent>
+                <p className={styles.sectionSubtitle}>
+                  No live eBay deals returned for {liveCategory}. Try another category or refresh.
+                </p>
+              </CardContent>
+            </Card>
+          ) : (
+            <DealGrid columns={2}>
+              {(liveEbayDeals ?? []).map((deal) => (
+                <DealCard key={deal.id} deal={deal} variant="default" />
+              ))}
+            </DealGrid>
+          )}
+        </section>
+
         <section className={styles.section}>
           <div className={styles.sectionHeader}>
             <div>
@@ -253,6 +241,14 @@ export function Dashboard() {
                 <div key={i} className={styles.skeletonCard} />
               ))}
             </DealGrid>
+          ) : topDeals.length === 0 ? (
+            <Card>
+              <CardContent>
+                <p className={styles.sectionSubtitle}>
+                  No ranked deals yet. Ingest listings and run TMV + Score to populate this feed.
+                </p>
+              </CardContent>
+            </Card>
           ) : (
             <DealGrid columns={2}>
               {topDeals.map((deal, index) => (
@@ -267,63 +263,54 @@ export function Dashboard() {
           )}
         </section>
 
-        {/* Quick Stats */}
-        <section className={styles.section}>
-          <div className={styles.statsGrid}>
-            <Card>
-              <CardHeader title="Category Breakdown" />
-              <CardContent>
-                <div className={styles.categoryList}>
-                  {[
-                    { name: 'Gaming', count: 12, profit: 28.5 },
-                    { name: 'Electronics', count: 8, profit: 24.2 },
-                    { name: 'Computers', count: 6, profit: 31.4 },
-                    { name: 'Audio', count: 4, profit: 19.8 },
-                  ].map((cat) => (
-                    <div key={cat.name} className={styles.categoryItem}>
-                      <div className={styles.categoryInfo}>
-                        <span className={styles.categoryName}>{cat.name}</span>
-                        <span className={styles.categoryCount}>
-                          {cat.count} deals
+        {deals.length > 0 && (
+          <section className={styles.section}>
+            <div className={styles.statsGrid}>
+              <Card>
+                <CardHeader title="Category Breakdown" />
+                <CardContent>
+                  <div className={styles.categoryList}>
+                    {categoryStats.map((cat) => (
+                      <div key={cat.name} className={styles.categoryItem}>
+                        <div className={styles.categoryInfo}>
+                          <span className={styles.categoryName}>{cat.name}</span>
+                          <span className={styles.categoryCount}>
+                            {cat.count} {cat.count === 1 ? 'deal' : 'deals'}
+                          </span>
+                        </div>
+                        <span className={styles.categoryProfit}>
+                          {(cat.avgProfitMargin * 100).toFixed(1)}%
                         </span>
                       </div>
-                      <span className={styles.categoryProfit}>
-                        +{cat.profit}%
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
 
-            <Card>
-              <CardHeader title="Source Performance" />
-              <CardContent>
-                <div className={styles.sourceList}>
-                  {[
-                    { name: 'eBay', deals: 15, score: 87 },
-                    { name: 'FB Marketplace', deals: 12, score: 82 },
-                    { name: 'Craigslist', deals: 8, score: 74 },
-                    { name: 'OfferUp', deals: 5, score: 71 },
-                  ].map((source) => (
-                    <div key={source.name} className={styles.sourceItem}>
-                      <div className={styles.sourceInfo}>
-                        <span className={styles.sourceName}>{source.name}</span>
-                        <span className={styles.sourceDeals}>
-                          {source.deals} active
-                        </span>
+              <Card>
+                <CardHeader title="Source Performance" />
+                <CardContent>
+                  <div className={styles.sourceList}>
+                    {sourceStats.map((source) => (
+                      <div key={source.name} className={styles.sourceItem}>
+                        <div className={styles.sourceInfo}>
+                          <span className={styles.sourceName}>{source.name}</span>
+                          <span className={styles.sourceDeals}>
+                            {source.count} active
+                          </span>
+                        </div>
+                        <div className={styles.sourceScore}>
+                          <BarChart3 size={14} />
+                          <span>{source.avgRank}</span>
+                        </div>
                       </div>
-                      <div className={styles.sourceScore}>
-                        <BarChart3 size={14} />
-                        <span>{source.score}</span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </section>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </section>
+        )}
       </div>
     </div>
   );

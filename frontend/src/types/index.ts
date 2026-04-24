@@ -1,10 +1,14 @@
 // Core domain types aligned with PRD data model
 
+export type LiveEbayCategory = 'automotive' | 'gaming' | 'tech' | 'tvs' | 'speakers' | 'tools';
+
 export interface Deal {
   id: string;
   source: string;
   sourceId: string;
   title: string;
+  description?: string | null;
+  imageUrl?: string | null;
   price: number;
   condition: string | null;
   category: string;
@@ -13,6 +17,16 @@ export interface Deal {
   createdAt: string;
   tmv?: TMVResult;
   score?: Score;
+}
+
+export interface LiveEbayDeal extends Deal {
+  source: 'ebay';
+  description: string;
+  imageUrl: string;
+  condition: string;
+  category: LiveEbayCategory;
+  location: string;
+  url: string;
 }
 
 export interface MarketSample {
@@ -79,6 +93,56 @@ export interface TMVScenario {
   notes?: string | null;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface DealIntelligence {
+  repairAnalysis: {
+    skillLevel: string;
+    summary: string;
+    likelyIssue: string;
+    partsCost: number;
+  };
+  marketDynamics: {
+    summary: string;
+    targetPrice: number;
+    priceHistory: number[];
+  };
+  negotiation: {
+    targetOffer: number;
+    openingScript: string;
+  };
+}
+
+export interface IngestSourceRecord {
+  id: string;
+  kind: string;
+  enabled: boolean;
+  lastRunAt?: string | null;
+  createdAt: string;
+  updatedAt: string;
+  config: {
+    rssUrl?: string;
+    lastAcceptedCount?: number;
+    lastFetchedCount?: number;
+    lastRejectedCount?: number;
+    lastError?: string | null;
+  };
+}
+
+export interface ConnectionsData {
+  ebay: {
+    status: 'configured' | 'missing_credentials';
+    lastLivePullAt: string | null;
+  };
+  craigslist: {
+    schedulerEnabled: boolean;
+    sources: IngestSourceRecord[];
+  };
+  facebook: {
+    status: 'configured' | 'not_configured';
+    profileName: string | null;
+    lastTestedAt: string | null;
+  };
 }
 
 // UI State types

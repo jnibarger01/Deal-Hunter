@@ -2,11 +2,11 @@ import { NavLink, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard,
   Tags,
-  TrendingUp,
   Calculator,
   Settings,
   Activity,
 } from 'lucide-react';
+import { useHealth } from '../../hooks/useDeals';
 import styles from './Sidebar.module.css';
 
 interface NavItem {
@@ -17,14 +17,34 @@ interface NavItem {
 }
 
 const navItems: NavItem[] = [
-  { path: '/app', label: 'Dashboard', icon: <LayoutDashboard size={20} />, end: true },
-  { path: '/app/deals', label: 'All Deals', icon: <Tags size={20} /> },
-  { path: '/app/ranked', label: 'Top Ranked', icon: <TrendingUp size={20} /> },
-  { path: '/app/calculator', label: 'TMV Calculator', icon: <Calculator size={20} /> },
+  { path: '/', label: 'Dashboard', icon: <LayoutDashboard size={20} />, end: true },
+  { path: '/deals', label: 'All Deals', icon: <Tags size={20} /> },
+  { path: '/calculator', label: 'TMV Calculator', icon: <Calculator size={20} /> },
 ];
 
 export function Sidebar() {
   const location = useLocation();
+  const { data: health, loading: healthLoading, error: healthError } = useHealth();
+
+  const healthState: 'online' | 'offline' | 'loading' =
+    healthLoading && !health ? 'loading' : healthError || !health ? 'offline' : 'online';
+
+  const dotClass =
+    healthState === 'online'
+      ? styles.statusDot
+      : healthState === 'offline'
+      ? `${styles.statusDot} ${styles.statusDotError}`
+      : `${styles.statusDot} ${styles.statusDotLoading}`;
+
+  const valueClass =
+    healthState === 'online'
+      ? styles.statusValue
+      : healthState === 'offline'
+      ? `${styles.statusValue} ${styles.statusValueError}`
+      : `${styles.statusValue} ${styles.statusValueLoading}`;
+
+  const valueText =
+    healthState === 'online' ? 'Online' : healthState === 'offline' ? 'Offline' : 'Checking…';
 
   return (
     <aside className={styles.sidebar}>
@@ -65,15 +85,15 @@ export function Sidebar() {
       <div className={styles.statusSection}>
         <div className={styles.statusCard}>
           <div className={styles.statusHeader}>
-            <span className={styles.statusDot} />
+            <span className={dotClass} />
             <span className={styles.statusLabel}>System Status</span>
           </div>
-          <span className={styles.statusValue}>Online</span>
+          <span className={valueClass}>{valueText}</span>
         </div>
       </div>
 
       <div className={styles.footer}>
-        <NavLink to="/app/settings" className={styles.footerLink}>
+        <NavLink to="/settings" className={styles.footerLink}>
           <Settings size={18} />
           <span>Settings</span>
         </NavLink>

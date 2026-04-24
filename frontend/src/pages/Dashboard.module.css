@@ -47,6 +47,51 @@
   margin: var(--space-1) 0 0 0;
 }
 
+/* Live eBay feed */
+.liveCategoryRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-bottom: var(--space-4);
+}
+
+.liveCategoryButton {
+  border: 1px solid var(--color-border-primary);
+  background: var(--color-surface-2);
+  color: var(--color-text-secondary);
+  border-radius: var(--radius-pill);
+  padding: var(--space-2) var(--space-3);
+  text-transform: capitalize;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.liveCategoryButton:hover {
+  color: var(--color-text-primary);
+  background: var(--color-bg-hover);
+}
+
+.liveCategoryButtonActive {
+  border-color: var(--color-accent);
+  background: var(--color-accent-dim);
+  color: var(--color-accent);
+}
+
+.loadLiveButton {
+  margin-top: var(--space-3);
+  border: 1px solid var(--color-accent);
+  background: var(--color-accent-dim);
+  color: var(--color-accent);
+  border-radius: var(--radius-pill);
+  padding: var(--space-2) var(--space-4);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.loadLiveButton:hover {
+  background: var(--color-bg-hover);
+}
+
 /* Skeleton loading */
 .skeletonCard {
   height: 280px;

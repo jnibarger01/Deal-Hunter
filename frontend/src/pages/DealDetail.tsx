@@ -1,63 +1,11 @@
-import { useParams, useNavigate } from 'react-router-dom';
-import {
-  ArrowLeft,
-  ExternalLink,
-  TrendingUp,
-  Clock,
-  Shield,
-  BarChart3,
-  Target,
-  Activity,
-  DollarSign,
-  RefreshCw,
-} from 'lucide-react';
-import { Header } from '../components/layout';
-import {
-  Card,
-  CardHeader,
-  CardContent,
-  Button,
-  MetricCard,
-  MetricGrid,
-  Badge,
-  ConfidenceBadge,
-  RiskBadge,
-  ConditionBadge,
-} from '../components/ui';
-import { useDeal, useCalculateTMV } from '../hooks/useDeals';
-import type { RankedDeal } from '../types';
+import { useEffect, useMemo, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { ArrowLeft, ExternalLink, RefreshCw, TrendingUp, Zap } from 'lucide-react';
+import { Card, Badge } from '../components/ui';
+import { useDeal, useCalculateTMV, useDealIntelligence } from '../hooks/useDeals';
+import { adaptDealIntelligenceView } from '../adapters/dealIntelligence';
+import type { Deal, TMVResult } from '../types';
 import styles from './DealDetail.module.css';
-
-// Mock data for when API is unavailable
-const mockDeal: RankedDeal = {
-  id: '1',
-  source: 'eBay',
-  sourceId: 'eb-123456',
-  title: 'Sony PlayStation 5 Console - Digital Edition with Extra Controller',
-  price: 350,
-  condition: 'Like New',
-  category: 'Gaming',
-  location: 'Los Angeles, CA',
-  url: 'https://example.com/deal/1',
-  createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
-  tmv: {
-    dealId: '1',
-    tmv: 450,
-    confidence: 0.87,
-    sampleCount: 124,
-    volatility: 0.12,
-    liquidityScore: 0.89,
-    estimatedDaysToSell: 3,
-    calculatedAt: new Date().toISOString(),
-  },
-  score: {
-    dealId: '1',
-    profitMargin: 0.286,
-    velocityScore: 0.92,
-    riskScore: 0.15,
-    compositeRank: 94,
-  },
-};
 
 function formatCurrency(value: number): string {
   return new Intl.NumberFormat('en-US', {
@@ -69,44 +17,97 @@ function formatCurrency(value: number): string {
 }
 
 function formatPercent(value: number): string {
-  return `${(value * 100).toFixed(1)}%`;
+  return `${value >= 0 ? '+' : ''}${(value * 100).toFixed(0)}%`;
 }
 
-function formatDate(dateString: string): string {
-  return new Date(dateString).toLocaleDateString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  });
+function toTitleCase(value: string): string {
+  return value
+    .split(/[-_\s]+/)
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(' ');
+}
+
+function sourceLabel(source: string): string {
+  const normalized = source.toLowerCase();
+  if (normalized === 'ebay') return 'eBay';
+  if (normalized === 'craigslist') return 'Craigslist';
+  if (normalized === 'facebook' || normalized === 'fb marketplace') return 'FB Marketplace';
+  return toTitleCase(source);
+}
+
+function PriceHistoryChart({ values, marketValue }: { values: number[]; marketValue: number }) {
+  const min = Math.min(...values);
+  const max = Math.max(...values);
+  const points = values
+    .map((value, index) => {
+      const x = (index / (values.length - 1)) * 100;
+      const y = max === min ? 50 : 100 - ((value - min) / (max - min)) * 100;
+      return `${x},${y}`;
+    })
+    .join(' ');
+  const pointTokens = points.split(' ');
+  const lastPoint = (pointTokens[pointTokens.length - 1] ?? '100,50').split(',');
+
+  return (
+    <div className={styles.chartShell}>
+      <div className={styles.chartHeader}>
+        <span>6-Month Price History</span>
+        <span className={styles.chartTarget}>Target: {formatCurrency(marketValue)}</span>
+      </div>
+      <div className={styles.chartArea}>
+        <svg viewBox="0 0 100 100" preserveAspectRatio="none" className={styles.chartSvg} aria-label="6-month price history">
+          <polyline fill="none" points={points} className={styles.chartLine} />
+          <circle cx={lastPoint[0]} cy={lastPoint[1]} r="3.5" className={styles.chartDot} />
+        </svg>
+        <div className={styles.chartFooter}>
+          <span>6MO AGO</span>
+          <span>NOW</span>
+        </div>
+      </div>
+    </div>
+  );
 }
 
 export function DealDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { data: apiDeal, loading: dealLoading } = useDeal(id || '');
+  const { data: deal, loading: dealLoading, refetch } = useDeal(id || '');
+  const { data: intelligence, refetch: refetchIntelligence } = useDealIntelligence(id || '');
   const { calculate, loading: calculating } = useCalculateTMV();
+  const [localTMV, setLocalTMV] = useState<TMVResult | null>(null);
 
-  const enableMockFallback =
-    import.meta.env.DEV && import.meta.env.VITE_ENABLE_MOCK_FALLBACK === 'true';
-  const deal = (apiDeal as RankedDeal) ?? (enableMockFallback ? mockDeal : undefined);
+  useEffect(() => {
+    if (deal?.tmv) {
+      setLocalTMV(null);
+    }
+  }, [deal?.tmv]);
+
   const loading = dealLoading && !deal;
+  const dealWithAnalytics: Deal | undefined = deal ?? undefined;
 
-  const hasTMV = deal.tmv !== undefined;
-  const hasScore = deal.score !== undefined;
-  const profitAmount = hasTMV ? deal.tmv.tmv - deal.price : 0;
+  const tmv = dealWithAnalytics?.tmv ?? localTMV ?? undefined;
+  const intelligenceView = useMemo(() => {
+    if (!dealWithAnalytics) {
+      return null;
+    }
+
+    return adaptDealIntelligenceView(dealWithAnalytics, intelligence, tmv);
+  }, [dealWithAnalytics, intelligence, tmv]);
 
   const handleRecalculate = async () => {
-    if (id) {
-      await calculate(id);
+    if (!id) return;
+    const recalculated = await calculate(id);
+    if (recalculated) {
+      setLocalTMV(recalculated);
     }
+    refetch();
+    refetchIntelligence();
   };
 
   if (loading) {
     return (
       <div className={styles.page}>
-        <Header title="Loading..." />
         <div className={styles.content}>
           <div className={styles.skeleton} />
         </div>
@@ -114,233 +115,141 @@ export function DealDetail() {
     );
   }
 
-  if (!deal) {
+  if (!dealWithAnalytics) {
     return (
       <div className={styles.page}>
-        <Header title="Deal not found" subtitle="No deal data available" />
+        <div className={styles.content}>
+          <h1 className={styles.emptyTitle}>Deal not found</h1>
+          <p className={styles.emptyText}>No deal data available.</p>
+        </div>
       </div>
     );
   }
 
+  if (!intelligenceView) {
+    return null;
+  }
+
+  const { dealScore, description, marketDynamics, marketValue, negotiation, repairAnalysis, roi } = intelligenceView;
+
   return (
     <div className={styles.page}>
-      <Header
-        title="Deal Analysis"
-        subtitle={deal.category}
-        onRefresh={handleRecalculate}
-        refreshing={calculating}
-      />
-
       <div className={styles.content}>
-        {/* Back navigation */}
         <button onClick={() => navigate(-1)} className={styles.backButton}>
           <ArrowLeft size={18} />
-          Back to Deals
+          Back to Feed
         </button>
 
-        {/* Main content grid */}
         <div className={styles.grid}>
-          {/* Left column - Deal info */}
-          <div className={styles.mainColumn}>
-            {/* Deal Header */}
-            <Card padding="lg" className={styles.dealHeader}>
-              <div className={styles.headerContent}>
-                <div className={styles.badges}>
-                  <Badge variant="default">{deal.source}</Badge>
-                  <ConditionBadge condition={deal.condition ?? 'Unknown'} />
-                  {hasScore && (
-                    <Badge variant="accent" glow>
-                      Rank #{deal.score.compositeRank}
-                    </Badge>
-                  )}
+          <section className={styles.leftPanel}>
+            {dealWithAnalytics.imageUrl ? (
+              <img src={dealWithAnalytics.imageUrl} alt={dealWithAnalytics.title} className={styles.heroImageTag} />
+            ) : (
+              <div className={styles.heroImage} aria-hidden="true" />
+            )}
+            <h1 className={styles.title}>{dealWithAnalytics.title}</h1>
+
+            <div className={styles.metricRow}>
+              <div className={styles.metricBox}>
+                <span className={styles.metricLabel}>List Price</span>
+                <span className={styles.metricValue}>{formatCurrency(dealWithAnalytics.price)}</span>
+              </div>
+              <div className={styles.metricBox}>
+                <span className={styles.metricLabel}>Market Value</span>
+                <span className={styles.metricValue}>{formatCurrency(marketValue)}</span>
+              </div>
+              <div className={styles.metricBox}>
+                <span className={styles.metricLabel}>ROI</span>
+                <span className={`${styles.metricValue} ${roi >= 0 ? styles.positiveValue : styles.negativeValue}`}>{formatPercent(roi)}</span>
+              </div>
+            </div>
+
+            <div className={styles.sectionBlock}>
+              <span className={styles.sectionEyebrow}>Description</span>
+              <Card className={styles.descriptionCard}>
+                <p className={styles.descriptionText}>{description}</p>
+              </Card>
+            </div>
+
+            <div className={styles.tagRow}>
+              <Badge variant="accent">{sourceLabel(dealWithAnalytics.source)}</Badge>
+              <Badge variant="info">{dealWithAnalytics.condition ? `${toTitleCase(dealWithAnalytics.condition)} condition` : 'Condition unknown'}</Badge>
+              <Badge variant="default">{dealWithAnalytics.location ?? 'Location unknown'}</Badge>
+            </div>
+          </section>
+
+          <aside className={styles.rightPanel}>
+            <div className={styles.intelligenceHeader}>
+              <div className={styles.intelligenceTitleWrap}>
+                <div className={styles.intelligenceIcon}>
+                  <Zap size={18} />
                 </div>
-                <h1 className={styles.title}>{deal.title}</h1>
-                <div className={styles.meta}>
-                  <span className={styles.location}>{deal.location ?? 'Unknown location'}</span>
-                  <span className={styles.separator}>·</span>
-                  <span className={styles.date}>Listed {formatDate(deal.createdAt)}</span>
+                <div>
+                  <h2 className={styles.intelligenceTitle}>Deal Intelligence</h2>
+                </div>
+              </div>
+              <div className={styles.scoreBlock}>
+                <span className={styles.scoreLabel}>Deal Score</span>
+                <span className={styles.scoreValue}>{dealScore}</span>
+              </div>
+            </div>
+
+            <Card className={styles.intelligenceCard}>
+              <div className={styles.cardTopRow}>
+                <span className={styles.cardEyebrow}>Repair Analysis</span>
+                <Badge variant="success">{repairAnalysis.skillLevel}</Badge>
+              </div>
+              <p className={styles.analysisText}>{repairAnalysis.summary}</p>
+              <div className={styles.dualStatGrid}>
+                <div className={styles.subPanel}>
+                  <span className={styles.subPanelLabel}>Likely Issue</span>
+                  <p className={styles.subPanelText}>{repairAnalysis.likelyIssue}</p>
+                </div>
+                <div className={styles.subPanel}>
+                  <span className={styles.subPanelLabel}>Parts Cost</span>
+                  <p className={styles.subPanelValue}>{formatCurrency(repairAnalysis.partsCost)}</p>
                 </div>
               </div>
             </Card>
 
-            {/* Price Analysis */}
-            <Card padding="lg">
-              <CardHeader title="Price Analysis" subtitle="TMV comparison and profit potential" />
-              <CardContent>
-                <div className={styles.priceComparison}>
-                  <div className={styles.priceBlock}>
-                    <span className={styles.priceLabel}>Asking Price</span>
-                    <span className={styles.askingPrice}>{formatCurrency(deal.price)}</span>
-                  </div>
-
-                  {hasTMV && (
-                    <>
-                      <div className={styles.priceArrow}>
-                        <TrendingUp size={24} />
-                      </div>
-                      <div className={styles.priceBlock}>
-                        <span className={styles.priceLabel}>True Market Value</span>
-                        <span className={styles.tmvPrice}>{formatCurrency(deal.tmv.tmv)}</span>
-                      </div>
-                    </>
-                  )}
-                </div>
-
-                {hasTMV && profitAmount > 0 && (
-                  <div className={styles.profitBanner}>
-                    <div className={styles.profitContent}>
-                      <span className={styles.profitLabel}>Potential Profit</span>
-                      <div className={styles.profitValues}>
-                        <span className={styles.profitAmount}>
-                          +{formatCurrency(profitAmount)}
-                        </span>
-                        <span className={styles.profitPercent}>
-                          ({formatPercent(deal.score?.profitMargin || 0)} margin)
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </CardContent>
+            <Card className={styles.intelligenceCard}>
+              <div className={styles.cardTopRow}>
+                <span className={styles.cardEyebrow}>Market Dynamics</span>
+                <button className={styles.refreshButton} onClick={handleRecalculate} disabled={calculating}>
+                  <RefreshCw size={14} className={calculating ? styles.spinning : ''} />
+                  Refresh
+                </button>
+              </div>
+              <p className={styles.analysisText}>{marketDynamics.summary}</p>
+              <PriceHistoryChart values={marketDynamics.priceHistory} marketValue={marketDynamics.targetPrice} />
             </Card>
 
-            {/* TMV Details */}
-            {hasTMV && (
-              <Card padding="lg">
-                <CardHeader
-                  title="TMV Engine Analysis"
-                  subtitle={`Calculated ${formatDate(deal.tmv.calculatedAt)}`}
-                  action={
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      icon={<RefreshCw size={14} />}
-                      onClick={handleRecalculate}
-                      loading={calculating}
-                    >
-                      Recalculate
-                    </Button>
-                  }
-                />
-                <CardContent>
-                  <MetricGrid columns={3}>
-                    <MetricCard
-                      label="Sample Count"
-                      value={deal.tmv.sampleCount}
-                      icon={<BarChart3 size={16} />}
-                      subtitle="Market data points"
-                    />
-                    <MetricCard
-                      label="Volatility"
-                      value={formatPercent(deal.tmv.volatility)}
-                      icon={<Activity size={16} />}
-                      variant={deal.tmv.volatility > 0.2 ? 'warning' : 'default'}
-                      subtitle="Price variation"
-                    />
-                    <MetricCard
-                      label="Liquidity"
-                      value={formatPercent(deal.tmv.liquidityScore)}
-                      icon={<Target size={16} />}
-                      variant={deal.tmv.liquidityScore > 0.7 ? 'profit' : 'default'}
-                      subtitle="Market activity"
-                    />
-                  </MetricGrid>
-                </CardContent>
-              </Card>
-            )}
-          </div>
-
-          {/* Right column - Quick stats & actions */}
-          <div className={styles.sideColumn}>
-            {/* Quick Stats */}
-            {hasScore && (
-              <Card padding="lg">
-                <CardHeader title="Quick Stats" />
-                <CardContent>
-                  <div className={styles.statsList}>
-                    <div className={styles.statItem}>
-                      <span className={styles.statLabel}>
-                        <Target size={14} />
-                        Confidence
-                      </span>
-                      <ConfidenceBadge confidence={deal.tmv.confidence} />
-                    </div>
-                    <div className={styles.statItem}>
-                      <span className={styles.statLabel}>
-                        <Shield size={14} />
-                        Risk Level
-                      </span>
-                      <RiskBadge riskScore={deal.score.riskScore} />
-                    </div>
-                    <div className={styles.statItem}>
-                      <span className={styles.statLabel}>
-                        <Clock size={14} />
-                        Est. Sell Time
-                      </span>
-                      <span className={styles.statValue}>
-                        {deal.tmv.estimatedDaysToSell} days
-                      </span>
-                    </div>
-                    <div className={styles.statItem}>
-                      <span className={styles.statLabel}>
-                        <TrendingUp size={14} />
-                        Velocity Score
-                      </span>
-                      <span className={styles.statValue}>
-                        {formatPercent(deal.score.velocityScore)}
-                      </span>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-
-            {/* Actions */}
-            <Card padding="lg">
-              <CardHeader title="Actions" />
-              <CardContent>
-                <div className={styles.actions}>
-                  <Button
-                    variant="primary"
-                    fullWidth
-                    icon={<ExternalLink size={16} />}
-                    iconPosition="right"
-                    onClick={() => deal.url && window.open(deal.url, '_blank')}
-                  >
+            <Card className={styles.intelligenceCard}>
+              <div className={styles.cardTopRow}>
+                <span className={styles.cardEyebrow}>Negotiation AI</span>
+                <div className={styles.offerBlock}>
+                  <span className={styles.offerLabel}>Target Offer</span>
+                  <span className={styles.offerValue}>{formatCurrency(negotiation.targetOffer)}</span>
+                </div>
+              </div>
+              <div className={styles.scriptBlock}>
+                <span className={styles.subPanelLabel}>Opening Script</span>
+                <p className={styles.scriptText}>{negotiation.openingScript}</p>
+              </div>
+              <div className={styles.actionRow}>
+                {dealWithAnalytics.url ? (
+                  <a href={dealWithAnalytics.url} target="_blank" rel="noopener noreferrer" className={styles.primaryAction}>
                     View Original Listing
-                  </Button>
-                  <Button
-                    variant="secondary"
-                    fullWidth
-                    icon={<DollarSign size={16} />}
-                  >
-                    Track This Deal
-                  </Button>
+                    <ExternalLink size={14} />
+                  </a>
+                ) : null}
+                <div className={styles.inlineStat}>
+                  <TrendingUp size={14} />
+                  <span>{tmv ? `TMV confidence ${(tmv.confidence * 100).toFixed(0)}%` : 'Using heuristic market estimate'}</span>
                 </div>
-              </CardContent>
+              </div>
             </Card>
-
-            {/* Source Info */}
-            <Card padding="lg">
-              <CardHeader title="Source Details" />
-              <CardContent>
-                <div className={styles.sourceInfo}>
-                  <div className={styles.sourceRow}>
-                    <span className={styles.sourceLabel}>Platform</span>
-                    <span className={styles.sourceValue}>{deal.source}</span>
-                  </div>
-                  <div className={styles.sourceRow}>
-                    <span className={styles.sourceLabel}>Source ID</span>
-                    <span className={styles.sourceValue}>{deal.sourceId}</span>
-                  </div>
-                  <div className={styles.sourceRow}>
-                    <span className={styles.sourceLabel}>Category</span>
-                    <span className={styles.sourceValue}>{deal.category}</span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
+          </aside>
         </div>
       </div>
     </div>

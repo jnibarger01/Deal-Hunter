@@ -7,6 +7,8 @@ import type {
   HealthStatus,
   TMVAssumptions,
   TMVScenario,
+  DealIntelligence,
+  LiveEbayDeal,
 } from '../types';
 
 interface UseDataState<T> {
@@ -16,12 +18,16 @@ interface UseDataState<T> {
   refetch: () => void;
 }
 
-function useApiData<T>(fetcher: () => Promise<T>): UseDataState<T> {
+function useApiData<T>(fetcher: () => Promise<T>, enabled = true): UseDataState<T> {
   const [data, setData] = useState<T | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(enabled);
   const [error, setError] = useState<string | null>(null);
 
   const fetchData = useCallback(async () => {
+    if (!enabled) {
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     setError(null);
     try {
@@ -36,11 +42,15 @@ function useApiData<T>(fetcher: () => Promise<T>): UseDataState<T> {
     } finally {
       setLoading(false);
     }
-  }, [fetcher]);
+  }, [enabled, fetcher]);
 
   useEffect(() => {
+    if (!enabled) {
+      setLoading(false);
+      return;
+    }
     fetchData();
-  }, [fetchData]);
+  }, [enabled, fetchData]);
 
   return { data, loading, error, refetch: fetchData };
 }
@@ -60,6 +70,47 @@ export function useDeal(id: string): UseDataState<Deal> {
 
 export function useRankedDeals(): UseDataState<RankedDeal[]> {
   return useApiData(api.getRankedDeals);
+}
+
+export function useRankedDeal(id: string): UseDataState<RankedDeal | null> {
+  const fetcher = useCallback(() => api.getRankedDeal(id), [id]);
+  return useApiData(fetcher);
+}
+
+export function useLiveEbayDeals(category: string, enabled = false): UseDataState<LiveEbayDeal[]> {
+  const [data, setData] = useState<LiveEbayDeal[] | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchData = useCallback(async () => {
+    if (!enabled) return;
+    setLoading(true);
+    setError(null);
+    try {
+      const result = await api.getLiveEbayDeals({ category, limit: 6 });
+      setData(result);
+    } catch (err) {
+      if (err instanceof ApiError) {
+        setError(err.message);
+      } else {
+        setError('An unexpected error occurred');
+      }
+    } finally {
+      setLoading(false);
+    }
+  }, [category, enabled]);
+
+  useEffect(() => {
+    if (!enabled) return;
+    fetchData();
+  }, [enabled, fetchData]);
+
+  return { data, loading, error, refetch: fetchData };
+}
+
+export function useDealIntelligence(dealId: string): UseDataState<DealIntelligence> {
+  const fetcher = useCallback(() => api.getDealIntelligence(dealId), [dealId]);
+  return useApiData(fetcher);
 }
 
 export function useTMV(dealId: string): UseDataState<TMVResult> {
