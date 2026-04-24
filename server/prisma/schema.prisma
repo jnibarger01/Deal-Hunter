@@ -16,7 +16,9 @@ model Deal {
   sourceId        String   @default(cuid()) // External ID
   title           String
   description     String?
+  imageUrl        String?
   price           Decimal
+
   marketValue     Decimal?
   estimatedProfit Decimal?
   dealScore       Decimal?
@@ -184,6 +186,26 @@ model MarketplaceSync {
   lastSyncedAt DateTime?
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
+}
+
+model IngestSource {
+  id        String   @id @default(cuid())
+  kind      String
+  config    Json
+  enabled   Boolean  @default(true)
+  lastRunAt DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([kind])
+  @@index([enabled])
+}
+
+model OperatorSecret {
+  id        String   @id @default(cuid())
+  kind      String   @unique
+  value     String
+  updatedAt DateTime @updatedAt
 }
 
 model CategoryConfig {

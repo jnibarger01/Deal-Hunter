@@ -28,9 +28,14 @@
 ## 4) Deployment smoke (Docker host)
 
 - [ ] `docker compose -f docker-compose.prod.yml config`
-- [ ] `docker compose -f docker-compose.prod.yml up -d --build`
+- [ ] `docker compose -f docker-compose.prod.yml build --no-cache server nginx`
+- [ ] `docker compose -f docker-compose.prod.yml up -d --force-recreate server nginx`
+- [ ] `GET /nginx-health` returns 200
 - [ ] `GET /health` returns 200
 - [ ] `GET /ready` returns 200 (DB connected)
+- [ ] `GET /api/v1/ranked?limit=1` returns valid JSON array
+- [ ] `GET /api/v1/connections` returns JSON and reports expected Craigslist/eBay wiring
+- [ ] If eBay credentials are intentionally absent, `GET /api/v1/deals/live/ebay?...` returns a clean degraded 503 with credential guidance instead of a silent failure/500
 - [ ] Login works
 - [ ] Deals read works
 - [ ] One write path works (watchlist/portfolio/etc.)
@@ -44,6 +49,7 @@
 ## 6) Governance
 
 - [ ] Branch protection on `main`
-- [ ] Required checks set (`Lint`, `Test`, `Build`, `Docker Build`)
+- [ ] Required checks set (`Lint`, `Test`, `Frontend Test`, `Build`, `Docker Build`)
+- [ ] Manual GitHub config confirmed: direct pushes blocked, PR approval required, and stale approvals dismissed on new commits.
 - [ ] Deploy blocked until required checks pass
 - [ ] Release tag/version captured in ops notes

@@ -19,8 +19,24 @@ export const errorHandler = (
   res: Response,
   _next: NextFunction
 ) => {
+  const requestId = req.headers['x-request-id']?.toString() ?? null;
+  const context = {
+    requestId,
+    method: req.method,
+    path: req.originalUrl,
+    ip: req.ip,
+    userAgent: req.headers['user-agent'] ?? null,
+    message: err.message,
+    stack: err.stack,
+    sentryEnabled: Boolean(process.env.SENTRY_DSN),
+  };
+
   if (err instanceof AppError) {
-    logger.error(`${err.statusCode} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
+    logger.error('Operational request error', {
+      ...context,
+      statusCode: err.statusCode,
+      operational: true,
+    });
 
     return res.status(err.statusCode).json({
       success: false,
@@ -31,10 +47,7 @@ export const errorHandler = (
     });
   }
 
-  // Unhandled errors
-  logger.error(`500 - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`, {
-    stack: err.stack,
-  });
+  logger.error('Unhandled request error', context);
 
   return res.status(500).json({
     success: false,
@@ -42,7 +55,7 @@ export const errorHandler = (
       message: 'Internal server error',
       ...(process.env.NODE_ENV === 'development' && {
         originalError: err.message,
-        stack: err.stack
+        stack: err.stack,
       }),
     },
   });

@@ -7,16 +7,17 @@ import rateLimit from 'express-rate-limit';
 import config from './config/env';
 import logger from './config/logger';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler';
-import prisma from './config/database';
+import prisma from './config/prisma';
 
-// Import routes
 import authRoutes from './routes/auth.routes';
 import userRoutes from './routes/user.routes';
 import dealRoutes from './routes/deal.routes';
+import dealIngestRoutes from './routes/deal-ingest.routes';
 import watchlistRoutes from './routes/watchlist.routes';
 import portfolioRoutes from './routes/portfolio.routes';
 import alertRoutes from './routes/alert.routes';
 import analysisRoutes from './routes/analysis.routes';
+import connectionsRoutes from './routes/connections.routes';
 
 const app: Application = express();
 
@@ -29,7 +30,6 @@ app.use((req, res, next) => {
   next();
 });
 
-// Security middleware
 app.use(helmet());
 app.use(
   cors({
@@ -38,7 +38,6 @@ app.use(
   })
 );
 
-// Rate limiting
 const limiter = rateLimit({
   windowMs: config.rateLimit.windowMs,
   max: config.rateLimit.max,
@@ -48,7 +47,6 @@ const limiter = rateLimit({
 });
 app.use('/api', limiter);
 
-// Logging
 if (config.isDevelopment) {
   app.use(morgan('dev'));
 } else {
@@ -60,11 +58,9 @@ if (config.isDevelopment) {
   }));
 }
 
-// Body parsing
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// Health check
 app.get('/health', (_req, res) => {
   res.status(200).json({
     status: 'ok',
@@ -90,7 +86,6 @@ app.get('/ready', async (_req, res) => {
   }
 });
 
-// Webhooks
 app.post('/webhooks/marketplace-account-deletion', (req, res) => {
   const headerToken =
     req.headers['x-verification-token'] ?? req.headers['x-hub-verify-token'];
@@ -108,20 +103,20 @@ app.post('/webhooks/marketplace-account-deletion', (req, res) => {
   return res.status(200).send('OK');
 });
 
-// API Routes
 const apiRouter = express.Router();
 apiRouter.use('/auth', authRoutes);
 apiRouter.use('/users', userRoutes);
+apiRouter.use('/deals', dealIngestRoutes);
 apiRouter.use('/deals', dealRoutes);
 apiRouter.use('/watchlist', watchlistRoutes);
 apiRouter.use('/portfolio', portfolioRoutes);
 apiRouter.use('/alerts', alertRoutes);
+apiRouter.use('/connections', connectionsRoutes);
 apiRouter.use('/', analysisRoutes);
 
 app.use(`/api/${config.apiVersion}`, apiRouter);
 app.use('/api', apiRouter);
 
-// Error handling
 app.use(notFoundHandler);
 app.use(errorHandler);
 

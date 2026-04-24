@@ -15,8 +15,14 @@ const envSchema = z.object({
   GEMINI_API_KEY: z.string().optional(),
   EBAY_API_KEY: z.string().optional(),
   EBAY_APP_ID: z.string().optional(),
+  EBAY_CLIENT_ID: z.string().optional(),
+  EBAY_CLIENT_SECRET: z.string().optional(),
+  EBAY_OAUTH_ENVIRONMENT: z.enum(['PRODUCTION', 'SANDBOX']).default('PRODUCTION'),
   FACEBOOK_API_KEY: z.string().optional(),
   MARKETPLACE_DELETE_TOKEN: z.string().optional(),
+  OPERATOR_INGEST_TOKEN: z.string().optional(),
+  OPERATOR_SECRET_KEY: z.string().optional(),
+  SENTRY_DSN: z.string().optional(),
   FRONTEND_URL: z.string().url().default('http://localhost:5173'),
   AUTH_REQUIRE_VERIFIED_EMAIL: z.string().default('true'),
   PASSWORD_RESET_TOKEN_TTL_MINUTES: z.string().default('30'),
@@ -38,6 +44,7 @@ const envSchema = z.object({
   CRAIGSLIST_INGEST_INTERVAL_MINUTES: z.string().default('30'),
   CRAIGSLIST_MAX_PER_FEED: z.string().default('50'),
   CRAIGSLIST_SCHEDULER_ENABLED: z.string().default('false'),
+  EXPERIMENTAL: z.string().default('false'),
 });
 
 let env: z.infer<typeof envSchema>;
@@ -84,6 +91,9 @@ export const config = {
   apiKeys: {
     gemini: env.GEMINI_API_KEY,
     ebay: env.EBAY_API_KEY ?? env.EBAY_APP_ID,
+    ebayClientId: env.EBAY_CLIENT_ID,
+    ebayClientSecret: env.EBAY_CLIENT_SECRET,
+    ebayOAuthEnvironment: env.EBAY_OAUTH_ENVIRONMENT,
     facebook: env.FACEBOOK_API_KEY,
   },
   auth: {
@@ -103,6 +113,9 @@ export const config = {
   marketplace: {
     deleteToken: env.MARKETPLACE_DELETE_TOKEN,
   },
+  operatorIngestToken: env.OPERATOR_INGEST_TOKEN,
+  operatorSecretKey: env.OPERATOR_SECRET_KEY,
+  sentryDsn: env.SENTRY_DSN,
   rateLimit: {
     windowMs: parseInt(env.RATE_LIMIT_WINDOW_MS, 10),
     max: parseInt(env.RATE_LIMIT_MAX_REQUESTS, 10),
@@ -123,6 +136,7 @@ export const config = {
     maxPerFeed: parseInt(env.CRAIGSLIST_MAX_PER_FEED, 10),
     schedulerEnabled: env.CRAIGSLIST_SCHEDULER_ENABLED.toLowerCase() === 'true',
   },
+  experimental: env.EXPERIMENTAL.toLowerCase() === 'true',
   trustProxy,
   isDevelopment: env.NODE_ENV === 'development',
   isProduction: env.NODE_ENV === 'production',

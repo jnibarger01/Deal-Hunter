@@ -1,6 +1,6 @@
 import 'dotenv/config';
 import config from '../src/config/env';
-import prisma from '../src/config/database';
+import prisma from '../src/config/prisma';
 import { ingestCraigslistFromFeeds } from '../src/services/craigslist';
 
 const parseCliFeedUrls = (): string[] => {

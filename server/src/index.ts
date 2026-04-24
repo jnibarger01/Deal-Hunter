@@ -1,8 +1,30 @@
 import app from './app';
 import config from './config/env';
 import logger from './config/logger';
-import prisma from './config/database';
+import prisma from './config/prisma';
 import { ingestCraigslistFromFeeds } from './services/craigslist';
+
+const CRAIGSLIST_KIND = 'craigslist_rss';
+
+const getCraigslistSchedulerUrls = async () => {
+  const persistedSources = await prisma.ingestSource.findMany({
+    where: { kind: CRAIGSLIST_KIND, enabled: true },
+    orderBy: { createdAt: 'asc' },
+  });
+
+  const persistedUrls = persistedSources
+    .map((source) => {
+      const configValue = source.config;
+      if (!configValue || typeof configValue !== 'object' || Array.isArray(configValue)) {
+        return null;
+      }
+      const rssUrl = (configValue as { rssUrl?: unknown }).rssUrl;
+      return typeof rssUrl === 'string' && rssUrl.trim().length > 0 ? rssUrl.trim() : null;
+    })
+    .filter((value): value is string => Boolean(value));
+
+  return persistedUrls.length > 0 ? persistedUrls : config.craigslist.rssUrls;
+};
 
 const startServer = async () => {
   try {
@@ -17,7 +39,7 @@ const startServer = async () => {
       logger.info(`🏥 Health: http://localhost:${config.port}/health`);
     });
 
-    if (config.craigslist.schedulerEnabled && config.craigslist.rssUrls.length > 0) {
+    if (config.craigslist.schedulerEnabled) {
       const intervalMs = Math.max(1, config.craigslist.ingestIntervalMinutes) * 60_000;
       let ingestInProgress = false;
 
@@ -29,10 +51,14 @@ const startServer = async () => {
 
         ingestInProgress = true;
         try {
-          const results = await ingestCraigslistFromFeeds(
-            config.craigslist.rssUrls,
-            config.craigslist.maxPerFeed
-          );
+          const rssUrls = await getCraigslistSchedulerUrls();
+
+          if (rssUrls.length === 0) {
+            logger.info('Craigslist ingest skipped (no enabled feed URLs configured)');
+            return;
+          }
+
+          const results = await ingestCraigslistFromFeeds(rssUrls, config.craigslist.maxPerFeed);
 
           const summary = results.reduce(
             (acc, item) => {
@@ -52,8 +78,9 @@ const startServer = async () => {
         }
       };
 
+      const schedulerUrls = await getCraigslistSchedulerUrls();
       logger.info(
-        `Craigslist scheduler enabled: ${config.craigslist.rssUrls.length} feed(s), every ${config.craigslist.ingestIntervalMinutes} minute(s)`
+        `Craigslist scheduler enabled: ${schedulerUrls.length} feed(s), every ${config.craigslist.ingestIntervalMinutes} minute(s)`
       );
 
       setInterval(() => {

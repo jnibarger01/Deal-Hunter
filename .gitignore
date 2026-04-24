@@ -13,3 +13,8 @@ server/logs/
 # Coverage reports
 coverage/
 *.lcov
+.worktrees/
+.omx/
+
+# Accidental nested repo copy
+/deal-hunter/

@@ -22,15 +22,13 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
-          cache-dependency-path: server/package-lock.json
+          cache-dependency-path: package-lock.json
 
-      - name: Install server dependencies
-        working-directory: ./server
+      - name: Install workspace dependencies
         run: npm ci
 
       - name: Run ESLint
-        working-directory: ./server
-        run: npm run lint
+        run: npm run lint --workspace server
 
   test:
     name: Test
@@ -58,10 +56,9 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
-          cache-dependency-path: server/package-lock.json
+          cache-dependency-path: package-lock.json
 
-      - name: Install server dependencies
-        working-directory: ./server
+      - name: Install workspace dependencies
         run: npm ci
 
       - name: Generate Prisma client
@@ -74,13 +71,13 @@ jobs:
       - name: Run database migrations
         working-directory: ./server
         env:
-          DATABASE_URL: "postgresql://test:test@localhost:5432/test?schema=public"
+          DATABASE_URL: "postgresql://test:***@localhost:5432/test?schema=public"
         run: npx prisma migrate deploy
 
       - name: Run tests with coverage
         working-directory: ./server
         env:
-          DATABASE_URL: "postgresql://test:test@localhost:5432/test?schema=public"
+          DATABASE_URL: "postgresql://test:***@localhost:5432/test?schema=public"
           JWT_SECRET: "test-jwt-secret-for-ci-32-characters-long"
         run: npm test
 
@@ -90,6 +87,26 @@ jobs:
           name: coverage-report
           path: server/coverage/
           retention-days: 7
+
+  frontend-test:
+    name: Frontend Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: package-lock.json
+
+      - name: Install frontend dependencies
+        run: npm ci --workspace frontend
+
+      - name: Run frontend tests
+        run: npm test --workspace frontend
 
   build:
     name: Build
@@ -103,15 +120,12 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
-          cache-dependency-path: |
-            server/package-lock.json
-            frontend/package-lock.json
+          cache-dependency-path: package-lock.json
 
-      # Build Server
-      - name: Install server dependencies
-        working-directory: ./server
+      - name: Install workspace dependencies
         run: npm ci
 
+      # Build Server
       - name: Generate Prisma client
         working-directory: ./server
         run: |
@@ -124,12 +138,10 @@ jobs:
 
       # Build Frontend
       - name: Install frontend dependencies
-        working-directory: ./frontend
-        run: npm ci
+        run: npm ci --workspace frontend
 
       - name: Build frontend
-        working-directory: ./frontend
-        run: npm run build
+        run: npm run build --workspace frontend
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
@@ -143,7 +155,7 @@ jobs:
   docker:
     name: Docker Build
     runs-on: ubuntu-latest
-    needs: [lint, test, build]
+    needs: [lint, test, frontend-test, build]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4

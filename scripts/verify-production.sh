@@ -3,14 +3,18 @@ set -euo pipefail
 
 ENV_FILE="server/.env"
 HEALTH_URL="${HEALTHCHECK_URL:-}"
+RANKED_URL="${RANKED_URL:-}"
+CONNECTIONS_URL="${CONNECTIONS_URL:-}"
 
 usage() {
   cat <<'EOF'
-Usage: ./scripts/verify-production.sh [--env-file <path>] [--health-url <url>]
+Usage: ./scripts/verify-production.sh [--env-file <path>] [--health-url <url>] [--ranked-url <url>] [--connections-url <url>]
 
 Examples:
   ./scripts/verify-production.sh --env-file server/.env
   ./scripts/verify-production.sh --health-url https://api.example.com/ready
+  ./scripts/verify-production.sh --health-url https://api.example.com/ready --ranked-url https://api.example.com/api/v1/ranked?limit=1
+  ./scripts/verify-production.sh --health-url https://api.example.com/ready --connections-url https://api.example.com/api/v1/connections
 EOF
 }
 
@@ -22,6 +26,14 @@ while [[ $# -gt 0 ]]; do
       ;;
     --health-url)
       HEALTH_URL="$2"
+      shift 2
+      ;;
+    --ranked-url)
+      RANKED_URL="$2"
+      shift 2
+      ;;
+    --connections-url)
+      CONNECTIONS_URL="$2"
       shift 2
       ;;
     -h|--help)
@@ -88,6 +100,39 @@ if [[ -n "$HEALTH_URL" ]]; then
     echo "✅ Health endpoint OK: $HEALTH_URL"
   else
     warn "Health response missing status=ok/ready"
+  fi
+
+  base_url="${HEALTH_URL%/ready}"
+  base_url="${base_url%/health}"
+
+  if [[ -z "$RANKED_URL" ]]; then
+    RANKED_URL="$base_url/api/v1/ranked?limit=1"
+  fi
+
+  if [[ -z "$CONNECTIONS_URL" ]]; then
+    CONNECTIONS_URL="$base_url/api/v1/connections"
+  fi
+fi
+
+if [[ -n "$RANKED_URL" ]]; then
+  if ! ranked_body="$(curl -fsS "$RANKED_URL" 2>/dev/null)"; then
+    echo "❌ Ranked endpoint failed: $RANKED_URL"
+    failures=$((failures + 1))
+  elif [[ "$ranked_body" == "[]" || "$ranked_body" == \[* ]]; then
+    echo "✅ Ranked endpoint OK: $RANKED_URL"
+  else
+    warn "Ranked response was not a JSON array"
+  fi
+fi
+
+if [[ -n "$CONNECTIONS_URL" ]]; then
+  if ! connections_body="$(curl -fsS "$CONNECTIONS_URL" 2>/dev/null)"; then
+    echo "❌ Connections endpoint failed: $CONNECTIONS_URL"
+    failures=$((failures + 1))
+  elif [[ "$connections_body" == *'"craigslist"'* && "$connections_body" == *'"ebay"'* ]]; then
+    echo "✅ Connections endpoint OK: $CONNECTIONS_URL"
+  else
+    warn "Connections response missing craigslist/ebay payload"
   fi
 fi
 
