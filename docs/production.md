@@ -1,140 +1,121 @@
 # Production Runbook (Docker Host + Supabase)
 
-This is the primary production contract.
+This is the production/runtime notes file for the current Deal Hunter baseline.
 
-- Runtime: `docker-compose.prod.yml` on your host
-- Database: Supabase Postgres (`DATABASE_URL`)
-- Health: `/health` (liveness), `/ready` (DB readiness)
-- TLS: terminate upstream of this stack (load balancer, reverse proxy, or platform ingress). The shipped nginx config is HTTP-only.
+## Current baseline state
 
-## 1) Required server env vars
+- Standalone baseline repo.
+- One baseline commit exists.
+- Expected clean baseline state: no active code diff except untracked `.codex/`.
+- This document records runtime/deployment findings only; it does not imply application code fixes have landed.
+
+## Required server env vars
+
+Use real values only in the deployment environment or secret manager. Keep committed examples as placeholders.
 
 - `NODE_ENV=production`
 - `PORT=5000`
-- `DATABASE_URL=<supabase-postgres-uri>`
-- `JWT_SECRET=<32+ random characters>`
+- `API_VERSION=v1`
+- `DATABASE_URL=<postgres-uri>`
+- `JWT_SECRET=<32+ character secret>`
+- `API_KEY=<32+ character secret>` if the runtime path requires it
 - `JWT_EXPIRES_IN=7d`
 - `JWT_REFRESH_EXPIRES_IN=30d`
 - `FRONTEND_URL=https://<frontend-domain>`
 - `CORS_ORIGIN=https://<frontend-domain>`
 - `TRUST_PROXY=1`
-- `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USER`, `SMTP_PASS`, `SMTP_FROM`
+- `LOG_LEVEL=info`
 
-Optional:
-- `EBAY_APP_ID=<finding-api-app-id>` — Finding API app id for public/live search fallback.
-- `EBAY_CLIENT_ID=<browse-api-client-id>` + `EBAY_CLIENT_SECRET=<browse-api-client-secret>` — preferred Browse API credential pair for on-demand live eBay pulls.
-- `EBAY_OAUTH_ENVIRONMENT=PRODUCTION|SANDBOX`
-- `EBAY_API_KEY=<legacy-app-id-or-short-lived-token>` — only use for a valid legacy app id or a short-lived OAuth token during local debugging; token-only mode is brittle and will fail once the token expires.
-- `GEMINI_API_KEY=<gemini-api-key>`
+Optional integration vars:
 
-**eBay degraded-mode note:** the deployed stack is considered healthy without live eBay results. Until real `EBAY_APP_ID` or `EBAY_CLIENT_ID` + `EBAY_CLIENT_SECRET` values are supplied at runtime, `/api/v1/deals/live/ebay` should return a clean degraded response instead of silently failing.
+- `EBAY_APP_ID=<finding-api-app-id>`
+- `EBAY_CLIENT_ID=<browse-api-client-id>`
+- `EBAY_CLIENT_SECRET=<browse-api-client-secret>`
+- `EBAY_OAUTH_ENVIRONMENT=PRODUCTION`
+- `EBAY_API_KEY=<legacy-or-short-lived-token>`; local debugging only unless intentionally supported
+- `GEMINI_API_KEY=<gemini-key>`
+- SMTP values: `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USER`, `SMTP_PASS`, `SMTP_FROM`
+- `OPERATOR_INGEST_TOKEN=<32+ character token>` for operator ingest endpoints
+- `OPERATOR_SECRET_KEY=<32+ character secret>` for encrypted operator cookie storage
+- `CRAIGSLIST_RSS_URLS`, `CRAIGSLIST_MAX_PER_FEED`, `CRAIGSLIST_INGEST_INTERVAL_MINUTES`, `CRAIGSLIST_SCHEDULER_ENABLED`
 
-- `OPERATOR_INGEST_TOKEN` — when set, operator-only ingest and connection endpoints accept `X-Operator-Token: <value>` instead of an admin JWT.
-- `OPERATOR_SECRET_KEY` — 32+ character secret used to encrypt stored operator cookies for Facebook Marketplace scraping.
-- `SENTRY_DSN` — enables structured server-side error context and future Sentry wiring.
-- `VITE_SENTRY_DSN` — optional frontend build-time flag that enables client-side browser error reporting.
+## Local startup path
 
-## 2) Supabase connection string
-
-Get from Supabase:
-- Project Settings → Database → Connection string
-
-Example shape:
-
-```env
-DATABASE_URL="postgresql://postgres.<project-ref>:<password>@aws-0-<region>.pooler.supabase.com:6543/postgres?pgbouncer=true&connection_limit=1"
-```
-
-## 3) Deployment steps (host)
-
-The shipped nginx container is **HTTP-only**. Put TLS in front of it with your platform/load balancer/reverse proxy, or extend `nginx/nginx.conf` yourself before exposing it directly on the internet.
-
-## 4) Deployment steps (host)
+From the repo root:
 
 ```bash
-cd <deploy-path>
-docker compose -f docker-compose.prod.yml config >/tmp/deal-hunter.compose
-
-docker compose -f docker-compose.prod.yml build --no-cache server nginx
-
-docker compose -f docker-compose.prod.yml up -d --force-recreate server nginx
-
-docker compose -f docker-compose.prod.yml ps
-curl -fsS http://<server>/nginx-health
-curl -fsS http://<server>/health
-curl -fsS http://<server>/ready
-curl -fsS 'http://<server>/api/v1/ranked?limit=1'
-curl -fsS http://<server>/api/v1/connections
-```
-
-## 5) Local full-stack verification (canonical repo root)
-
-```bash
-cd /home/jnibarger/Deal-Hunter
+npm install
+cp server/.env.example server/.env
 docker compose up -d db
-npm --prefix server run build
-npm --prefix server run test:file -- tests/integration/connections.routes.test.ts tests/integration/deals.ingest.test.ts tests/integration/ebay-live-persist.test.ts tests/unit/ebay-live-route.test.ts
-npm --prefix frontend run build
-
-docker compose build server frontend nginx
-docker compose up -d --force-recreate db server frontend nginx
-
-docker compose ps
-curl -fsS http://127.0.0.1:8081/nginx-health
-curl -fsS http://127.0.0.1:8081/health
-curl -fsS http://127.0.0.1:8081/ready
-curl -fsS 'http://127.0.0.1:8081/api/v1/ranked?limit=1'
-curl -fsS http://127.0.0.1:8081/api/v1/connections
-./scripts/verify-production.sh --env-file server/.env --health-url http://127.0.0.1:8081/ready --ranked-url 'http://127.0.0.1:8081/api/v1/ranked?limit=1' --connections-url http://127.0.0.1:8081/api/v1/connections
+cd server
+npm run prisma:generate
+npm run prisma:migrate
+cd ..
+npm run dev
 ```
 
-Craigslist scheduler remains **disabled by default** (`CRAIGSLIST_SCHEDULER_ENABLED=false`). Keep it that way unless you intentionally want recurring ingest in the deployed environment.
+Run migrations before exercising API routes that depend on Prisma tables. The default compose startup should not be assumed to create all tables.
 
-## 6) Migration policy
+## Verification commands
 
-App startup runs:
+Baseline/code-review findings:
 
 ```bash
-npx prisma migrate deploy && npm start
+cd server && npm test              # passes when run outside sandbox
+cd server && npm run build         # passes
+cd frontend && npm run build       # passes
+cd workers && npm run build        # not runnable in this checkout; workers/ is absent
+
+docker compose config              # passes
+docker compose -f docker-compose.prod.yml config  # currently fails alone
 ```
 
-For multi-instance rollouts, run migrations as a one-shot pre-step before scaling app containers.
+## Compose status
 
-## 6) Rollback
+- `docker-compose.yml` is the base local compose file.
+- `docker-compose.prod.yml` is not currently standalone-valid. `nginx` depends on an undefined `frontend` service.
+- Treat `docker compose -f docker-compose.prod.yml config` failure as an expected known issue until the compose topology is fixed.
 
-1. Set `TAG=<previous-known-good>`
-2. Redeploy:
-   ```bash
-   TAG=<previous-known-good> docker compose -f docker-compose.prod.yml up -d
-   ```
-3. Verify `http://<server>/health` and `http://<server>/ready`.
+## Known Issues / Next Fixes
 
-## 7) Backup and restore (Supabase)
+- `docker-compose.yml` uses `API_KEY=dev-api-key-change-in-prod`, but server env validation requires 32+ characters.
+- Workers service is referenced by compose/review findings, but no `workers/` package exists in this checkout. The referenced runtime path is `dist/workers/scheduler.js`; verify the compose topology before adding or wiring a worker image.
+- `docker-compose.prod.yml` is not standalone-valid because `nginx` depends on undefined `frontend`.
+- README quick start may not create DB tables because migrations are behind a compose profile or otherwise outside the default startup path.
+- `/api` proxy paths are forwarded unchanged, but Express routes are mounted without `/api` prefix.
+- Ranked scoring currently sorts by raw fields instead of `compositeScore`.
+- Score route limit parsing can produce `NaN`; invalid input should return 400.
+- Quality scripts are currently broken or incomplete:
+  - server lint does not target existing TS files correctly.
+  - frontend lint has no ESLint config.
+  - server `test:tmv` points at the wrong test path.
 
-- Enable Supabase backups/PITR per plan.
-- Retention target: 14–30 days.
-- Run restore drill in non-prod before launch and quarterly.
-- Release day check: confirm latest backup exists.
+## Deployment checks
 
-## 8) Facebook Marketplace operator workflow
+Before deploy:
 
-- The app stores the operator's exported Facebook Marketplace cookies encrypted at rest using `OPERATOR_SECRET_KEY`.
-- Use only the operator's own session cookies (`c_user`, `xs`, or a full browser cookie JSON export). Never share those cookies outside the host.
-- Runtime requires Chromium in the server container. `docker/server.Dockerfile` installs `chromium`, and the scraper uses a headless browser fallback when JSON-LD extraction is unavailable.
-- Rate-limit guidance: keep Marketplace scrapes to roughly 1 request/second with jitter and cap bulk pulls to 50 listings per run.
-- Settings → Connections → Facebook Marketplace should be used to:
-  - paste cookie JSON and run **Test Facebook Connection**
-  - scrape one listing URL
-  - scrape one saved search batch
+```bash
+docker compose config
+npm --prefix server run build
+npm --prefix frontend run build
+```
 
-## 9) Uptime / observability guidance
+Do not deploy from `docker-compose.prod.yml` alone until its undefined service dependency is fixed.
 
-- Monitor `/ready` and `/api/v1/ranked?limit=1` from an external uptime check.
-- Watch container restart count and 5xx rate in docker logs.
-- When `SENTRY_DSN` is set, the API emits structured request error context including request id, method, path, user agent, and stack.
-- When `VITE_SENTRY_DSN` is set at build time, the frontend installs browser error and unhandled rejection listeners.
+## Health checks
 
-## 10) Incident triage
+- API liveness: `/health`
+- API readiness: `/ready`
+- Nginx health: `/nginx-health` when nginx is running
+
+## Runtime notes
+
+- TLS should terminate upstream of this stack unless nginx is explicitly extended for TLS.
+- Keep Craigslist scheduler disabled unless recurring ingest is intentionally enabled.
+- Store production credentials outside git.
+- If eBay credentials are absent or expired, live eBay paths should degrade cleanly rather than silently failing.
+
+## Incident triage
 
 ```bash
 docker compose -f docker-compose.prod.yml ps
@@ -142,4 +123,4 @@ docker compose -f docker-compose.prod.yml logs --tail=200 server
 curl -i http://<server>/ready
 ```
 
-If unresolved within 15 minutes and customer-impacting, rollback.
+If unresolved quickly and customer-impacting, rollback to the last known-good deployment artifact.

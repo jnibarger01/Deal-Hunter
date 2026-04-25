@@ -1,190 +1,155 @@
 # Deal Hunter
 
-> **The Bloomberg Terminal for Flippers.**
+Operational baseline for Deal Hunter: a Node/Express/Prisma API, React/Vite frontend, and Docker Compose deployment assets.
 
-Deal Hunter is a sophisticated platform designed to help flippers identify, evaluate, and track high-margin opportunities across various marketplaces. It combines real-time data integration, AI-driven analysis, and comprehensive portfolio management to give flippers a competitive edge.
+## Current Repo State
 
-## 🚀 Features
+- Standalone baseline repo.
+- One baseline commit exists.
+- Expected clean baseline state: no active code diff except an untracked `.codex/` directory.
+- This README documents the current review findings only. Application code behavior has not been changed by this documentation pass.
 
-- **📊 Intelligent Dashboard**: Get a bird's-eye view of your flipping operations, including active deals, profit potential, and portfolio performance.
-- **🔍 Deal Discovery & Ranking**: Advanced algorithms to rank deals based on profitability, liquidity, and risk.
-- **🤖 AI-Powered Analysis**: Integrated with Google Gemini AI to provide deeper insights into item value and market trends.
-- **🔌 Marketplace Integration**: Seamlessly connects with major platforms (e.g., eBay) to fetch live pricing and listing data.
-- **📈 Portfolio Tracking**: Manage your inventory, track costs, and monitor realized profits.
-- **🔔 Real-time Alerts**: Never miss a deal with customizable alerts based on your specific criteria.
-- **🧮 TMV Calculator**: (Coming Soon) True Market Value calculator to estimate selling price with high precision.
+## Project Layout
 
-## 🛠️ Tech Stack
+- `server/` — Express API, Prisma schema, Jest tests.
+- `frontend/` — React/Vite SPA.
+- `docker/` — Dockerfiles for runtime images.
+- `nginx/` — reverse proxy configuration.
+- `docker-compose.yml` — base local compose file.
+- `docker-compose.prod.yml` — production compose override/stack file; see known issue below.
+- `docs/` — deployment and release notes.
 
-### Frontend
-- **Framework**: [React](https://reactjs.org/) with [TypeScript](https://www.typescriptlang.org/)
-- **Build Tool**: [Vite](https://vitejs.dev/)
-- **Routing**: [React Router](https://reactrouter.com/)
-- **Icons**: [Lucide React](https://lucide.dev/)
-- **Styling**: Modern CSS with CSS Modules
+## Environment Setup
 
-### Backend
-- **Runtime**: [Node.js](https://nodejs.org/) with [TypeScript](https://www.typescriptlang.org/)
-- **Framework**: [Express.js](https://expressjs.com/)
-- **ORM**: [Prisma](https://www.prisma.io/)
-- **Database**: PostgreSQL (dev/staging/production)
-- **Validation**: [Zod](https://zod.dev/) & [Express Validator](https://express-validator.github.io/)
-- **Security**: JWT, Helmet, Rate Limiting, Bcrypt
+Use placeholder values locally. Do not commit real credentials.
 
-### AI & Integrations
-- **AI Engine**: [Google Gemini AI](https://ai.google.dev/)
-- **External APIs**: eBay Integration
+```bash
+cp server/.env.example server/.env
+```
 
-## 📦 Infrastructure & Deployment
+`server/.env.example` is the tracked template. `server/.env` is the local file consumed by the base Docker Compose server service.
 
-- **Containerization**: [Docker](https://www.docker.com/) & Docker Compose
-- **Proxy/Web Server**: [Nginx](https://www.nginx.com/)
-- **CI/CD**: GitHub Actions
-- **Primary production target**: Docker host + Supabase Postgres
-- **Optional deployment path**: [Render](https://render.com/) (non-primary)
+Required local values:
 
-## 🚀 Getting Started
+- `DATABASE_URL` — local PostgreSQL URL.
+- `JWT_SECRET` — 32+ characters.
+- `API_KEY` — 32+ characters if enabled by server validation/runtime config.
+- `FRONTEND_URL` and `CORS_ORIGIN` — local frontend/proxy origins.
 
-### Prerequisites
+External service keys such as eBay, Gemini, SMTP, and Facebook should stay empty unless testing those integrations intentionally.
 
-- Node.js (v18+)
-- Docker and Docker Compose
-- PostgreSQL (if running locally without Docker)
+## Recommended Local Startup
 
-### Local Development (with Docker)
+Install dependencies from the repo root:
 
-The easiest way to get started is using Docker Compose:
+```bash
+npm install
+```
 
-1.  Clone the repository:
-    ```bash
-    git clone https://github.com/jnibarger01/Deal-Hunter.git
-    cd Deal-Hunter
-    ```
+Start the local database:
 
-2.  Start the services:
-    ```bash
-    npm run docker:up
-    ```
+```bash
+docker compose up -d db
+```
 
-3.  Access the application:
-    - Frontend: `http://localhost:5173`
-    - Backend: `http://localhost:5000`
-    - Nginx Proxy: `http://localhodst:8080`
-
-### Local Development (Manual, PostgreSQL)
-
-1. **Install dependencies (root workspace):**
-   ```bash
-   npm install
-   ```
-
-2. **Environment setup:**
-   ```bash
-   cp server/.env.example server/.env
-   ```
-   `server/.env.example` defaults to local Docker Postgres on `localhost:5433`:
-   ```env
-   DATABASE_URL="postgresql://dealhunter:dealhunter_dev_password@localhost:5433/dealhunter?schema=public"
-   ```
-
-3. **Prisma client generation:**
-   ```bash
-   cd server
-   npm run prisma:generate
-   ```
-
-4. **Initialize/update the PostgreSQL schema:**
-   ```bash
-   npm run prisma:migrate
-   ```
-
-5. **Run backend + frontend:**
-   From the project root:
-   ```bash
-   cd ..
-   npm run dev
-   ```
-
-## 🔌 API Contract (MVP)
-
-Base URL: `http://localhost:5000/api/v1`
-
-- `POST /tmv/calculate`
-  - Body: `{ "dealId": "<uuid>" }`
-  - Response: `{ dealId, tmv, confidence, sampleCount, volatility, liquidityScore, estimatedDaysToSell, calculatedAt }`
-- `GET /tmv/:dealId`
-  - Response: same shape as TMV calculate
-- `POST /score`
-  - Body: `{ "dealId": "<uuid>", "feeAssumptions": { "platformFeeRate": 0.13, "shippingCost": 12, "fixedFees": 1.5 } }`
-  - Response: `{ dealId, profitMargin, velocityScore, riskScore, compositeRank, feesApplied, calculatedAt }`
-- `GET /ranked?limit=50`
-  - Response: `RankedDeal[]` with embedded `tmv` and `score`
-
-Legacy routes under `/api/v1/deals` remain available for CRUD and ingest.
-
-## 🦾 Craigslist RSS Ingest (No official API required)
-
-Deal-Hunter supports Craigslist via RSS feed ingest.
-
-### One-shot ingest
+Generate Prisma client and create/update DB tables before calling API routes that depend on Prisma tables:
 
 ```bash
 cd server
-CRAIGSLIST_RSS_URLS="https://kansascity.craigslist.org/search/sss?format=rss" npm run ingest:craigslist
+npm run prisma:generate
+npm run prisma:migrate
+cd ..
 ```
 
-### API-triggered ingest (admin auth)
-
-- `POST /api/v1/deals/ingest/craigslist`
-- Body:
-  ```json
-  {
-    "rssUrls": ["https://kansascity.craigslist.org/search/sss?format=rss"],
-    "maxPerFeed": 50
-  }
-  ```
-
-### Scheduler pattern (optional)
-
-Set in `server/.env`:
-
-```env
-CRAIGSLIST_RSS_URLS=https://kansascity.craigslist.org/search/sss?format=rss
-CRAIGSLIST_MAX_PER_FEED=50
-CRAIGSLIST_INGEST_INTERVAL_MINUTES=30
-CRAIGSLIST_SCHEDULER_ENABLED=true
-```
-
-When enabled, the backend runs periodic Craigslist ingest on startup.
-
-## 🔒 Developer Hardening
-
-- Normalize line endings/encoding via `.gitattributes` (UTF-8 + LF)
-- Install local git hooks:
-  ```bash
-  ./scripts/install-git-hooks.sh
-  ```
-  This enables a pre-commit binary-file guard.
-
-## 🚢 Production Docs
-
-- Deployment and operations runbook: `docs/production.md`
-- Release checklist: `docs/release-checklist.md`
-
-Quick env/deploy sanity check:
+Then run the app:
 
 ```bash
-./scripts/verify-production.sh --health-url https://<your-api-domain>/ready
+npm run dev
 ```
 
-## 🏗️ Project Structure
+Useful local URLs:
 
-- `frontend/`: React application (Vite-based)
-- `server/`: Express backend with Prisma ORM
-- `docker/`: Dockerfiles for server, frontend, and nginx
-- `nginx/`: Nginx configuration files
-- `.github/`: CI/CD workflows
+- Frontend dev server: `http://localhost:5173`
+- API server: `http://localhost:5000`
+- Nginx proxy when compose nginx is running: `http://localhost:8081`
 
-## 📄 License
+## Docker Compose
 
-This project is licensed under the MIT License - see the `LICENSE` file for details (if applicable).
+Validate the base compose file:
+
+```bash
+docker compose config
+```
+
+Start the base local stack:
+
+```bash
+docker compose up -d
+```
+
+The README quick start must not be treated as a DB migration guarantee. Migrations are required before Prisma-backed API routes can work. Run the Prisma commands above when bootstrapping a fresh database.
+
+## Verified Commands
+
+These results are from the completed baseline/code-review pass.
+
+| Area | Command | Result |
+| --- | --- | --- |
+| Server tests | `cd server && npm test` | Passes when run outside the sandbox. |
+| Server build | `cd server && npm run build` | Passes. |
+| Frontend build | `cd frontend && npm run build` | Passes. |
+| Workers build | `cd workers && npm run build` | Not runnable in this checkout; `workers/` is absent. |
+| Base compose config | `docker compose config` | Passes. |
+| Production compose alone | `docker compose -f docker-compose.prod.yml config` | Currently fails; see known issues. |
+
+## Known Issues / Next Fixes
+
+- `docker-compose.yml` uses `API_KEY=dev-api-key-change-in-prod`, but server env validation requires an API key of at least 32 characters.
+- Workers service is referenced by compose/review findings, but no `workers/` package exists in this checkout. The referenced runtime path is `dist/workers/scheduler.js`; verify the compose topology before adding or wiring a worker image.
+- `docker-compose.prod.yml` is not standalone-valid because `nginx` depends on an undefined `frontend` service.
+- README quick start may not create DB tables because migration execution is behind a compose profile or otherwise not part of the default startup path.
+- `/api` proxy paths are forwarded unchanged, but Express routes are mounted without an `/api` prefix.
+- Ranked scoring currently sorts by raw fields instead of `compositeScore`.
+- The score route `limit` parser can produce `NaN`; invalid input should return HTTP 400.
+- Quality scripts are currently broken or incomplete:
+  - server lint does not target existing TypeScript files correctly.
+  - frontend lint has no ESLint config.
+  - server `test:tmv` points at the wrong test path.
+
+## Quality / Verification Commands
+
+Run these before treating a baseline as deployable:
+
+```bash
+cd server && npm test
+cd server && npm run build
+cd frontend && npm run build
+cd workers && npm run build
+
+docker compose config
+docker compose -f docker-compose.prod.yml config
+```
+
+Expected current behavior:
+
+- Builds should pass for packages present in this checkout.
+- `workers/` is absent in this checkout, so `cd workers && npm run build` is not runnable and should not be counted as verified.
+- `docker-compose.prod.yml` alone is expected to fail until the undefined `frontend` dependency is fixed or the compose files are invoked together intentionally.
+
+## Runtime Notes
+
+- Health endpoints: `/health` and `/ready`.
+- API routes are mounted under the server route configuration, not automatically under an nginx-added `/api` prefix.
+- Prisma-backed routes require generated Prisma client and migrated tables.
+- Keep Craigslist scheduler disabled unless recurring ingest is explicitly desired.
+
+## Deployment Docs
+
+- Production runbook: `docs/production.md`
+- Release checklist: `docs/release-checklist.md`
+
+## Security
+
+- Do not commit real credentials.
+- Use generated 32+ character values for local secrets.
+- Store production secrets in the deployment environment, not in git.
