@@ -14,6 +14,24 @@ describe('Connections API', () => {
     config.operatorIngestToken = originalOperatorIngestToken;
   });
 
+  it('rejects unauthenticated connection inventory requests', async () => {
+    await prisma.ingestSource.create({
+      data: {
+        kind: 'craigslist_rss',
+        enabled: true,
+        config: {
+          rssUrl: 'https://kansascity.craigslist.org/search/sss?format=rss',
+        },
+      },
+    });
+
+    const response = await request(app)
+      .get('/api/v1/connections')
+      .expect(401);
+
+    expect(JSON.stringify(response.body)).not.toContain('kansascity.craigslist.org');
+  });
+
   it('lists craigslist connection sources and scheduler status for operator-token requests', async () => {
     await prisma.ingestSource.create({
       data: {

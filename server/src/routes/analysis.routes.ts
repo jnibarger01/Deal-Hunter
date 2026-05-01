@@ -8,6 +8,7 @@ import { DealScorer } from '../domain/score';
 import { authorizeOperatorOrAdmin } from '../middleware/auth';
 import { validate } from '../middleware/validation';
 import asyncHandler from '../utils/asyncHandler';
+import analyticsService from '../services/analytics.service';
 
 const router = Router();
 
@@ -22,6 +23,23 @@ const scoreValidation = [
 const calculateValidation = [body('dealId').isString().notEmpty()];
 const dealIdValidation = [param('dealId').isString().notEmpty()];
 const rankedValidation = [query('limit').optional().isInt({ min: 1, max: 100 }).toInt()];
+const assumptionsValidation = [
+  query('category').optional().isString().trim(),
+  query('source').optional().isString().trim(),
+];
+const scenarioValidation = [
+  body('name').isString().trim().notEmpty(),
+  body('category').optional().isString().trim(),
+  body('source').optional().isString().trim(),
+  body('buyPrice').isFloat({ min: 0 }).toFloat(),
+  body('expectedSalePrice').isFloat({ min: 0 }).toFloat(),
+  body('shippingCost').optional().isFloat({ min: 0 }).toFloat(),
+  body('platformFeePct').optional().isFloat({ min: 0 }).toFloat(),
+  body('prepCost').optional().isFloat({ min: 0 }).toFloat(),
+  body('taxPct').optional().isFloat({ min: 0 }).toFloat(),
+  body('notes').optional().isString().trim(),
+];
+const scenarioIdValidation = [param('id').isString().trim().notEmpty()];
 
 const decimalToNumber = (value: Decimal | null | undefined): number | null => {
   if (value == null) {
@@ -92,6 +110,56 @@ router.post(
       estimatedDaysToSell: tmv.estimatedDaysToSell,
       calculatedAt: tmv.calculatedAt,
     });
+  })
+);
+
+router.get(
+  '/deal-intelligence/:dealId',
+  validate(dealIdValidation),
+  asyncHandler(async (req, res) => {
+    const data = await analyticsService.getDealIntelligence(String(req.params.dealId));
+    res.status(200).json({ success: true, data });
+  })
+);
+
+router.get(
+  '/tmv/assumptions',
+  validate(assumptionsValidation),
+  asyncHandler(async (req, res) => {
+    const data = await analyticsService.getTMVAssumptions({
+      category: typeof req.query.category === 'string' ? req.query.category : undefined,
+      source: typeof req.query.source === 'string' ? req.query.source : undefined,
+    });
+    res.status(200).json({ success: true, data });
+  })
+);
+
+router.get(
+  '/tmv/scenarios',
+  asyncHandler(async (_req, res) => {
+    const data = await analyticsService.listTMVScenarios();
+    res.status(200).json({ success: true, data });
+  })
+);
+
+router.post(
+  '/tmv/scenarios',
+  authorizeOperatorOrAdmin,
+  validate(scenarioValidation),
+  asyncHandler(async (req, res) => {
+    const data = await analyticsService.createTMVScenario(req.body);
+    res.status(201).json({ success: true, data });
+  })
+);
+
+router.delete(
+  '/tmv/scenarios/:id',
+  authorizeOperatorOrAdmin,
+  validate(scenarioIdValidation),
+  asyncHandler(async (req, res) => {
+    const id = String(req.params.id);
+    await analyticsService.deleteTMVScenario(id);
+    res.status(200).json({ success: true, data: { id } });
   })
 );
 

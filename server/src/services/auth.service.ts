@@ -2,7 +2,7 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import type { SignOptions } from 'jsonwebtoken';
 import { randomUUID } from 'crypto';
-import { User } from '@prisma/client';
+import { Prisma, User } from '@prisma/client';
 import prisma from '../config/database';
 import config from '../config/env';
 import { AppError } from '../middleware/errorHandler';
@@ -30,6 +30,7 @@ interface OneTimeTokenPayload {
   purpose: 'verify-email' | 'reset-password';
   email: string;
   userId: string;
+  jti?: string;
 }
 
 interface AuthTokens {
@@ -67,7 +68,7 @@ export class AuthService {
     });
 
     if (config.auth.requireVerifiedEmail) {
-      const verificationToken = this.createOneTimeToken(user, 'verify-email', config.auth.emailVerificationTokenTtlHours * 60 * 60);
+      const verificationToken = await this.createOneTimeToken(user, 'verify-email', config.auth.emailVerificationTokenTtlHours * 60 * 60);
       await emailService.sendEmailVerification(user.email, verificationToken);
     }
 
@@ -176,9 +177,12 @@ export class AuthService {
       throw new AppError('Invalid verification token', 400);
     }
 
-    await prisma.user.update({
-      where: { id: payload.userId, email: payload.email },
-      data: { isActive: true },
+    await prisma.$transaction(async (tx) => {
+      await this.consumeOneTimeToken(tx, payload, 'verify-email', 'verification');
+      await tx.user.update({
+        where: { id: payload.userId, email: payload.email },
+        data: { isActive: true },
+      });
     });
   }
 
@@ -192,7 +196,7 @@ export class AuthService {
       return;
     }
 
-    const token = this.createOneTimeToken(user, 'verify-email', config.auth.emailVerificationTokenTtlHours * 60 * 60);
+    const token = await this.createOneTimeToken(user, 'verify-email', config.auth.emailVerificationTokenTtlHours * 60 * 60);
     await emailService.sendEmailVerification(user.email, token);
   }
 
@@ -207,7 +211,7 @@ export class AuthService {
       return;
     }
 
-    const resetToken = this.createOneTimeToken(user, 'reset-password', config.auth.passwordResetTokenTtlMinutes * 60);
+    const resetToken = await this.createOneTimeToken(user, 'reset-password', config.auth.passwordResetTokenTtlMinutes * 60);
     await emailService.sendPasswordReset(user.email, resetToken);
   }
 
@@ -226,28 +230,74 @@ export class AuthService {
 
     const hashedPassword = await bcrypt.hash(newPassword, 10);
 
-    await prisma.$transaction([
-      prisma.user.update({
+    await prisma.$transaction(async (tx) => {
+      await this.consumeOneTimeToken(tx, payload, 'reset-password', 'reset');
+      await tx.oneTimeToken.updateMany({
+        where: {
+          userId: payload.userId,
+          purpose: 'reset-password',
+          consumedAt: null,
+        },
+        data: { consumedAt: new Date() },
+      });
+      await tx.user.update({
         where: { id: payload.userId, email: payload.email },
         data: { password: hashedPassword },
-      }),
-      prisma.refreshToken.deleteMany({
+      });
+      await tx.refreshToken.deleteMany({
         where: { userId: payload.userId },
-      }),
-    ]);
+      });
+    });
   }
 
-  private createOneTimeToken(user: User, purpose: OneTimeTokenPayload['purpose'], expiresInSeconds: number): string {
+  private async createOneTimeToken(user: User, purpose: OneTimeTokenPayload['purpose'], expiresInSeconds: number): Promise<string> {
+    const tokenId = randomUUID();
     const payload: OneTimeTokenPayload = {
       purpose,
       userId: user.id,
       email: user.email,
     };
 
+    const expiresAt = new Date(Date.now() + expiresInSeconds * 1000);
+    await prisma.oneTimeToken.create({
+      data: {
+        tokenId,
+        userId: user.id,
+        purpose,
+        expiresAt,
+      },
+    });
+
     return jwt.sign(payload, config.jwt.secret, {
       expiresIn: expiresInSeconds,
-      jwtid: randomUUID(),
+      jwtid: tokenId,
     });
+  }
+
+  private async consumeOneTimeToken(
+    tx: Prisma.TransactionClient,
+    payload: OneTimeTokenPayload,
+    purpose: OneTimeTokenPayload['purpose'],
+    label: 'verification' | 'reset'
+  ): Promise<void> {
+    if (!payload.jti) {
+      throw new AppError(`Invalid or expired ${label} token`, 400);
+    }
+
+    const consumed = await tx.oneTimeToken.updateMany({
+      where: {
+        tokenId: payload.jti,
+        userId: payload.userId,
+        purpose,
+        consumedAt: null,
+        expiresAt: { gt: new Date() },
+      },
+      data: { consumedAt: new Date() },
+    });
+
+    if (consumed.count !== 1) {
+      throw new AppError(`Invalid or expired ${label} token`, 400);
+    }
   }
 
   private async generateAuthTokens(user: User): Promise<AuthTokens> {

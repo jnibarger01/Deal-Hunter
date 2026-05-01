@@ -2,7 +2,8 @@ import request from 'supertest';
 import app from '../../src/app';
 import { prisma } from '../setup';
 import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
+import config from '../../src/config/env';
+import emailService from '../../src/services/email.service';
 
 const uniqueTestEmail = (prefix: string) =>
   `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}@example.com`;
@@ -261,21 +262,27 @@ describe('Authentication API', () => {
   });
 
   describe('Password and verification lifecycle', () => {
-    it('should verify email with a valid token', async () => {
-      const hashedPassword = await bcrypt.hash('Test123!', 10);
-      const user = await prisma.user.create({
-        data: {
-          email: 'verify@example.com',
-          password: hashedPassword,
-          isActive: false,
-        },
-      });
+    const originalRequireVerifiedEmail = config.auth.requireVerifiedEmail;
 
-      const rawToken = jwt.sign(
-        { purpose: 'verify-email', userId: user.id, email: user.email },
-        process.env.JWT_SECRET as string,
-        { expiresIn: '1h' }
-      );
+    afterEach(() => {
+      config.auth.requireVerifiedEmail = originalRequireVerifiedEmail;
+      jest.restoreAllMocks();
+    });
+
+    it('should verify email with a valid token', async () => {
+      config.auth.requireVerifiedEmail = true;
+      const sendVerification = jest
+        .spyOn(emailService, 'sendEmailVerification')
+        .mockResolvedValue(undefined);
+
+      const email = uniqueTestEmail('verify');
+      await request(app)
+        .post('/api/v1/auth/register')
+        .send({ email, password: 'Test123!' })
+        .expect(201);
+
+      const rawToken = sendVerification.mock.calls[0]?.[1];
+      expect(rawToken).toEqual(expect.any(String));
 
       const response = await request(app)
         .post('/api/v1/auth/verify-email')
@@ -284,8 +291,35 @@ describe('Authentication API', () => {
 
       expect(response.body.success).toBe(true);
 
-      const verified = await prisma.user.findUnique({ where: { id: user.id } });
+      const verified = await prisma.user.findUnique({ where: { email } });
       expect(verified?.isActive).toBe(true);
+    });
+
+    it('rejects verification token replay after successful use', async () => {
+      config.auth.requireVerifiedEmail = true;
+      const sendVerification = jest
+        .spyOn(emailService, 'sendEmailVerification')
+        .mockResolvedValue(undefined);
+
+      await request(app)
+        .post('/api/v1/auth/register')
+        .send({ email: uniqueTestEmail('verify-replay'), password: 'Test123!' })
+        .expect(201);
+
+      const rawToken = sendVerification.mock.calls[0]?.[1];
+      expect(rawToken).toEqual(expect.any(String));
+
+      await request(app)
+        .post('/api/v1/auth/verify-email')
+        .send({ token: rawToken })
+        .expect(200);
+
+      const replay = await request(app)
+        .post('/api/v1/auth/verify-email')
+        .send({ token: rawToken })
+        .expect(400);
+
+      expect(replay.body.error.message).toContain('Invalid or expired verification token');
     });
 
     it('should reset password and invalidate existing refresh tokens', async () => {
@@ -306,11 +340,17 @@ describe('Authentication API', () => {
         },
       });
 
-      const rawToken = jwt.sign(
-        { purpose: 'reset-password', userId: user.id, email: user.email },
-        process.env.JWT_SECRET as string,
-        { expiresIn: '30m' }
-      );
+      const sendPasswordReset = jest
+        .spyOn(emailService, 'sendPasswordReset')
+        .mockResolvedValue(undefined);
+
+      await request(app)
+        .post('/api/v1/auth/forgot-password')
+        .send({ email: user.email })
+        .expect(200);
+
+      const rawToken = sendPasswordReset.mock.calls[0]?.[1];
+      expect(rawToken).toEqual(expect.any(String));
 
       const response = await request(app)
         .post('/api/v1/auth/reset-password')
@@ -325,6 +365,80 @@ describe('Authentication API', () => {
 
       const activeTokens = await prisma.refreshToken.findMany({ where: { userId: user.id } });
       expect(activeTokens).toHaveLength(0);
+    });
+
+    it('rejects password reset token replay after successful use', async () => {
+      const hashedPassword = await bcrypt.hash('OldPass123', 10);
+      const user = await prisma.user.create({
+        data: {
+          email: uniqueTestEmail('reset-replay'),
+          password: hashedPassword,
+          isActive: true,
+        },
+      });
+      const sendPasswordReset = jest
+        .spyOn(emailService, 'sendPasswordReset')
+        .mockResolvedValue(undefined);
+
+      await request(app)
+        .post('/api/v1/auth/forgot-password')
+        .send({ email: user.email })
+        .expect(200);
+
+      const rawToken = sendPasswordReset.mock.calls[0]?.[1];
+      expect(rawToken).toEqual(expect.any(String));
+
+      await request(app)
+        .post('/api/v1/auth/reset-password')
+        .send({ token: rawToken, newPassword: 'NewPass123' })
+        .expect(200);
+
+      const replay = await request(app)
+        .post('/api/v1/auth/reset-password')
+        .send({ token: rawToken, newPassword: 'OtherPass123' })
+        .expect(400);
+
+      expect(replay.body.error.message).toContain('Invalid or expired reset token');
+    });
+
+    it('rejects older outstanding reset links after a newer reset succeeds', async () => {
+      const hashedPassword = await bcrypt.hash('OldPass123', 10);
+      const user = await prisma.user.create({
+        data: {
+          email: uniqueTestEmail('reset-multiple'),
+          password: hashedPassword,
+          isActive: true,
+        },
+      });
+      const sendPasswordReset = jest
+        .spyOn(emailService, 'sendPasswordReset')
+        .mockResolvedValue(undefined);
+
+      await request(app)
+        .post('/api/v1/auth/forgot-password')
+        .send({ email: user.email })
+        .expect(200);
+      await request(app)
+        .post('/api/v1/auth/forgot-password')
+        .send({ email: user.email })
+        .expect(200);
+
+      const firstToken = sendPasswordReset.mock.calls[0]?.[1];
+      const secondToken = sendPasswordReset.mock.calls[1]?.[1];
+      expect(firstToken).toEqual(expect.any(String));
+      expect(secondToken).toEqual(expect.any(String));
+
+      await request(app)
+        .post('/api/v1/auth/reset-password')
+        .send({ token: secondToken, newPassword: 'NewPass123' })
+        .expect(200);
+
+      const staleReset = await request(app)
+        .post('/api/v1/auth/reset-password')
+        .send({ token: firstToken, newPassword: 'OtherPass123' })
+        .expect(400);
+
+      expect(staleReset.body.error.message).toContain('Invalid or expired reset token');
     });
 
     it('should return generic response for forgot-password with unknown account', async () => {

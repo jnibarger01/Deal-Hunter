@@ -5,6 +5,7 @@ import { Card, Badge } from '../components/ui';
 import { useDeal, useCalculateTMV, useDealIntelligence } from '../hooks/useDeals';
 import { adaptDealIntelligenceView } from '../adapters/dealIntelligence';
 import type { Deal, TMVResult } from '../types';
+import { getSafeExternalUrl } from '../utils/url';
 import styles from './DealDetail.module.css';
 
 function formatCurrency(value: number): string {
@@ -131,6 +132,7 @@ export function DealDetail() {
   }
 
   const { dealScore, description, marketDynamics, marketValue, negotiation, repairAnalysis, roi } = intelligenceView;
+  const safeExternalUrl = getSafeExternalUrl(dealWithAnalytics.url);
 
   return (
     <div className={styles.page}>
@@ -237,8 +239,8 @@ export function DealDetail() {
                 <p className={styles.scriptText}>{negotiation.openingScript}</p>
               </div>
               <div className={styles.actionRow}>
-                {dealWithAnalytics.url ? (
-                  <a href={dealWithAnalytics.url} target="_blank" rel="noopener noreferrer" className={styles.primaryAction}>
+                {safeExternalUrl ? (
+                  <a href={safeExternalUrl} target="_blank" rel="noopener noreferrer" className={styles.primaryAction}>
                     View Original Listing
                     <ExternalLink size={14} />
                   </a>

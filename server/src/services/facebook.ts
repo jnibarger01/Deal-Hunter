@@ -29,11 +29,42 @@ type FacebookProfile = {
   profileName: string;
 };
 
+const FACEBOOK_MARKETPLACE_ITEM_PATH = /^\/marketplace\/item\/[^/]+\/?$/;
+const FACEBOOK_HOSTS = new Set(['facebook.com', 'www.facebook.com']);
+const FACEBOOK_REQUEST_TIMEOUT_MS = 15_000;
+
+export function normalizeFacebookMarketplaceItemUrl(input: string): string {
+  let parsed: URL;
+  try {
+    parsed = new URL(input);
+  } catch {
+    throw new Error('Only HTTPS Facebook Marketplace item URLs are supported');
+  }
+
+  if (parsed.protocol !== 'https:' || !FACEBOOK_HOSTS.has(parsed.hostname.toLowerCase())) {
+    throw new Error('Only HTTPS Facebook Marketplace item URLs are supported');
+  }
+
+  if (!FACEBOOK_MARKETPLACE_ITEM_PATH.test(parsed.pathname)) {
+    throw new Error('Only HTTPS Facebook Marketplace item URLs are supported');
+  }
+
+  return `https://www.facebook.com${parsed.pathname.replace(/\/$/, '')}`;
+}
+
+function normalizeFacebookCookieDomain(domain?: string): string {
+  const hostname = (domain ?? '.facebook.com').trim().replace(/^\./, '').toLowerCase();
+  if (hostname !== 'facebook.com' && !hostname.endsWith('.facebook.com')) {
+    throw new Error('Facebook cookie domains must belong to facebook.com');
+  }
+  return '.facebook.com';
+}
+
 const normalizeCookies = (cookies: FacebookCookie[]): Cookie[] =>
   cookies.map((cookie) => ({
     name: cookie.name,
     value: cookie.value,
-    domain: cookie.domain ?? '.facebook.com',
+    domain: normalizeFacebookCookieDomain(cookie.domain),
     path: cookie.path ?? '/',
     httpOnly: cookie.httpOnly ?? true,
     secure: cookie.secure ?? true,
@@ -52,7 +83,7 @@ export function parseFacebookCookieInput(cookieInput: string): FacebookCookie[] 
     return {
       name: String(cookie.name ?? ''),
       value: String(cookie.value ?? ''),
-      domain: typeof cookie.domain === 'string' ? cookie.domain : '.facebook.com',
+      domain: normalizeFacebookCookieDomain(typeof cookie.domain === 'string' ? cookie.domain : undefined),
       path: typeof cookie.path === 'string' ? cookie.path : '/',
       httpOnly: typeof cookie.httpOnly === 'boolean' ? cookie.httpOnly : true,
       secure: typeof cookie.secure === 'boolean' ? cookie.secure : true,
@@ -112,7 +143,10 @@ const parseListingFromHtml = (html: string, url: string): FacebookListing => {
 export async function testFacebookConnection(cookies: FacebookCookie[]): Promise<FacebookProfile> {
   return withFacebookContext(cookies, async (context) => {
     const page = await context.newPage();
-    await page.goto('https://www.facebook.com/me', { waitUntil: 'domcontentloaded' });
+    await page.goto('https://www.facebook.com/me', {
+      waitUntil: 'domcontentloaded',
+      timeout: FACEBOOK_REQUEST_TIMEOUT_MS,
+    });
     const title = await page.title();
     const profileName = title.replace(/\s*\|.*$/, '').trim() || 'Facebook Operator';
     return { profileName };
@@ -120,21 +154,26 @@ export async function testFacebookConnection(cookies: FacebookCookie[]): Promise
 }
 
 export async function scrapeFacebookListing(url: string, cookies: FacebookCookie[]): Promise<FacebookListing> {
+  const safeUrl = normalizeFacebookMarketplaceItemUrl(url);
   const cookieHeader = cookies.map((cookie) => `${cookie.name}=${cookie.value}`).join('; ');
   try {
-    const response = await axios.get<string>(url, {
+    const response = await axios.get<string>(safeUrl, {
       headers: {
         Cookie: cookieHeader,
         'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123 Safari/537.36',
       },
+      timeout: FACEBOOK_REQUEST_TIMEOUT_MS,
     });
-    return parseListingFromHtml(response.data, url);
+    return parseListingFromHtml(response.data, safeUrl);
   } catch {
     return withFacebookContext(cookies, async (context) => {
       const page = await context.newPage();
-      await page.goto(url, { waitUntil: 'domcontentloaded' });
+      await page.goto(safeUrl, {
+        waitUntil: 'domcontentloaded',
+        timeout: FACEBOOK_REQUEST_TIMEOUT_MS,
+      });
       const html = await page.content();
-      return parseListingFromHtml(html, url);
+      return parseListingFromHtml(html, safeUrl);
     });
   }
 }
@@ -146,8 +185,11 @@ export async function scrapeFacebookSearch(
   const limit = Math.min(params.limit ?? 10, 50);
   return withFacebookContext(cookies, async (context) => {
     const page = await context.newPage();
-    const location = params.location ? `&query=${encodeURIComponent(params.query)}&exact=false` : `&query=${encodeURIComponent(params.query)}`;
-    await page.goto(`https://www.facebook.com/marketplace/search/?${location}`, { waitUntil: 'domcontentloaded' });
+    const query = params.location ? `${params.query} ${params.location}` : params.query;
+    await page.goto(`https://www.facebook.com/marketplace/search/?query=${encodeURIComponent(query)}&exact=false`, {
+      waitUntil: 'domcontentloaded',
+      timeout: FACEBOOK_REQUEST_TIMEOUT_MS,
+    });
     const urls = await page.$$eval('a[href*="/marketplace/item/"]', (anchors) =>
       Array.from(new Set((anchors as Array<{ href?: string }>).map((a) => a.href).filter(Boolean) as string[]))
     );

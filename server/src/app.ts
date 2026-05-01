@@ -86,21 +86,57 @@ app.get('/ready', async (_req, res) => {
   }
 });
 
-app.post('/webhooks/marketplace-account-deletion', (req, res) => {
-  const headerToken =
-    req.headers['x-verification-token'] ?? req.headers['x-hub-verify-token'];
-  const token =
-    (typeof req.query.verification_token === 'string'
-      ? req.query.verification_token
-      : undefined) ??
-    (typeof headerToken === 'string' ? headerToken : undefined);
+app.post('/webhooks/marketplace-account-deletion', async (req, res, next) => {
+  const headerToken = req.headers['x-verification-token'] ?? req.headers['x-hub-verify-token'];
+  const token = typeof headerToken === 'string' ? headerToken : undefined;
 
   if (!config.marketplace.deleteToken || token !== config.marketplace.deleteToken) {
     return res.status(401).send('Invalid token');
   }
 
-  logger.info('Account deletion webhook received', { body: req.body });
-  return res.status(200).send('OK');
+  try {
+    const body = req.body && typeof req.body === 'object' ? req.body as Record<string, unknown> : {};
+    const email = typeof body.email === 'string' ? body.email.trim().toLowerCase() : undefined;
+    const userId = typeof body.userId === 'string'
+      ? body.userId.trim()
+      : typeof body.accountId === 'string'
+        ? body.accountId.trim()
+        : undefined;
+
+    if (!email && !userId) {
+      return res.status(400).json({
+        success: false,
+        error: { message: 'Deletion callback requires email, userId, or accountId' },
+      });
+    }
+
+    const users = await prisma.user.findMany({
+      where: {
+        OR: [
+          ...(email ? [{ email }] : []),
+          ...(userId ? [{ id: userId }] : []),
+        ],
+      },
+      select: { id: true },
+    });
+
+    if (users.length === 0) {
+      logger.info('Account deletion webhook processed', { deleted: false });
+      return res.status(200).json({ success: true, deleted: false });
+    }
+
+    const userIds = users.map((user) => user.id);
+    await prisma.user.deleteMany({ where: { id: { in: userIds } } });
+    logger.info('Account deletion webhook processed', { deleted: true, deletedCount: userIds.length });
+    return res.status(200).json({
+      success: true,
+      deleted: true,
+      deletedCount: userIds.length,
+      ...(userIds.length === 1 ? { userId: userIds[0] } : {}),
+    });
+  } catch (error) {
+    return next(error);
+  }
 });
 
 const apiRouter = express.Router();

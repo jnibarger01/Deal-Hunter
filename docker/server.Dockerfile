@@ -11,6 +11,7 @@ WORKDIR /app
 COPY package.json package-lock.json ./
 COPY server/package.json ./server/
 COPY frontend/package.json ./frontend/
+COPY mcp/package.json ./mcp/
 COPY server/tsconfig.json ./server/
 COPY server/prisma ./server/prisma/
 

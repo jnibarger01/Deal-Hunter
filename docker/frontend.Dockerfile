@@ -9,6 +9,7 @@ WORKDIR /app
 COPY package.json package-lock.json ./
 COPY frontend/package.json ./frontend/
 COPY server/package.json ./server/
+COPY mcp/package.json ./mcp/
 COPY frontend/vite.config.ts ./frontend/
 COPY frontend/tsconfig.json ./frontend/
 

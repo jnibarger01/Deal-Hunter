@@ -5,10 +5,11 @@ ENV_FILE="server/.env"
 HEALTH_URL="${HEALTHCHECK_URL:-}"
 RANKED_URL="${RANKED_URL:-}"
 CONNECTIONS_URL="${CONNECTIONS_URL:-}"
+OPERATOR_TOKEN="${OPERATOR_INGEST_TOKEN:-}"
 
 usage() {
   cat <<'EOF'
-Usage: ./scripts/verify-production.sh [--env-file <path>] [--health-url <url>] [--ranked-url <url>] [--connections-url <url>]
+Usage: ./scripts/verify-production.sh [--env-file <path>] [--health-url <url>] [--ranked-url <url>] [--connections-url <url>] [--operator-token <token>]
 
 Examples:
   ./scripts/verify-production.sh --env-file server/.env
@@ -36,6 +37,10 @@ while [[ $# -gt 0 ]]; do
       CONNECTIONS_URL="$2"
       shift 2
       ;;
+    --operator-token)
+      OPERATOR_TOKEN="$2"
+      shift 2
+      ;;
     -h|--help)
       usage
       exit 0
@@ -50,6 +55,8 @@ done
 if [[ -f "$ENV_FILE" ]]; then
   set -a && source "$ENV_FILE" && set +a
 fi
+
+OPERATOR_TOKEN="${OPERATOR_TOKEN:-${OPERATOR_INGEST_TOKEN:-}}"
 
 failures=0
 warnings=0
@@ -74,6 +81,14 @@ require_var DATABASE_URL
 require_var JWT_SECRET
 require_var CORS_ORIGIN
 require_var FRONTEND_URL
+require_var SMTP_HOST
+require_var SMTP_PORT
+require_var SMTP_USER
+require_var SMTP_PASS
+require_var SMTP_FROM
+require_var OPERATOR_INGEST_TOKEN
+require_var OPERATOR_SECRET_KEY
+require_var MARKETPLACE_DELETE_TOKEN
 
 if [[ "${NODE_ENV:-}" != "production" ]]; then
   warn "NODE_ENV should be production"
@@ -126,7 +141,12 @@ if [[ -n "$RANKED_URL" ]]; then
 fi
 
 if [[ -n "$CONNECTIONS_URL" ]]; then
-  if ! connections_body="$(curl -fsS "$CONNECTIONS_URL" 2>/dev/null)"; then
+  connections_headers=()
+  if [[ -n "$OPERATOR_TOKEN" ]]; then
+    connections_headers=(-H "X-Operator-Token: $OPERATOR_TOKEN")
+  fi
+
+  if ! connections_body="$(curl -fsS "${connections_headers[@]}" "$CONNECTIONS_URL" 2>/dev/null)"; then
     echo "❌ Connections endpoint failed: $CONNECTIONS_URL"
     failures=$((failures + 1))
   elif [[ "$connections_body" == *'"craigslist"'* && "$connections_body" == *'"ebay"'* ]]; then

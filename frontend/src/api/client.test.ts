@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, expectTypeOf, it, vi } from 'vitest';
 import type { LiveEbayDeal } from '../types';
-import { api } from './client';
+import { api, resolveApiOrigin } from './client';
 
 describe('frontend api client contract', () => {
   afterEach(() => {
@@ -17,7 +17,7 @@ describe('frontend api client contract', () => {
 
     await api.getTMV('deal-123');
 
-    expect(fetchMock).toHaveBeenCalledWith('http://localhost:5000/api/v1/tmv/deal-123', expect.any(Object));
+    expect(fetchMock).toHaveBeenCalledWith('/api/v1/tmv/deal-123', expect.any(Object));
   });
 
   it('posts scoring requests to the canonical /score endpoint with dealId in the body', async () => {
@@ -30,7 +30,7 @@ describe('frontend api client contract', () => {
     await api.calculateScore('deal-123');
 
     expect(fetchMock).toHaveBeenCalledWith(
-      'http://localhost:5000/api/v1/score',
+      '/api/v1/score',
       expect.objectContaining({
         method: 'POST',
         body: JSON.stringify({ dealId: 'deal-123' }),
@@ -47,7 +47,7 @@ describe('frontend api client contract', () => {
 
     await api.getRankedDeals();
 
-    expect(fetchMock).toHaveBeenCalledWith('http://localhost:5000/api/v1/ranked', expect.any(Object));
+    expect(fetchMock).toHaveBeenCalledWith('/api/v1/ranked', expect.any(Object));
   });
 
   it('types live ebay deals as the dedicated LiveEbayDeal contract', () => {
@@ -87,7 +87,7 @@ describe('frontend api client contract', () => {
     const deals = await api.getLiveEbayDeals({ category: 'gaming', limit: 6 });
 
     expect(fetchMock).toHaveBeenCalledWith(
-      'http://localhost:5000/api/v1/deals/live/ebay?category=gaming&limit=6',
+      '/api/v1/deals/live/ebay?category=gaming&limit=6',
       expect.any(Object)
     );
     expect(deals).toEqual(payload.data.deals);
@@ -103,7 +103,7 @@ describe('frontend api client contract', () => {
     await api.getDealIntelligence('deal-123');
 
     expect(fetchMock).toHaveBeenCalledWith(
-      'http://localhost:5000/api/v1/deal-intelligence/deal-123',
+      '/api/v1/deal-intelligence/deal-123',
       expect.any(Object)
     );
   });
@@ -118,7 +118,7 @@ describe('frontend api client contract', () => {
     await api.getTMVAssumptions({ source: 'ebay' });
 
     expect(fetchMock).toHaveBeenCalledWith(
-      'http://localhost:5000/api/v1/tmv/assumptions?source=ebay',
+      '/api/v1/tmv/assumptions?source=ebay',
       expect.any(Object)
     );
   });
@@ -141,7 +141,7 @@ describe('frontend api client contract', () => {
     await api.getConnections();
 
     expect(fetchMock).toHaveBeenCalledWith(
-      'http://localhost:5000/api/v1/connections',
+      '/api/v1/connections',
       expect.objectContaining({
         headers: expect.objectContaining({
           'X-Operator-Token': 'operator-secret',
@@ -159,6 +159,25 @@ describe('frontend api client contract', () => {
 
     await api.getTMVScenarios();
 
-    expect(fetchMock).toHaveBeenCalledWith('http://localhost:5000/api/v1/tmv/scenarios', expect.any(Object));
+    expect(fetchMock).toHaveBeenCalledWith('/api/v1/tmv/scenarios', expect.any(Object));
+  });
+
+  it('uses same-origin API paths by default and rejects localhost in production config', () => {
+    expect(resolveApiOrigin('', true)).toBe('');
+    expect(resolveApiOrigin(undefined, true)).toBe('');
+    expect(resolveApiOrigin('https://api.example.com/', true)).toBe('https://api.example.com');
+    expect(() => resolveApiOrigin('http://localhost:5000', true)).toThrow(
+      'VITE_API_URL must not point to localhost in production'
+    );
+    expect(() => resolveApiOrigin('http://user@localhost:5000', true)).toThrow(
+      'VITE_API_URL must not point to localhost in production'
+    );
+    expect(() => resolveApiOrigin('http://0.0.0.0:5000', true)).toThrow(
+      'VITE_API_URL must not point to localhost in production'
+    );
+    expect(() => resolveApiOrigin('http://[::ffff:127.0.0.1]:5000', true)).toThrow(
+      'VITE_API_URL must not point to localhost in production'
+    );
+    expect(resolveApiOrigin('http://localhost:5000', false)).toBe('http://localhost:5000');
   });
 });

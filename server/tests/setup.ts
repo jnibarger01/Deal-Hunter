@@ -8,6 +8,7 @@ const prisma = new PrismaClient();
 
 async function resetDatabase() {
   await prisma.refreshToken.deleteMany({});
+  await prisma.oneTimeToken.deleteMany({});
   await prisma.watchlistItem.deleteMany({});
   await prisma.portfolioItem.deleteMany({});
   await prisma.alert.deleteMany({});

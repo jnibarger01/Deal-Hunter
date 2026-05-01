@@ -126,6 +126,7 @@ model User {
   updatedAt DateTime @updatedAt
 
   refreshTokens  RefreshToken[]
+  oneTimeTokens  OneTimeToken[]
   watchlistItems WatchlistItem[]
   portfolioItems PortfolioItem[]
   alerts         Alert[]
@@ -138,6 +139,20 @@ model RefreshToken {
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   expiresAt DateTime
   createdAt DateTime @default(now())
+}
+
+model OneTimeToken {
+  id         String    @id @default(cuid())
+  tokenId    String    @unique
+  userId     String
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  purpose    String
+  expiresAt  DateTime
+  consumedAt DateTime?
+  createdAt  DateTime  @default(now())
+
+  @@index([userId, purpose])
+  @@index([expiresAt])
 }
 
 model WatchlistItem {

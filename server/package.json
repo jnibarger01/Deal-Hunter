@@ -12,6 +12,7 @@
     "test:integration": "jest --testPathPattern=integration",
     "test:file": "jest --runInBand --coverage=false",
     "lint": "eslint src --ext .ts --max-warnings=0",
+    "postinstall": "prisma generate",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
     "prisma:db:push": "prisma db push",

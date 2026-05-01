@@ -16,6 +16,7 @@ WORKDIR /app
 COPY package.json package-lock.json ./
 COPY frontend/package.json ./frontend/
 COPY server/package.json ./server/
+COPY mcp/package.json ./mcp/
 RUN npm ci --workspace frontend
 COPY frontend/ ./frontend/
 WORKDIR /app/frontend

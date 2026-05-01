@@ -9,6 +9,7 @@ import asyncHandler from '../utils/asyncHandler';
 import { ingestCraigslistFromFeeds } from '../services/craigslist';
 import { decryptOperatorSecret } from '../services/operator-secret.service';
 import {
+  normalizeFacebookMarketplaceItemUrl,
   parseFacebookCookieInput,
   scrapeFacebookListing,
   scrapeFacebookSearch,
@@ -191,7 +192,13 @@ router.post(
   ingestLimiter,
   validate([
     body('urls').optional().isArray({ min: 1 }),
-    body('urls.*').optional().isString().isURL(),
+    body('urls.*')
+      .optional()
+      .isString()
+      .custom((url) => {
+        normalizeFacebookMarketplaceItemUrl(String(url));
+        return true;
+      }),
     body('search').optional().isObject(),
     body('search.query').optional().isString().trim().notEmpty(),
     body('search.location').optional().isString().trim().notEmpty(),

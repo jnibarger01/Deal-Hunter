@@ -36,6 +36,7 @@ Optional integration vars:
 - SMTP values: `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USER`, `SMTP_PASS`, `SMTP_FROM`
 - `OPERATOR_INGEST_TOKEN=<32+ character token>` for operator ingest endpoints
 - `OPERATOR_SECRET_KEY=<32+ character secret>` for encrypted operator cookie storage
+- `MARKETPLACE_DELETE_TOKEN=<32+ character token>` for marketplace account deletion webhooks
 - `CRAIGSLIST_RSS_URLS`, `CRAIGSLIST_MAX_PER_FEED`, `CRAIGSLIST_INGEST_INTERVAL_MINUTES`, `CRAIGSLIST_SCHEDULER_ENABLED`
 
 ## Local startup path
@@ -79,12 +80,12 @@ docker compose -f docker-compose.prod.yml config
 
 ## Known Issues / Next Fixes
 
-- Compose startup does not run migrations. Run `prisma migrate deploy` for staging/production before routing traffic to Prisma-backed endpoints.
+- GitHub staging and production deploy workflows run `prisma migrate deploy` before `up -d`; manual compose deploys must do the same before routing traffic to Prisma-backed endpoints.
 - No separate `workers/` image exists. Optional scheduler behavior runs in the server process when configured.
 - Ranked scoring currently sorts by raw fields instead of `compositeScore`.
 - Score route limit parsing can produce `NaN`; invalid input should return 400.
 - Frontend has no lint script/config yet. Use frontend tests and `npm run build` as current frontend gates.
-- `OPERATOR_INGEST_TOKEN` and `OPERATOR_SECRET_KEY` are optional in the schema but required for a safe operator deployment.
+- `OPERATOR_INGEST_TOKEN`, `OPERATOR_SECRET_KEY`, and `MARKETPLACE_DELETE_TOKEN` are optional in the schema but required for a safe operator deployment.
 
 ## Deployment checks
 

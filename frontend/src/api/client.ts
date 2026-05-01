@@ -13,10 +13,40 @@ import type {
   IngestSourceRecord,
 } from '../types';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 const API_VERSION = 'v1';
-const API_BASE = `${API_URL}/api/${API_VERSION}`;
 const OPERATOR_TOKEN_STORAGE_KEY = 'deal-hunter-operator-token';
+
+export function resolveApiOrigin(configuredApiUrl: string | undefined, isProduction: boolean): string {
+  const trimmed = configuredApiUrl?.trim().replace(/\/+$/, '') ?? '';
+  if (!trimmed) {
+    return '';
+  }
+
+  let hostname = '';
+  try {
+    hostname = new URL(trimmed).hostname.toLowerCase();
+  } catch {
+    hostname = '';
+  }
+
+  const normalizedHostname = hostname.replace(/^\[|\]$/g, '');
+  const isLoopback =
+    normalizedHostname === 'localhost' ||
+    normalizedHostname === '0.0.0.0' ||
+    normalizedHostname === '::1' ||
+    normalizedHostname.startsWith('127.') ||
+    normalizedHostname.startsWith('::ffff:127.') ||
+    normalizedHostname.startsWith('::ffff:7f');
+
+  if (isProduction && isLoopback) {
+    throw new Error('VITE_API_URL must not point to localhost in production');
+  }
+
+  return trimmed;
+}
+
+const API_ORIGIN = resolveApiOrigin(import.meta.env.VITE_API_URL, import.meta.env.PROD);
+const API_BASE = `${API_ORIGIN}/api/${API_VERSION}`;
 
 const getOperatorToken = () => {
   if (typeof window === 'undefined') {
@@ -60,7 +90,7 @@ interface LiveDealsResponse {
 }
 
 async function request<T>(endpoint: string, options?: RequestInit): Promise<T> {
-  const baseUrl = endpoint.startsWith('/health') ? API_URL : API_BASE;
+  const baseUrl = endpoint.startsWith('/health') ? API_ORIGIN : API_BASE;
   const operatorToken = endpoint.startsWith('/health') ? undefined : getOperatorToken();
 
   const response = await fetch(`${baseUrl}${endpoint}`, {

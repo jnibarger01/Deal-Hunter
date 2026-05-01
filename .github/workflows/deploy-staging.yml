@@ -64,6 +64,17 @@ jobs:
           key: ${{ secrets.STAGING_SSH_KEY }}
           script: |
             cd ${{ vars.DEPLOY_PATH }}
+            if [ -f .env ]; then set -a && . ./.env && set +a; fi
+            for name in DATABASE_URL JWT_SECRET SMTP_HOST SMTP_PORT SMTP_USER SMTP_PASS SMTP_FROM OPERATOR_INGEST_TOKEN OPERATOR_SECRET_KEY MARKETPLACE_DELETE_TOKEN; do
+              if [ -z "$(printenv "$name")" ]; then
+                echo "Missing required staging env var: $name" >&2
+                exit 1
+              fi
+            done
+            export REGISTRY=ghcr.io
+            export IMAGE_PREFIX=${{ github.repository_owner }}/deal-hunter
+            export TAG=staging
             docker compose -f docker-compose.staging.yml pull
+            docker compose -f docker-compose.staging.yml run --rm server npx prisma migrate deploy
             docker compose -f docker-compose.staging.yml up -d
             docker system prune -f

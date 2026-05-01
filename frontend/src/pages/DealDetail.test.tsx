@@ -141,6 +141,38 @@ describe('DealDetail payload-shape handling', () => {
     expect(screen.getByText('$675')).toBeInTheDocument();
   });
 
+  it('does not render unsafe original listing URLs', () => {
+    useDealMock.mockReturnValue({
+      data: {
+        id: 'deal-1',
+        source: 'ebay',
+        sourceId: 'source-1',
+        title: 'Unsafe URL Deal',
+        price: 100,
+        condition: 'good',
+        category: 'tech',
+        location: 'KC',
+        url: 'javascript:alert(1)',
+        createdAt: '2026-04-19T00:00:00.000Z',
+      },
+      loading: false,
+      error: null,
+      refetch: vi.fn(),
+    });
+    useCalculateTMVMock.mockReturnValue({ calculate: vi.fn(), loading: false, error: null });
+    useDealIntelligenceMock.mockReturnValue({ data: null, loading: false, error: null, refetch: vi.fn() });
+
+    render(
+      <MemoryRouter initialEntries={['/deals/deal-1']}>
+        <Routes>
+          <Route path="/deals/:id" element={<DealDetail />} />
+        </Routes>
+      </MemoryRouter>
+    );
+
+    expect(screen.queryByText(/view original listing/i)).not.toBeInTheDocument();
+  });
+
   it('recalculates analytics, refetches the deal, and renders returned tmv as a fallback', async () => {
     const refetch = vi.fn();
     useDealMock.mockReturnValue({

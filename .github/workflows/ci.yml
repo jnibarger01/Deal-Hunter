@@ -143,6 +143,9 @@ jobs:
       - name: Build frontend
         run: npm run build --workspace frontend
 
+      - name: Build MCP server
+        run: npm run build --workspace mcp
+
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -150,6 +153,7 @@ jobs:
           path: |
             server/dist/
             frontend/dist/
+            mcp/dist/
           retention-days: 7
 
   docker:

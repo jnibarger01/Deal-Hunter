@@ -122,6 +122,7 @@ const buildConnectionsPayload = async () => {
 
 router.get(
   '/',
+  authorizeOperatorOrAdminIfConfigured,
   asyncHandler(async (_req, res) => {
     res.json({
       success: true,
