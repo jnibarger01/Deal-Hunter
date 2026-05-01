@@ -4,6 +4,7 @@ export interface TMVConfig {
   minSamples: number;
   freshnessWindow: number;
   halfLifeDays: number;
+  decayRate?: number;
   minConfidence: number;
   comparableSimilarityThreshold: number;
   conditionFactors: Record<string, number>;

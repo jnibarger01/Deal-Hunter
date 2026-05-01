@@ -71,13 +71,13 @@ jobs:
       - name: Run database migrations
         working-directory: ./server
         env:
-          DATABASE_URL: "postgresql://test:***@localhost:5432/test?schema=public"
+          DATABASE_URL: "postgresql://test:test@localhost:5432/test?schema=public"
         run: npx prisma migrate deploy
 
       - name: Run tests with coverage
         working-directory: ./server
         env:
-          DATABASE_URL: "postgresql://test:***@localhost:5432/test?schema=public"
+          DATABASE_URL: "postgresql://test:test@localhost:5432/test?schema=public"
           JWT_SECRET: "test-jwt-secret-for-ci-32-characters-long"
         run: npm test
 

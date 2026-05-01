@@ -9,12 +9,12 @@
     ],
     "scripts": {
         "dev": "concurrently \"npm run dev:server\" \"npm run dev:frontend\"",
-        "dev:server": "cd server && npm run dev",
-        "dev:frontend": "cd frontend && npm run dev",
+        "dev:server": "npm run dev --workspace server",
+        "dev:frontend": "npm run dev --workspace frontend",
         "build": "concurrently \"npm run build:server\" \"npm run build:frontend\"",
-        "build:server": "cd server && npm run build",
-        "build:frontend": "cd frontend && npm run build",
-        "start": "cd server && npm start",
+        "build:server": "npm run build --workspace server",
+        "build:frontend": "npm run build --workspace frontend",
+        "start": "npm start --workspace server",
         "docker:up": "docker compose up -d",
         "docker:down": "docker compose down",
         "docker:build": "docker compose build"
