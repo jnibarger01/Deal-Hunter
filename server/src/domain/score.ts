@@ -5,7 +5,6 @@ interface TMVResult {
   confidence: number;
   volatility: Decimal;
   liquidityScore: number;
-  estimatedDaysToSell?: number | null;
 }
 
 interface Deal {
@@ -33,16 +32,12 @@ export class DealScorer {
     tmv: TMVResult,
     feeAssumptions: FeeAssumptions = {}
   ): ScoreResult {
-    if (tmv.confidence < 0.4) {
-      throw new Error('TMV confidence is below the minimum ranking threshold');
-    }
-
     const fees = this.calculateFees(deal.price, feeAssumptions);
 
     const netProfit = tmv.tmv.minus(deal.price).minus(fees);
     const profitMargin = netProfit.dividedBy(deal.price);
 
-    const velocityScore = this.calculateVelocity(tmv);
+    const velocityScore = new Decimal(tmv.liquidityScore);
     const riskScore = this.calculateRisk(tmv);
 
     const compositeRank = this.calculateComposite(
@@ -69,17 +64,9 @@ export class DealScorer {
     return platformFees.plus(shippingCost).plus(fixedFees);
   }
 
-  private calculateVelocity(tmv: TMVResult): Decimal {
-    const liquidityComponent = Math.min(Math.max(tmv.liquidityScore, 0), 1);
-    const daysToSell = tmv.estimatedDaysToSell;
-    const timeComponent = daysToSell == null ? liquidityComponent : 1 / (1 + daysToSell / 14);
-
-    return new Decimal(liquidityComponent * 0.6 + timeComponent * 0.4);
-  }
-
   private calculateRisk(tmv: TMVResult): Decimal {
-    const confidenceRisk = (1 - tmv.confidence) * 0.45;
-    const volatilityRisk = Math.min(tmv.volatility.toNumber(), 0.6) * 0.35;
+    const confidenceRisk = (1 - tmv.confidence) * 0.4;
+    const volatilityRisk = Math.min(tmv.volatility.toNumber(), 0.4);
     const liquidityRisk = (1 - Math.max(0, Math.min(1, tmv.liquidityScore))) * 0.2;
 
     return new Decimal(confidenceRisk + volatilityRisk + liquidityRisk);
@@ -96,8 +83,8 @@ export class DealScorer {
 
     const composite =
       (normalizedProfit * 0.5 +
-        normalizedVelocity * 0.25 +
-        (1 - normalizedRisk) * 0.25) *
+        normalizedVelocity * 0.3 +
+        (1 - normalizedRisk) * 0.2) *
       100;
 
     return new Decimal(Math.min(Math.max(composite, 0), 100));

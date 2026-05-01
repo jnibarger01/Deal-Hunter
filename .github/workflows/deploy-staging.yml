@@ -1,9 +1,8 @@
 name: Deploy to Staging
 
 on:
-  workflow_run:
-    workflows: [CI]
-    types: [completed]
+  push:
+    branches: [develop]
 
 env:
   REGISTRY: ghcr.io
@@ -12,7 +11,6 @@ env:
 jobs:
   deploy:
     name: Deploy to Staging
-    if: ${{ github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'develop' }}
     runs-on: ubuntu-latest
     environment: staging
     permissions:
@@ -22,8 +20,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.workflow_run.head_sha }}
 
       - name: Log in to Container Registry
         uses: docker/login-action@v3
@@ -43,7 +39,7 @@ jobs:
           push: true
           tags: |
             ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-server:staging
-            ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-server:${{ github.event.workflow_run.head_sha }}
+            ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-server:${{ github.sha }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -55,7 +51,7 @@ jobs:
           push: true
           tags: |
             ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-nginx:staging
-            ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-nginx:${{ github.event.workflow_run.head_sha }}
+            ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-nginx:${{ github.sha }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -68,12 +64,24 @@ jobs:
           key: ${{ secrets.STAGING_SSH_KEY }}
           script: |
             cd ${{ vars.DEPLOY_PATH }}
-            export REGISTRY=${{ env.REGISTRY }}
-            export IMAGE_PREFIX=${{ env.IMAGE_PREFIX }}
+            if [ -f .env ]; then set -a && . ./.env && set +a; fi
+            for name in DATABASE_URL JWT_SECRET SMTP_HOST SMTP_PORT SMTP_USER SMTP_PASS SMTP_FROM OPERATOR_INGEST_TOKEN OPERATOR_SECRET_KEY MARKETPLACE_DELETE_TOKEN; do
+              if [ -z "$(printenv "$name")" ]; then
+                echo "Missing required staging env var: $name" >&2
+                exit 1
+              fi
+            done
+            export REGISTRY=ghcr.io
+            export IMAGE_PREFIX=${{ github.repository_owner }}/deal-hunter
             export TAG=staging
             docker compose -f docker-compose.staging.yml pull
             docker compose -f docker-compose.staging.yml run --rm server npx prisma migrate deploy
             docker compose -f docker-compose.staging.yml up -d
-            curl -fsS http://localhost/health
-            curl -fsS http://localhost/ready
+            STAGING_BASE_URL="${{ vars.STAGING_BASE_URL }}"
+            STAGING_BASE_URL="${STAGING_BASE_URL%/}"
+            if [ -n "$STAGING_BASE_URL" ]; then
+              ./scripts/verify-production.sh \
+                --health-url "$STAGING_BASE_URL/health" \
+                --ready-url "$STAGING_BASE_URL/ready"
+            fi
             docker system prune -f

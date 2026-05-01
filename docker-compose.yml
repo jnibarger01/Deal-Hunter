@@ -25,22 +25,29 @@ services:
     depends_on:
       db:
         condition: service_healthy
+    env_file:
+      - ./server/.env
     environment:
-      - NODE_ENV=development
-      - PORT=5000
-      - DATABASE_URL=postgresql://dealhunter:dealhunter_dev_password@db:5432/dealhunter?schema=public
-      - JWT_SECRET=f971505a609dd75ef812ab00ed730748c21f9d6bbe1d5249e93e6e66a650e460386f3dd966f935c6266fed5300fdbfb18a91e8db45f6239a85e9834bfa1802fe
-      - API_VERSION=v1
-      - CORS_ORIGIN=http://localhost:5173
-      - LOG_LEVEL=info
+      NODE_ENV: development
+      PORT: 5000
+      API_VERSION: v1
+      DATABASE_URL: postgresql://dealhunter:dealhunter_dev_password@db:5432/dealhunter?schema=public
+      EBAY_APP_ID: ${EBAY_APP_ID:-}
+      EBAY_CLIENT_ID: ${EBAY_CLIENT_ID:-}
+      EBAY_CLIENT_SECRET: ${EBAY_CLIENT_SECRET:-}
+      EBAY_OAUTH_ENVIRONMENT: ${EBAY_OAUTH_ENVIRONMENT:-PRODUCTION}
+      FRONTEND_URL: http://localhost:8081
+      CORS_ORIGIN: http://localhost:5173,http://localhost:8081
+      TRUST_PROXY: 1
+      LOG_LEVEL: info
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:5000/health"]
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:5000/ready"]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 40s
     ports:
-      - "5000:5000"
+      - "5002:5000"
     networks:
       - deal-hunter-network
 
@@ -57,10 +64,16 @@ services:
     build:
       context: .
       dockerfile: docker/nginx.Dockerfile
-    ports:
-      - "8080:80"
     depends_on:
-      - server
+      server:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://127.0.0.1/nginx-health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    ports:
+      - "8081:80"
     networks:
       - deal-hunter-network
 

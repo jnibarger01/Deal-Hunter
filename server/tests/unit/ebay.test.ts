@@ -1,5 +1,9 @@
 import axios from 'axios';
-import { EbayClient } from '../../src/services/ebay';
+import {
+  EbayClient,
+  getLiveEbayKeywords,
+  isLiveEbayCategory,
+} from '../../src/services/ebay';
 
 jest.mock('axios');
 
@@ -14,6 +18,12 @@ describe('EbayClient', () => {
 
   beforeEach(() => {
     mockedAxios.get.mockReset();
+  });
+
+  it('recognizes live eBay categories and keyword queries', () => {
+    expect(isLiveEbayCategory('gaming')).toBe(true);
+    expect(isLiveEbayCategory('books')).toBe(false);
+    expect(getLiveEbayKeywords('tools')).toContain('milwaukee');
   });
 
   it('parses active listings from the API response', async () => {
@@ -48,9 +58,11 @@ describe('EbayClient', () => {
         itemId: '123',
         title: 'Item One',
         currentPrice: 9.99,
+        description: '',
         condition: 'New',
         categoryName: 'Gadgets',
         location: 'Austin, TX',
+        imageUrl: '',
         viewItemURL: 'https://example.com/1',
       },
     ]);
@@ -92,6 +104,8 @@ describe('EbayClient', () => {
 
     expect(results[0].condition).toBe('Unknown');
     expect(results[0].location).toBe('');
+    expect(results[0].description).toBe('');
+    expect(results[0].imageUrl).toBe('');
     expect(mockedAxios.get).toHaveBeenCalledWith(
       expect.any(String),
       expect.objectContaining({
@@ -100,6 +114,105 @@ describe('EbayClient', () => {
         }),
       })
     );
+  });
+
+  it('passes postal distance filters for active listings', async () => {
+    mockedAxios.get.mockResolvedValueOnce({
+      data: {
+        findItemsAdvancedResponse: [
+          {
+            searchResult: [
+              {
+                item: [],
+              },
+            ],
+          },
+        ],
+      },
+    });
+
+    await client.searchActiveListings('camera', undefined, 5, {
+      buyerPostalCode: '78701',
+      maxDistance: 25,
+    });
+
+    expect(mockedAxios.get).toHaveBeenCalledWith(
+      expect.any(String),
+      expect.objectContaining({
+        params: expect.objectContaining({
+          buyerPostalCode: '78701',
+          'itemFilter(0).name': 'MaxDistance',
+          'itemFilter(0).value': '25',
+          'itemFilter(1).name': 'LocatedIn',
+          'itemFilter(1).value': 'US',
+        }),
+      })
+    );
+  });
+
+  it('maps browse listings and location fallbacks for OAuth-backed live deals', async () => {
+    const oauthClient = new EbayClient({
+      appId: 'v^1.1#token',
+      certId: 'test-cert',
+      devId: 'test-dev',
+    });
+
+    mockedAxios.get.mockResolvedValueOnce({
+      data: {
+        itemSummaries: [
+          {
+            itemId: 'browse-1',
+            title: 'Browse Item',
+            shortDescription: 'Browse description',
+            image: { imageUrl: 'https://example.com/browse.jpg' },
+            price: { value: '101.50' },
+            condition: 'Open box',
+            categories: [{ categoryName: 'Electronics' }],
+            itemLocation: { city: 'Austin', stateOrProvince: 'TX', country: 'US' },
+            itemWebUrl: 'https://example.com/browse-1',
+          },
+          {
+            itemId: 'browse-2',
+            title: 'Country Item',
+            price: { value: 'not-a-number' },
+            itemLocation: { country: 'US' },
+          },
+          {
+            itemId: 'browse-3',
+            title: 'Unknown Location Item',
+          },
+        ],
+      },
+    });
+
+    const results = await oauthClient.searchLiveDeals('tech', 3);
+
+    expect(results[0]).toMatchObject({
+      sourceId: 'browse-1',
+      description: 'Browse description',
+      imageUrl: 'https://example.com/browse.jpg',
+      price: 101.5,
+      condition: 'Open box',
+      location: 'Austin, TX',
+      url: 'https://example.com/browse-1',
+    });
+    expect(results[1]).toMatchObject({
+      price: 0,
+      condition: 'Unknown',
+      location: 'US',
+    });
+    expect(results[2].location).toBe('');
+  });
+
+  it('skips completed listing calls for OAuth-backed clients', async () => {
+    const oauthClient = new EbayClient({
+      appId: 'v^1.1#token',
+      certId: 'test-cert',
+      devId: 'test-dev',
+    });
+
+    await expect(oauthClient.searchCompletedListings('camera')).resolves.toEqual([]);
+    expect(mockedAxios.get).not.toHaveBeenCalled();
   });
 
   it('parses sold listings and uses an EndTimeFrom filter', async () => {

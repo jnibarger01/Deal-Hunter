@@ -1,21 +1,32 @@
 // Core domain types aligned with PRD data model
 
+export type LiveEbayCategory = 'automotive' | 'gaming' | 'tech' | 'tvs' | 'speakers' | 'tools';
+
 export interface Deal {
   id: string;
   source: string;
   sourceId: string;
   title: string;
+  description?: string | null;
+  imageUrl?: string | null;
   price: number;
   condition: string | null;
   category: string;
   location: string | null;
-   region?: string | null;
   url: string | null;
-   description?: string | null;
-   status?: 'active' | 'sold' | 'expired';
   createdAt: string;
   tmv?: TMVResult;
   score?: Score;
+}
+
+export interface LiveEbayDeal extends Deal {
+  source: 'ebay';
+  description: string;
+  imageUrl: string;
+  condition: string;
+  category: LiveEbayCategory;
+  location: string;
+  url: string;
 }
 
 export interface MarketSample {
@@ -33,7 +44,7 @@ export interface TMVResult {
   sampleCount: number;
   volatility: number;
   liquidityScore: number;
-  estimatedDaysToSell: number | null;
+  estimatedDaysToSell: number;
   calculatedAt: string;
 }
 
@@ -53,9 +64,85 @@ export interface RankedDeal extends Deal {
 }
 
 export interface HealthStatus {
-  status: 'ok' | 'error' | 'ready' | 'not_ready';
+  status: 'ok' | 'error';
   timestamp: string;
   environment?: string;
+}
+
+export interface TMVAssumptions {
+  category: string | null;
+  source: string | null;
+  sampleSize: number;
+  recommendedMarkupPct: number;
+  recommendedFeePct: number;
+  recommendedDaysToSell: number;
+  confidence: number;
+}
+
+export interface TMVScenario {
+  id: string;
+  name: string;
+  category?: string | null;
+  source?: string | null;
+  buyPrice: number;
+  expectedSalePrice: number;
+  shippingCost: number;
+  platformFeePct: number;
+  prepCost: number;
+  taxPct: number;
+  notes?: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface DealIntelligence {
+  repairAnalysis: {
+    skillLevel: string;
+    summary: string;
+    likelyIssue: string;
+    partsCost: number;
+  };
+  marketDynamics: {
+    summary: string;
+    targetPrice: number;
+    priceHistory: number[];
+  };
+  negotiation: {
+    targetOffer: number;
+    openingScript: string;
+  };
+}
+
+export interface IngestSourceRecord {
+  id: string;
+  kind: string;
+  enabled: boolean;
+  lastRunAt?: string | null;
+  createdAt: string;
+  updatedAt: string;
+  config: {
+    rssUrl?: string;
+    lastAcceptedCount?: number;
+    lastFetchedCount?: number;
+    lastRejectedCount?: number;
+    lastError?: string | null;
+  };
+}
+
+export interface ConnectionsData {
+  ebay: {
+    status: 'configured' | 'missing_credentials';
+    lastLivePullAt: string | null;
+  };
+  craigslist: {
+    schedulerEnabled: boolean;
+    sources: IngestSourceRecord[];
+  };
+  facebook: {
+    status: 'configured' | 'not_configured';
+    profileName: string | null;
+    lastTestedAt: string | null;
+  };
 }
 
 // UI State types

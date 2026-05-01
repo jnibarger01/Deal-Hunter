@@ -1,11 +1,30 @@
 import request from 'supertest';
 import app from '../../src/app';
+import config from '../../src/config/env';
 import { prisma } from '../setup';
 
 describe('TMV API', () => {
+  const originalOperatorIngestToken = config.operatorIngestToken;
+
+  beforeEach(() => {
+    config.operatorIngestToken = 'operator-secret';
+  });
+
+  afterEach(() => {
+    config.operatorIngestToken = originalOperatorIngestToken;
+  });
+
+  it('rejects unauthenticated tmv calculation writes', async () => {
+    await request(app)
+      .post('/api/v1/tmv/calculate')
+      .send({ dealId: 'missing-deal' })
+      .expect(401);
+  });
+
   it('returns 404 when deal is not found', async () => {
     const response = await request(app)
       .post('/api/v1/tmv/calculate')
+      .set('X-Operator-Token', 'operator-secret')
       .send({ dealId: 'missing-deal' })
       .expect(404);
 
@@ -25,6 +44,7 @@ describe('TMV API', () => {
 
     const response = await request(app)
       .post('/api/v1/tmv/calculate')
+      .set('X-Operator-Token', 'operator-secret')
       .send({ dealId: deal.id })
       .expect(400);
 

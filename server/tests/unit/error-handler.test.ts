@@ -7,6 +7,13 @@ const createRes = () => {
   return res;
 };
 
+const createReq = () => ({
+  originalUrl: '/test',
+  method: 'GET',
+  ip: '127.0.0.1',
+  headers: {},
+});
+
 describe('errorHandler', () => {
   const originalEnv = process.env.NODE_ENV;
 
@@ -17,7 +24,7 @@ describe('errorHandler', () => {
   it('returns AppError details with stack in development', () => {
     process.env.NODE_ENV = 'development';
     const err = new AppError('Bad request', 400);
-    const req: any = { originalUrl: '/test', method: 'GET', ip: '127.0.0.1' };
+    const req: any = createReq();
     const res = createRes();
 
     errorHandler(err, req, res, jest.fn());
@@ -37,7 +44,7 @@ describe('errorHandler', () => {
   it('returns generic error without stack in production', () => {
     process.env.NODE_ENV = 'production';
     const err = new Error('Boom');
-    const req: any = { originalUrl: '/test', method: 'GET', ip: '127.0.0.1' };
+    const req: any = createReq();
     const res = createRes();
 
     errorHandler(err, req, res, jest.fn());
@@ -54,7 +61,7 @@ describe('errorHandler', () => {
   it('omits stack for AppError in production', () => {
     process.env.NODE_ENV = 'production';
     const err = new AppError('Forbidden', 403);
-    const req: any = { originalUrl: '/test', method: 'GET', ip: '127.0.0.1' };
+    const req: any = createReq();
     const res = createRes();
 
     errorHandler(err, req, res, jest.fn());

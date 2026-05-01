@@ -13,3 +13,16 @@ server/logs/
 # Coverage reports
 coverage/
 *.lcov
+.worktrees/
+.omx/
+
+# Accidental nested repo copy
+/deal-hunter/
+
+# Local agent/workbench artifacts
+.codex
+.hermes/
+CLAUDE.md
+
+# Local transcript / scratch dumps
+20*-*-*-*.txt

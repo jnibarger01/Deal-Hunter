@@ -1,171 +1,162 @@
 # Deal Hunter
 
-Deal Hunter is a Docker-first deal discovery and valuation platform for resellers. The current rebuild centers on **TMV Engine v1**: ingest listings, store sold-market samples, calculate a true market value, score deals for profitability and risk, and surface ranked opportunities through a React SPA.
+Operational baseline for Deal Hunter: a Node/Express/Prisma API, React/Vite frontend, and Docker Compose deployment assets.
 
-## Current Product Surface
+## Current Repo State
 
-Active frontend pages:
-- Dashboard
-- All Deals
-- Top Ranked Deals
-- Deal Detail with on-demand TMV analysis
+- npm workspaces repo with `server` and `frontend` packages.
+- Current product direction is operator-first deal ingestion, TMV/scoring, ranked opportunities, and deal intelligence.
+- Treat this as an active pre-launch codebase. Run the quality gates below before claiming deployability.
 
-Active backend endpoints:
-- `GET /health`
-- `GET /deals`
-- `GET /deals/:id`
-- `POST /tmv/calculate`
-- `GET /tmv/:dealId`
-- `POST /score`
-- `GET /ranked`
+## Project Layout
 
-Not in v1:
-- auth
-- watchlist
-- portfolio
-- alerts
-- calculator scenarios
+- `server/` — Express API, Prisma schema, Jest tests.
+- `frontend/` — React/Vite SPA.
+- `docker/` — Dockerfiles for runtime images.
+- `nginx/` — reverse proxy configuration.
+- `docker-compose.yml` — base local compose file.
+- `docker-compose.staging.yml` — staging stack for published images.
+- `docker-compose.prod.yml` — production stack for published images.
+- `docs/` — deployment and release notes.
 
-## Tech Stack
+## Environment Setup
 
-Backend:
-- Node.js 20
-- TypeScript
-- Express
-- Prisma
-- PostgreSQL 16
+Use placeholder values locally. Do not commit real credentials.
 
-Frontend:
-- React 18
-- Vite
-- TypeScript
-- React Router
-- CSS Modules
-
-Infrastructure:
-- Docker and Docker Compose
-- Nginx
-- GitHub Actions
-
-## Repository Layout
-
-```text
-deal-hunter/
-├── server/      # Express + Prisma API
-├── frontend/    # React + Vite SPA
-├── docker/      # Dockerfiles
-├── nginx/       # Nginx config
-├── docs/        # Runbooks and release docs
-└── .github/     # CI/CD workflows
+```bash
+cp server/.env.example server/.env
 ```
 
-## Local Development
+`server/.env.example` is the tracked template. `server/.env` is the local file consumed by the base Docker Compose server service.
 
-### Prerequisites
+Required local values:
 
-- Node.js 20
-- Docker
+- `DATABASE_URL` — local PostgreSQL URL.
+- `JWT_SECRET` — 32+ characters.
+- `API_KEY` — 32+ characters.
+- `FRONTEND_URL` and `CORS_ORIGIN` — local frontend/proxy origins.
 
-### Install dependencies
+External service keys such as eBay, Gemini, SMTP, and Facebook should stay empty unless testing those integrations intentionally.
+
+## Recommended Local Startup
+
+Install dependencies from the repo root:
 
 ```bash
 npm install
 ```
 
-### Run with Docker
+Start the local database:
 
 ```bash
-npm run docker:up
+docker compose up -d db
 ```
 
-Expected local ports:
-- frontend preview: `http://localhost:5173`
-- API: `http://localhost:5000`
-- nginx: `http://localhost:8080`
-- Postgres: `localhost:5433`
-
-### Run without Docker
-
-1. Start a Postgres database reachable at `DATABASE_URL`
-2. Generate Prisma client and apply migrations
+Generate Prisma client and create/update DB tables before calling API routes that depend on Prisma tables:
 
 ```bash
 cd server
 npm run prisma:generate
-npx prisma migrate deploy
+npm run prisma:migrate
+cd ..
 ```
 
-3. Start the app from the repo root
+Then run the app:
 
 ```bash
 npm run dev
 ```
 
-## Verification Commands
+Useful local URLs:
 
-Root build:
+- Frontend dev server: `http://localhost:5173`
+- API server: `http://localhost:5000`
+- Nginx proxy when compose nginx is running: `http://localhost:8081`
 
-```bash
-npm run build
-```
+## Docker Compose
 
-Backend tests with coverage:
-
-```bash
-cd server
-npm test
-```
-
-Frontend production build:
-
-```bash
-cd frontend
-npm run build
-```
-
-Compose config validation:
+Validate the base compose file:
 
 ```bash
 docker compose config
+docker compose -f docker-compose.staging.yml config
+docker compose -f docker-compose.prod.yml config
 ```
 
-## Data Model
+Staging and production config checks may warn about unset deployment variables in a local shell. That means the YAML renders, not that the target environment is ready.
 
-Core persisted models:
-- `Deal`
-- `MarketSample`
-- `TMVResult`
-- `Score`
+Start the base local stack:
 
-Supporting models still used in v1:
-- `CategoryConfig`
-- `MarketplaceSync`
+```bash
+docker compose up -d
+```
 
-## TMV Engine v1
+The README quick start must not be treated as a DB migration guarantee. Migrations are required before Prisma-backed API routes can work. Run the Prisma commands above when bootstrapping a fresh database.
 
-The TMV engine currently applies:
-- sold-sample filtering
-- freshness window filtering
-- IQR outlier rejection
-- exponential time decay weighting
-- weighted median valuation
-- confidence scoring from sample count, volatility, and recency
-- liquidity and estimated days-to-sell calculation
-- hard rejection for insufficient samples or confidence below threshold
+## Verified Commands
 
-## Deployment
+Use these commands as the current local gate:
 
-Main operational docs:
-- `docs/production.md`
-- `docs/release-checklist.md`
+| Area | Command | Result |
+| --- | --- | --- |
+| Install | `npm ci` | Installs workspace dependencies without generating Prisma at install time. |
+| Prisma client | `npm run prisma:generate --workspace server` | Generates the server Prisma client explicitly. |
+| Server lint | `npm run lint --workspace server` | Required before release. |
+| Server tests | `npm test --workspace server` | Required before release; needs migrated Postgres for integration paths. |
+| Server build/typecheck | `npm run build --workspace server` | Runs `tsc`. |
+| Frontend tests | `npm test --workspace frontend` | Required before release. |
+| Frontend build/typecheck | `npm run build --workspace frontend` | Runs `tsc && vite build`; this is the frontend static-analysis gate until frontend ESLint is added. |
+| Workspace build | `npm run build` | Builds server and frontend workspaces. |
+| Compose config | `docker compose config` | Validates local stack. |
+| Staging compose config | `docker compose -f docker-compose.staging.yml config` | Validates staging stack. |
+| Production compose config | `docker compose -f docker-compose.prod.yml config` | Validates production stack. |
 
-Staging and production deploys use:
-- Docker images built in GitHub Actions
-- `prisma migrate deploy` before app rollout
-- `/health` and `/ready` smoke checks after deploy
+## Known Issues / Next Fixes
 
-## Notes
+- No separate `workers/` workspace exists. Background behavior currently lives in the server process, including optional Craigslist scheduler startup.
+- Compose startup does not run migrations. Run Prisma migrations before using Prisma-backed API routes on a fresh database.
+- Frontend has tests but no frontend ESLint config yet. Use the frontend build/typecheck and test commands as the current frontend gates.
+- Operator ingest routes depend on strong `OPERATOR_INGEST_TOKEN` or admin JWT configuration. Do not expose them publicly without production secret verification.
 
-- This rebuild intentionally removes non-v1 product modules from the active UI and API surface.
-- Prisma migrations now include a fresh baseline for the rebuilt schema.
-- Nginx logs are written to stdout/stderr to support read-only containers.
+## Quality / Verification Commands
+
+Run these before treating a baseline as deployable:
+
+```bash
+npm ci
+npm run prisma:generate --workspace server
+npm run lint --workspace server
+npm test --workspace server
+npm test --workspace frontend
+npm run build
+
+docker compose config
+docker compose -f docker-compose.staging.yml config
+docker compose -f docker-compose.prod.yml config
+bash -n scripts/verify-production.sh
+```
+
+Expected current behavior:
+
+- Builds should pass for both workspaces.
+- Compose config should render for local, staging, and production files.
+- Integration tests require a reachable PostgreSQL database and migrated schema.
+
+## Runtime Notes
+
+- Health endpoints: `/health` and `/ready`.
+- API routes are mounted at both `/api/v1/*` and compatibility `/api/*` paths by the Express app.
+- Prisma-backed routes require generated Prisma client and migrated tables.
+- Keep Craigslist scheduler disabled unless recurring ingest is explicitly desired.
+
+## Deployment Docs
+
+- Production runbook: `docs/production.md`
+- Release checklist: `docs/release-checklist.md`
+
+## Security
+
+- Do not commit real credentials.
+- Use generated 32+ character values for local secrets.
+- Store production secrets in the deployment environment, not in git.
+- Avoid pasting full `docker compose config` output into issues or chat because it expands environment values from local env files.

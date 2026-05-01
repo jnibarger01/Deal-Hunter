@@ -1,9 +1,11 @@
 import { XMLParser } from 'fast-xml-parser';
-import prisma from '../config/database';
+import prisma from '../config/prisma';
 
 type CraigslistListing = {
   id: string;
   title: string;
+  description?: string;
+  imageUrl?: string;
   price: number;
   category: string;
   location?: string;
@@ -60,6 +62,25 @@ const getHostRegion = (url?: string): string | undefined => {
   }
 };
 
+const cleanText = (value?: string): string | undefined => {
+  if (!value) return undefined;
+  const cleaned = value
+    .replace(/<!\[CDATA\[|\]\]>/g, '')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+  return cleaned || undefined;
+};
+
+const extractImageUrl = (item: {
+  enclosure?: { '@_url'?: string } | Array<{ '@_url'?: string }>;
+  'media:content'?: { '@_url'?: string } | Array<{ '@_url'?: string }>;
+}): string | undefined => {
+  const enclosure = toArray(item.enclosure)[0]?.['@_url'];
+  const media = toArray(item['media:content'])[0]?.['@_url'];
+  return enclosure || media;
+};
+
 const inferCategory = (feedTitle?: string): string => {
   if (!feedTitle) return 'general';
   const normalized = feedTitle.toLowerCase();
@@ -97,6 +118,10 @@ export const fetchCraigslistFeed = async (
           title?: string;
           link?: string;
           guid?: string | { '#text'?: string };
+          description?: string;
+          'content:encoded'?: string;
+          enclosure?: { '@_url'?: string } | Array<{ '@_url'?: string }>;
+          'media:content'?: { '@_url'?: string } | Array<{ '@_url'?: string }>;
           pubDate?: string;
         }>;
       };
@@ -121,6 +146,8 @@ export const fetchCraigslistFeed = async (
     return {
       id,
       title,
+      description: cleanText(item['content:encoded'] ?? item.description),
+      imageUrl: extractImageUrl(item),
       price: extractPrice(rawTitle),
       category,
       location: extractLocationFromTitle(rawTitle),
@@ -166,19 +193,26 @@ export const ingestCraigslistFromFeeds = async (
               source: 'craigslist',
               sourceId: listing.id,
               title: listing.title,
+              description: listing.description,
+              imageUrl: listing.imageUrl,
               price: listing.price,
               category: listing.category,
               location: listing.location,
               region,
               url: listing.url,
+              marketplace: 'Craigslist',
+              itemUrl: listing.url,
             },
             update: {
               title: listing.title,
+              description: listing.description,
+              imageUrl: listing.imageUrl,
               price: listing.price,
               category: listing.category,
               location: listing.location,
               region,
               url: listing.url,
+              itemUrl: listing.url,
             },
           });
 

@@ -2,6 +2,7 @@ import { ExternalLink, TrendingUp, Clock, Shield, BarChart3 } from 'lucide-react
 import { Link } from 'react-router-dom';
 import type { RankedDeal, Deal } from '../../types';
 import { Badge, ConfidenceBadge, RiskBadge, ConditionBadge } from './Badge';
+import { getSafeExternalUrl } from '../../utils/url';
 import styles from './DealCard.module.css';
 
 interface DealCardProps {
@@ -31,9 +32,14 @@ export function DealCard({ deal, rank, variant = 'default' }: DealCardProps) {
   const hasAnalytics = isRankedDeal(deal);
   const profitAmount = hasAnalytics ? deal.tmv.tmv - deal.price : 0;
   const profitPercent = hasAnalytics ? deal.score.profitMargin : 0;
+  const safeExternalUrl = getSafeExternalUrl(deal.url);
 
   return (
     <div className={`${styles.card} ${styles[`variant-${variant}`]}`}>
+      {deal.imageUrl ? (
+        <img className={styles.thumbnail} src={deal.imageUrl} alt={deal.title} loading="lazy" />
+      ) : null}
+
       {/* Rank indicator */}
       {rank && (
         <div className={styles.rank}>
@@ -112,9 +118,9 @@ export function DealCard({ deal, rank, variant = 'default' }: DealCardProps) {
           <Link to={`/deals/${deal.id}`} className={styles.actionLink}>
             View Details
           </Link>
-          {deal.url ? (
+          {safeExternalUrl ? (
             <a
-              href={deal.url}
+              href={safeExternalUrl}
               target="_blank"
               rel="noopener noreferrer"
               className={styles.externalLink}

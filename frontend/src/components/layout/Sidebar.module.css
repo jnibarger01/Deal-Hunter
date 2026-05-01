@@ -175,6 +175,16 @@
   animation: pulse 2s ease-in-out infinite;
 }
 
+.statusDotError {
+  background: var(--color-loss, #ef4444);
+  box-shadow: 0 0 8px var(--color-loss-glow, rgba(239, 68, 68, 0.5));
+}
+
+.statusDotLoading {
+  background: var(--color-text-tertiary);
+  box-shadow: none;
+}
+
 @keyframes pulse {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.6; }
@@ -193,6 +203,14 @@
   font-size: var(--text-sm);
   font-weight: var(--weight-semibold);
   color: var(--color-profit-text);
+}
+
+.statusValueError {
+  color: var(--color-loss-text, #f87171);
+}
+
+.statusValueLoading {
+  color: var(--color-text-tertiary);
 }
 
 /* Footer */

@@ -1,5 +1,5 @@
 import dotenv from 'dotenv';
-import prisma from '../src/config/database';
+import prisma from '../src/config/prisma';
 import { EbayClient } from '../src/services/ebay';
 import config from '../src/config/env';
 

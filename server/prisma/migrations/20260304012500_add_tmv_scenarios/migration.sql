@@ -1,0 +1,1 @@
+-- No-op: TMVScenario is included in baseline migration for PostgreSQL provider.

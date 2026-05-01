@@ -1,23 +1,34 @@
-import { execSync } from 'node:child_process';
 import { PrismaClient } from '@prisma/client';
+import { buildTestEnvironment, syncPrismaTestSchema } from './setup-env';
 
-process.env.DATABASE_URL =
-  process.env.DATABASE_URL ?? 'postgresql://dealhunter:dealhunter_dev_password@localhost:5433/dealhunter?schema=public';
-
-execSync('npx prisma db push --skip-generate', {
-  env: process.env,
-  stdio: 'ignore',
-});
+process.env = buildTestEnvironment(process.env);
+syncPrismaTestSchema(process.env);
 
 const prisma = new PrismaClient();
 
-beforeEach(async () => {
+async function resetDatabase() {
+  await prisma.refreshToken.deleteMany({});
+  await prisma.oneTimeToken.deleteMany({});
+  await prisma.watchlistItem.deleteMany({});
+  await prisma.portfolioItem.deleteMany({});
+  await prisma.alert.deleteMany({});
   await prisma.score.deleteMany({});
   await prisma.tMVResult.deleteMany({});
+  await prisma.tMVScenario.deleteMany({});
   await prisma.marketSample.deleteMany({});
   await prisma.deal.deleteMany({});
+  await prisma.user.deleteMany({});
+  await prisma.ingestSource.deleteMany({});
   await prisma.marketplaceSync.deleteMany({});
-  await prisma.categoryConfig.deleteMany({});
+  await prisma.operatorSecret.deleteMany({});
+}
+
+beforeAll(async () => {
+  await resetDatabase();
+});
+
+afterEach(async () => {
+  await resetDatabase();
 });
 
 afterAll(async () => {
