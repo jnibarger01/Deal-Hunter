@@ -5,13 +5,17 @@
 - [ ] `npm --prefix server run lint`
 - [ ] `npm --prefix server run build`
 - [ ] `npm --prefix frontend run build`
-- [ ] `npm --prefix server test`
+- [ ] `npm --prefix server run test`
+- [ ] `npm --prefix frontend run test`
 - [ ] CI checks green on `main`
 
 ## 2) Config and secrets
 
 - [ ] `DATABASE_URL` points to **Supabase production**
 - [ ] `JWT_SECRET` length >= 32
+- [ ] `API_KEY` length >= 32
+- [ ] `OPERATOR_INGEST_TOKEN` length >= 32 if operator ingest is enabled
+- [ ] `OPERATOR_SECRET_KEY` length >= 32 if Facebook cookie storage or other encrypted operator secrets are enabled
 - [ ] SMTP vars present and validated
 - [ ] `CORS_ORIGIN` + `FRONTEND_URL` match production domain(s)
 - [ ] `TRUST_PROXY` set correctly for nginx/reverse proxy
@@ -30,6 +34,7 @@
 - [ ] `docker compose -f docker-compose.prod.yml config`
 - [ ] `docker compose -f docker-compose.prod.yml build --no-cache server nginx`
 - [ ] `docker compose -f docker-compose.prod.yml up -d --force-recreate server nginx`
+- [ ] `./scripts/verify-production.sh --health-url <production-ready-url>`
 - [ ] `GET /nginx-health` returns 200
 - [ ] `GET /health` returns 200
 - [ ] `GET /ready` returns 200 (DB connected)

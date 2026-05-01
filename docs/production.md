@@ -4,10 +4,9 @@ This is the production/runtime notes file for the current Deal Hunter baseline.
 
 ## Current baseline state
 
-- Standalone baseline repo.
-- One baseline commit exists.
-- Expected clean baseline state: no active code diff except untracked `.codex/`.
-- This document records runtime/deployment findings only; it does not imply application code fixes have landed.
+- npm workspaces repo with `server` and `frontend` packages.
+- Active pre-launch codebase. Treat production deployment as blocked until release checklist gates pass.
+- Runtime stack is server plus nginx images, with the frontend static bundle served by nginx.
 
 ## Required server env vars
 
@@ -18,7 +17,7 @@ Use real values only in the deployment environment or secret manager. Keep commi
 - `API_VERSION=v1`
 - `DATABASE_URL=<postgres-uri>`
 - `JWT_SECRET=<32+ character secret>`
-- `API_KEY=<32+ character secret>` if the runtime path requires it
+- `API_KEY=<32+ character secret>`
 - `JWT_EXPIRES_IN=7d`
 - `JWT_REFRESH_EXPIRES_IN=30d`
 - `FRONTEND_URL=https://<frontend-domain>`
@@ -58,37 +57,34 @@ Run migrations before exercising API routes that depend on Prisma tables. The de
 
 ## Verification commands
 
-Baseline/code-review findings:
-
 ```bash
-cd server && npm test              # passes when run outside sandbox
-cd server && npm run build         # passes
-cd frontend && npm run build       # passes
-cd workers && npm run build        # not runnable in this checkout; workers/ is absent
+cd server && npm run lint
+cd server && npm test              # requires migrated Postgres for integration paths
+cd frontend && npm test
+cd server && npm run build         # TypeScript build
+cd frontend && npm run build       # TypeScript + Vite build
+npm run build                      # workspace build
 
-docker compose config              # passes
-docker compose -f docker-compose.prod.yml config  # currently fails alone
+docker compose config
+docker compose -f docker-compose.staging.yml config
+docker compose -f docker-compose.prod.yml config
 ```
 
 ## Compose status
 
 - `docker-compose.yml` is the base local compose file.
-- `docker-compose.prod.yml` is not currently standalone-valid. `nginx` depends on an undefined `frontend` service.
-- Treat `docker compose -f docker-compose.prod.yml config` failure as an expected known issue until the compose topology is fixed.
+- `docker-compose.staging.yml` and `docker-compose.prod.yml` run the published server and nginx images.
+- Nginx serves the built frontend and proxies `/api`, `/health`, and `/ready` to the server container.
+- Local `docker compose -f docker-compose.prod.yml config` may warn when deployment variables are unset. Treat a rendered config as syntax/topology validation only; runtime readiness still requires real secret values and a migrated database.
 
 ## Known Issues / Next Fixes
 
-- `docker-compose.yml` uses `API_KEY=dev-api-key-change-in-prod`, but server env validation requires 32+ characters.
-- Workers service is referenced by compose/review findings, but no `workers/` package exists in this checkout. The referenced runtime path is `dist/workers/scheduler.js`; verify the compose topology before adding or wiring a worker image.
-- `docker-compose.prod.yml` is not standalone-valid because `nginx` depends on undefined `frontend`.
-- README quick start may not create DB tables because migrations are behind a compose profile or otherwise outside the default startup path.
-- `/api` proxy paths are forwarded unchanged, but Express routes are mounted without `/api` prefix.
+- Compose startup does not run migrations. Run `prisma migrate deploy` for staging/production before routing traffic to Prisma-backed endpoints.
+- No separate `workers/` image exists. Optional scheduler behavior runs in the server process when configured.
 - Ranked scoring currently sorts by raw fields instead of `compositeScore`.
 - Score route limit parsing can produce `NaN`; invalid input should return 400.
-- Quality scripts are currently broken or incomplete:
-  - server lint does not target existing TS files correctly.
-  - frontend lint has no ESLint config.
-  - server `test:tmv` points at the wrong test path.
+- Frontend has no lint script/config yet. Use frontend tests and `npm run build` as current frontend gates.
+- `OPERATOR_INGEST_TOKEN` and `OPERATOR_SECRET_KEY` are optional in the schema but required for a safe operator deployment.
 
 ## Deployment checks
 
@@ -100,7 +96,7 @@ npm --prefix server run build
 npm --prefix frontend run build
 ```
 
-Do not deploy from `docker-compose.prod.yml` alone until its undefined service dependency is fixed.
+Do not deploy unless CI is green, migrations have been applied, and `scripts/verify-production.sh` passes against the target environment.
 
 ## Health checks
 
