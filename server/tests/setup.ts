@@ -13,6 +13,7 @@ async function resetDatabase() {
   await prisma.alert.deleteMany({});
   await prisma.score.deleteMany({});
   await prisma.tMVResult.deleteMany({});
+  await prisma.tMVScenario.deleteMany({});
   await prisma.marketSample.deleteMany({});
   await prisma.deal.deleteMany({});
   await prisma.user.deleteMany({});

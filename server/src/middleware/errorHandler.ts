@@ -19,13 +19,14 @@ export const errorHandler = (
   res: Response,
   _next: NextFunction
 ) => {
-  const requestId = req.headers['x-request-id']?.toString() ?? null;
+  const headers = req.headers ?? {};
+  const requestId = headers['x-request-id']?.toString() ?? null;
   const context = {
     requestId,
     method: req.method,
     path: req.originalUrl,
     ip: req.ip,
-    userAgent: req.headers['user-agent'] ?? null,
+    userAgent: headers['user-agent'] ?? null,
     message: err.message,
     stack: err.stack,
     sentryEnabled: Boolean(process.env.SENTRY_DSN),
