@@ -5,6 +5,7 @@ import prisma from '../config/database';
 import { TMVCalculator } from '../domain/tmv';
 import tmvConfig from '../config/tmv';
 import { DealScorer } from '../domain/score';
+import { authorizeOperatorOrAdmin } from '../middleware/auth';
 import { validate } from '../middleware/validation';
 import asyncHandler from '../utils/asyncHandler';
 
@@ -31,6 +32,7 @@ const decimalToNumber = (value: Decimal | null | undefined): number | null => {
 
 router.post(
   '/tmv/calculate',
+  authorizeOperatorOrAdmin,
   validate(calculateValidation),
   asyncHandler(async (req, res) => {
     const dealId = String(req.body.dealId);
@@ -123,6 +125,7 @@ router.get(
 
 router.post(
   '/score',
+  authorizeOperatorOrAdmin,
   validate(scoreValidation),
   asyncHandler(async (req, res) => {
     const dealId = String(req.body.dealId);

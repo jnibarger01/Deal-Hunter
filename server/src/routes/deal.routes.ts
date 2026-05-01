@@ -4,7 +4,7 @@ import rateLimit from 'express-rate-limit';
 import { body, param, query } from 'express-validator';
 import dealController from '../controllers/deal.controller';
 import { validate } from '../middleware/validation';
-import { authenticate, authorize } from '../middleware/auth';
+import { authenticate, authorize, authorizeOperatorOrAdmin } from '../middleware/auth';
 import asyncHandler from '../utils/asyncHandler';
 import config from '../config/env';
 import analyticsService from '../services/analytics.service';
@@ -95,16 +95,58 @@ const liveEbayValidation = [
   query('limit').optional().isInt({ min: 1, max: 24 }).toInt(),
 ];
 
+const getLiveEbayPayload = async (req: Request) => {
+  const hasLegacyCredential = Boolean(config.apiKeys.ebay);
+  const hasOAuthClientCredentials = Boolean(
+    config.apiKeys.ebayClientId && config.apiKeys.ebayClientSecret
+  );
+
+  if (!hasLegacyCredential && !hasOAuthClientCredentials) {
+    return {
+      errorStatus: 503,
+      errorMessage:
+        'eBay credentials are not configured. Set EBAY_APP_ID or both EBAY_CLIENT_ID and EBAY_CLIENT_SECRET.',
+    };
+  }
+
+  const category = typeof req.query.category === 'string' && isLiveEbayCategory(req.query.category)
+    ? req.query.category
+    : 'tech';
+  const limit = Number(req.query.limit ?? 12);
+  const ebay = new EbayClient({
+    appId: config.apiKeys.ebay ?? '',
+    certId: '',
+    devId: '',
+    oauthClientId: config.apiKeys.ebayClientId,
+    oauthClientSecret: config.apiKeys.ebayClientSecret,
+    oauthEnvironment: config.apiKeys.ebayOAuthEnvironment,
+  });
+  const deals = await ebay.searchLiveDeals(category, limit);
+
+  return {
+    category,
+    ebay,
+    deals,
+  };
+};
+
+const sendLiveEbayUpstreamAuthError = (res: Response, usesOAuthTokenOnly: boolean) => {
+  res.status(503).json({
+    success: false,
+    error: {
+      message: usesOAuthTokenOnly
+        ? 'eBay OAuth token is invalid or expired. Configure EBAY_CLIENT_ID and EBAY_CLIENT_SECRET, or provide a valid EBAY_APP_ID.'
+        : 'eBay credentials were rejected upstream. Verify EBAY_APP_ID or the OAuth client credentials.',
+    },
+  });
+};
+
 router.get('/', validate(listDealsValidation), dealController.getAllDeals);
-// NOTE: public endpoint (Dashboard consumes it unauthenticated). Rate-limit only.
-// If the Dashboard ever moves behind auth, add `authenticate` here and consider
-// whether persistLiveEbayDeals should be admin-gated since it does DB writes.
 router.get(
   '/live/ebay',
   liveEbayLimiter,
   validate(liveEbayValidation),
   asyncHandler(async (req, res) => {
-    const hasLegacyCredential = Boolean(config.apiKeys.ebay);
     const hasOAuthClientCredentials = Boolean(
       config.apiKeys.ebayClientId && config.apiKeys.ebayClientSecret
     );
@@ -112,53 +154,73 @@ router.get(
       config.apiKeys.ebay?.startsWith('v^1.1#') && !hasOAuthClientCredentials
     );
 
-    if (!hasLegacyCredential && !hasOAuthClientCredentials) {
-      res.status(503).json({
-        success: false,
-        error: {
-          message:
-            'eBay credentials are not configured. Set EBAY_APP_ID or both EBAY_CLIENT_ID and EBAY_CLIENT_SECRET.',
-        },
-      });
-      return;
-    }
-
-    const category = typeof req.query.category === 'string' && isLiveEbayCategory(req.query.category)
-      ? req.query.category
-      : 'tech';
-    const limit = Number(req.query.limit ?? 12);
-    const ebay = new EbayClient({
-      appId: config.apiKeys.ebay ?? '',
-      certId: '',
-      devId: '',
-      oauthClientId: config.apiKeys.ebayClientId,
-      oauthClientSecret: config.apiKeys.ebayClientSecret,
-      oauthEnvironment: config.apiKeys.ebayOAuthEnvironment,
-    });
-
     try {
-      const deals = await ebay.searchLiveDeals(category, limit);
-      const persistedDeals = await analyticsService.persistLiveEbayDeals(ebay, deals);
+      const payload = await getLiveEbayPayload(req);
+
+      if ('errorStatus' in payload) {
+        res.status(payload.errorStatus).json({
+          success: false,
+          error: { message: payload.errorMessage },
+        });
+        return;
+      }
 
       res.status(200).json({
         success: true,
         data: {
           source: 'ebay',
-          category,
+          category: payload.category,
+          deals: payload.deals,
+        },
+      });
+      return;
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.response?.status === 401) {
+        sendLiveEbayUpstreamAuthError(res, usesOAuthTokenOnly);
+        return;
+      }
+
+      throw error;
+    }
+  })
+);
+
+router.post(
+  '/live/ebay',
+  authorizeOperatorOrAdmin,
+  liveEbayLimiter,
+  validate(liveEbayValidation),
+  asyncHandler(async (req, res) => {
+    const usesOAuthTokenOnly = Boolean(
+      config.apiKeys.ebay?.startsWith('v^1.1#') &&
+        !(config.apiKeys.ebayClientId && config.apiKeys.ebayClientSecret)
+    );
+
+    try {
+      const payload = await getLiveEbayPayload(req);
+
+      if ('errorStatus' in payload) {
+        res.status(payload.errorStatus).json({
+          success: false,
+          error: { message: payload.errorMessage },
+        });
+        return;
+      }
+
+      const persistedDeals = await analyticsService.persistLiveEbayDeals(payload.ebay, payload.deals);
+
+      res.status(200).json({
+        success: true,
+        data: {
+          source: 'ebay',
+          category: payload.category,
           deals: persistedDeals,
         },
       });
       return;
     } catch (error) {
       if (axios.isAxiosError(error) && error.response?.status === 401) {
-        res.status(503).json({
-          success: false,
-          error: {
-            message: usesOAuthTokenOnly
-              ? 'eBay OAuth token is invalid or expired. Configure EBAY_CLIENT_ID and EBAY_CLIENT_SECRET, or provide a valid EBAY_APP_ID.'
-              : 'eBay credentials were rejected upstream. Verify EBAY_APP_ID or the OAuth client credentials.',
-          },
-        });
+        sendLiveEbayUpstreamAuthError(res, usesOAuthTokenOnly);
         return;
       }
 

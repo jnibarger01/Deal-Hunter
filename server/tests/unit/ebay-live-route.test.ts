@@ -80,7 +80,7 @@ describe('live eBay deals route', () => {
     return require('../../src/app').default;
   }
 
-  it('allows live eBay pulls when OAuth client credentials are configured without a pre-minted api key', async () => {
+  it('previews live eBay pulls without persisting when OAuth client credentials are configured without a pre-minted api key', async () => {
     delete process.env.EBAY_API_KEY;
     process.env.EBAY_CLIENT_ID = 'client-id';
     process.env.EBAY_CLIENT_SECRET = 'client-secret';
@@ -101,7 +101,6 @@ describe('live eBay deals route', () => {
     ];
 
     searchLiveDealsMock.mockResolvedValueOnce(liveDeals);
-    persistLiveEbayDealsMock.mockResolvedValueOnce(liveDeals);
 
     const app = await loadApp();
 
@@ -110,7 +109,19 @@ describe('live eBay deals route', () => {
       .expect(200);
 
     expect(searchLiveDealsMock).toHaveBeenCalledWith('tech', 1);
+    expect(persistLiveEbayDealsMock).not.toHaveBeenCalled();
     expect(response.body.success).toBe(true);
     expect(response.body.data.deals).toHaveLength(1);
+  });
+
+  it('rejects unauthenticated live eBay persistence requests', async () => {
+    const app = await loadApp();
+
+    await request(app)
+      .post('/api/v1/deals/live/ebay?category=tech&limit=1')
+      .expect(401);
+
+    expect(searchLiveDealsMock).not.toHaveBeenCalled();
+    expect(persistLiveEbayDealsMock).not.toHaveBeenCalled();
   });
 });

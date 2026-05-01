@@ -1,9 +1,20 @@
 import request from 'supertest';
 import { ListingStatus } from '@prisma/client';
 import app from '../../src/app';
+import config from '../../src/config/env';
 import { prisma } from '../setup';
 
 describe('Analysis API', () => {
+  const originalOperatorIngestToken = config.operatorIngestToken;
+
+  beforeEach(() => {
+    config.operatorIngestToken = 'operator-secret';
+  });
+
+  afterEach(() => {
+    config.operatorIngestToken = originalOperatorIngestToken;
+  });
+
   it('calculates tmv, score, and returns ranked deals', async () => {
     const deal = await prisma.deal.create({
       data: {
@@ -38,6 +49,7 @@ describe('Analysis API', () => {
 
     const tmvResponse = await request(app)
       .post('/api/v1/tmv/calculate')
+      .set('X-Operator-Token', 'operator-secret')
       .send({ dealId: deal.id })
       .expect(200);
 
@@ -52,6 +64,7 @@ describe('Analysis API', () => {
 
     const scoreResponse = await request(app)
       .post('/api/v1/score')
+      .set('X-Operator-Token', 'operator-secret')
       .send({
         dealId: deal.id,
         feeAssumptions: {
