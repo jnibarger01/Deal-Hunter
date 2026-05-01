@@ -63,6 +63,8 @@ jobs:
 
       - name: Generate Prisma client
         working-directory: ./server
+        env:
+          DATABASE_URL: "postgresql://test:test@localhost:5432/test?schema=public"
         run: |
           # Remove any stale generated client to force fresh generation
           rm -rf node_modules/.prisma
@@ -128,6 +130,8 @@ jobs:
       # Build Server
       - name: Generate Prisma client
         working-directory: ./server
+        env:
+          DATABASE_URL: "postgresql://test:test@localhost:5432/test?schema=public"
         run: |
           rm -rf node_modules/.prisma
           npx prisma generate

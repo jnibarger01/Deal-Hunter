@@ -45,6 +45,8 @@ jobs:
 
       - name: Generate Prisma client
         working-directory: ./server
+        env:
+          DATABASE_URL: "postgresql://test:${{ env.CI_POSTGRES_PASSWORD }}@localhost:5432/test?schema=public"
         run: npx prisma generate
 
       - name: Run database migrations
