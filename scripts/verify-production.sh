@@ -3,19 +3,20 @@ set -euo pipefail
 
 ENV_FILE="server/.env"
 HEALTH_URL="${HEALTHCHECK_URL:-}"
+READY_URL="${READINESS_URL:-}"
 RANKED_URL="${RANKED_URL:-}"
 CONNECTIONS_URL="${CONNECTIONS_URL:-}"
 OPERATOR_TOKEN="${OPERATOR_INGEST_TOKEN:-}"
 
 usage() {
   cat <<'EOF'
-Usage: ./scripts/verify-production.sh [--env-file <path>] [--health-url <url>] [--ranked-url <url>] [--connections-url <url>] [--operator-token <token>]
+Usage: ./scripts/verify-production.sh [--env-file <path>] [--health-url <url>] [--ready-url <url>] [--ranked-url <url>] [--connections-url <url>] [--operator-token <token>]
 
 Examples:
   ./scripts/verify-production.sh --env-file server/.env
-  ./scripts/verify-production.sh --health-url https://api.example.com/ready
-  ./scripts/verify-production.sh --health-url https://api.example.com/ready --ranked-url https://api.example.com/api/v1/ranked?limit=1
-  ./scripts/verify-production.sh --health-url https://api.example.com/ready --connections-url https://api.example.com/api/v1/connections
+  ./scripts/verify-production.sh --health-url https://api.example.com/health --ready-url https://api.example.com/ready
+  ./scripts/verify-production.sh --health-url https://api.example.com/health --ready-url https://api.example.com/ready --ranked-url https://api.example.com/api/v1/ranked?limit=1
+  ./scripts/verify-production.sh --health-url https://api.example.com/health --ready-url https://api.example.com/ready --connections-url https://api.example.com/api/v1/connections
 EOF
 }
 
@@ -27,6 +28,10 @@ while [[ $# -gt 0 ]]; do
       ;;
     --health-url)
       HEALTH_URL="$2"
+      shift 2
+      ;;
+    --ready-url)
+      READY_URL="$2"
       shift 2
       ;;
     --ranked-url)
@@ -76,6 +81,21 @@ warn() {
   warnings=$((warnings + 1))
 }
 
+check_status_url() {
+  local label="$1"
+  local url="$2"
+  local expected="$3"
+
+  if ! body="$(curl -fsS "$url" 2>/dev/null)"; then
+    echo "❌ $label check failed: $url"
+    failures=$((failures + 1))
+  elif [[ "$body" == *"\"status\":\"$expected\""* || "$body" == *"\"status\": \"$expected\""* ]]; then
+    echo "✅ $label endpoint OK: $url"
+  else
+    warn "$label response missing status=$expected"
+  fi
+}
+
 require_var NODE_ENV
 require_var DATABASE_URL
 require_var JWT_SECRET
@@ -107,17 +127,23 @@ if [[ -z "${TRUST_PROXY:-}" ]]; then
   warn "TRUST_PROXY is unset"
 fi
 
-if [[ -n "$HEALTH_URL" ]]; then
-  if ! body="$(curl -fsS "$HEALTH_URL" 2>/dev/null)"; then
-    echo "❌ Health check failed: $HEALTH_URL"
-    failures=$((failures + 1))
-  elif [[ "$body" == *'"status":"ok"'* || "$body" == *'"status":"ready"'* || "$body" == *'"status": "ok"'* || "$body" == *'"status": "ready"'* ]]; then
-    echo "✅ Health endpoint OK: $HEALTH_URL"
-  else
-    warn "Health response missing status=ok/ready"
+if [[ -n "$HEALTH_URL" || -n "$READY_URL" ]]; then
+  if [[ -z "$READY_URL" && "$HEALTH_URL" == */health ]]; then
+    READY_URL="${HEALTH_URL%/health}/ready"
+  fi
+  if [[ -z "$HEALTH_URL" && "$READY_URL" == */ready ]]; then
+    HEALTH_URL="${READY_URL%/ready}/health"
   fi
 
-  base_url="${HEALTH_URL%/ready}"
+  if [[ -n "$HEALTH_URL" ]]; then
+    check_status_url "Health" "$HEALTH_URL" "ok"
+  fi
+  if [[ -n "$READY_URL" ]]; then
+    check_status_url "Readiness" "$READY_URL" "ready"
+  fi
+
+  base_url="${READY_URL:-$HEALTH_URL}"
+  base_url="${base_url%/ready}"
   base_url="${base_url%/health}"
 
   if [[ -z "$RANKED_URL" ]]; then

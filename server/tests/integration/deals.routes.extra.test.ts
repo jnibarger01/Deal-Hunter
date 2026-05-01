@@ -60,6 +60,72 @@ describe('Deals extra routes', () => {
     expect(response.body[0]).toHaveProperty('score');
   });
 
+  it('rejects invalid ranked limits', async () => {
+    await request(app)
+      .get('/api/v1/ranked?limit=not-a-number')
+      .expect(400);
+  });
+
+  it('orders ranked deals by displayed composite rank', async () => {
+    await prisma.tMVResult.create({
+      data: {
+        dealId,
+        tmv: 130,
+        confidence: 0.7,
+        sampleCount: 8,
+        volatility: 0.3,
+        liquidityScore: 0.75,
+        estimatedDaysToSell: 6,
+      },
+    });
+    await prisma.score.create({
+      data: {
+        dealId,
+        profitMargin: 0.8,
+        velocityScore: 0.9,
+        riskScore: 0.1,
+        compositeRank: 60,
+      },
+    });
+    const betterDeal = await prisma.deal.create({
+      data: {
+        title: 'Higher Composite Rank Deal',
+        price: 120,
+        category: 'coverage',
+        source: 'ebay',
+        sourceId: `coverage-high-${Date.now()}`,
+        status: 'active',
+      },
+    });
+    await prisma.tMVResult.create({
+      data: {
+        dealId: betterDeal.id,
+        tmv: 160,
+        confidence: 0.8,
+        sampleCount: 10,
+        volatility: 0.2,
+        liquidityScore: 0.8,
+        estimatedDaysToSell: 5,
+      },
+    });
+    await prisma.score.create({
+      data: {
+        dealId: betterDeal.id,
+        profitMargin: 0.1,
+        velocityScore: 0.2,
+        riskScore: 0.6,
+        compositeRank: 95,
+      },
+    });
+
+    const response = await request(app)
+      .get('/api/v1/ranked?limit=2')
+      .expect(200);
+
+    expect(response.body.map((deal: { id: string }) => deal.id)).toEqual([betterDeal.id, dealId]);
+    expect(response.body.map((deal: { score: { compositeRank: number } }) => deal.score.compositeRank)).toEqual([95, 60]);
+  });
+
   it('scores a deal and handles not-found / missing tmv branches', async () => {
     await request(app)
       .post('/api/v1/score')

@@ -2,6 +2,7 @@ import { FormEvent, useMemo, useState } from 'react';
 import { RotateCcw } from 'lucide-react';
 import { Header } from '../components/layout';
 import { Card, CardContent, CardHeader, Button } from '../components/ui';
+import { OPERATOR_TOKEN_STORAGE_KEY } from '../api/client';
 import { useAppSettings } from '../context/AppSettingsContext';
 import { useConnections } from '../hooks/useConnections';
 import styles from './Settings.module.css';
@@ -28,6 +29,10 @@ export function Settings() {
   const [facebookSearchQuery, setFacebookSearchQuery] = useState('');
   const [facebookSearchLocation, setFacebookSearchLocation] = useState('');
   const [facebookSearchLimit, setFacebookSearchLimit] = useState(10);
+  const [operatorToken, setOperatorToken] = useState(() =>
+    typeof window === 'undefined' ? '' : window.localStorage.getItem(OPERATOR_TOKEN_STORAGE_KEY) ?? ''
+  );
+  const [operatorTokenSaved, setOperatorTokenSaved] = useState(false);
 
   const ebayStatusText = useMemo(() => {
     if (!connections) return 'Checking server credentials…';
@@ -65,6 +70,24 @@ export function Settings() {
       location: facebookSearchLocation || undefined,
       limit: facebookSearchLimit,
     });
+  };
+
+  const handleSaveOperatorToken = () => {
+    const trimmed = operatorToken.trim();
+    if (trimmed) {
+      window.localStorage.setItem(OPERATOR_TOKEN_STORAGE_KEY, trimmed);
+      setOperatorToken(trimmed);
+    } else {
+      window.localStorage.removeItem(OPERATOR_TOKEN_STORAGE_KEY);
+      setOperatorToken('');
+    }
+    setOperatorTokenSaved(true);
+  };
+
+  const handleClearOperatorToken = () => {
+    window.localStorage.removeItem(OPERATOR_TOKEN_STORAGE_KEY);
+    setOperatorToken('');
+    setOperatorTokenSaved(true);
   };
 
   return (
@@ -174,6 +197,30 @@ export function Settings() {
             subtitle="Operator-facing marketplace controls for live pulls and ingest feeds"
           />
           <CardContent>
+            <div className={styles.operatorTokenPanel}>
+              <label className={styles.field}>
+                <span>Operator Token</span>
+                <input
+                  type="password"
+                  value={operatorToken}
+                  onChange={(event) => {
+                    setOperatorToken(event.target.value);
+                    setOperatorTokenSaved(false);
+                  }}
+                  placeholder="Paste OPERATOR_INGEST_TOKEN"
+                  autoComplete="off"
+                />
+              </label>
+              <div className={styles.feedActions}>
+                <Button type="button" onClick={handleSaveOperatorToken}>
+                  Save Operator Token
+                </Button>
+                <Button type="button" variant="secondary" onClick={handleClearOperatorToken}>
+                  Clear Operator Token
+                </Button>
+                {operatorTokenSaved ? <span className={styles.saved}>Saved for this browser</span> : null}
+              </div>
+            </div>
             {connectionsError ? <p className={styles.errorText}>{connectionsError}</p> : null}
             <div className={styles.connectionsGrid}>
               <div className={styles.connectionCard}>

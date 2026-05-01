@@ -99,11 +99,13 @@ Use these commands as the current local gate:
 
 | Area | Command | Result |
 | --- | --- | --- |
-| Server lint | `cd server && npm run lint` | Required before release. |
-| Server tests | `cd server && npm test` | Required before release; needs migrated Postgres for integration paths. |
-| Server build/typecheck | `cd server && npm run build` | Runs `tsc`. |
-| Frontend tests | `cd frontend && npm test` | Required before release. |
-| Frontend build/typecheck | `cd frontend && npm run build` | Runs `tsc && vite build`. |
+| Install | `npm ci` | Installs workspace dependencies without generating Prisma at install time. |
+| Prisma client | `npm run prisma:generate --workspace server` | Generates the server Prisma client explicitly. |
+| Server lint | `npm run lint --workspace server` | Required before release. |
+| Server tests | `npm test --workspace server` | Required before release; needs migrated Postgres for integration paths. |
+| Server build/typecheck | `npm run build --workspace server` | Runs `tsc`. |
+| Frontend tests | `npm test --workspace frontend` | Required before release. |
+| Frontend build/typecheck | `npm run build --workspace frontend` | Runs `tsc && vite build`; this is the frontend static-analysis gate until frontend ESLint is added. |
 | Workspace build | `npm run build` | Builds server and frontend workspaces. |
 | Compose config | `docker compose config` | Validates local stack. |
 | Staging compose config | `docker compose -f docker-compose.staging.yml config` | Validates staging stack. |
@@ -113,9 +115,7 @@ Use these commands as the current local gate:
 
 - No separate `workers/` workspace exists. Background behavior currently lives in the server process, including optional Craigslist scheduler startup.
 - Compose startup does not run migrations. Run Prisma migrations before using Prisma-backed API routes on a fresh database.
-- Ranked scoring currently sorts by raw fields instead of `compositeScore`.
-- The score route `limit` parser can produce `NaN`; invalid input should return HTTP 400.
-- Frontend has tests but no frontend lint script or ESLint config. Use the frontend build and test commands as the current frontend gates.
+- Frontend has tests but no frontend ESLint config yet. Use the frontend build/typecheck and test commands as the current frontend gates.
 - Operator ingest routes depend on strong `OPERATOR_INGEST_TOKEN` or admin JWT configuration. Do not expose them publicly without production secret verification.
 
 ## Quality / Verification Commands
@@ -123,16 +123,17 @@ Use these commands as the current local gate:
 Run these before treating a baseline as deployable:
 
 ```bash
-cd server && npm run lint
-cd server && npm test
-cd frontend && npm test
-cd server && npm run build
-cd frontend && npm run build
+npm ci
+npm run prisma:generate --workspace server
+npm run lint --workspace server
+npm test --workspace server
+npm test --workspace frontend
 npm run build
 
 docker compose config
 docker compose -f docker-compose.staging.yml config
 docker compose -f docker-compose.prod.yml config
+bash -n scripts/verify-production.sh
 ```
 
 Expected current behavior:

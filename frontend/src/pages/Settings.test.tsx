@@ -1,6 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import { OPERATOR_TOKEN_STORAGE_KEY } from '../api/client';
 import { Settings } from './Settings';
 
 const useAppSettingsMock = vi.fn();
@@ -18,6 +19,7 @@ describe('Settings connections surface', () => {
   afterEach(() => {
     useAppSettingsMock.mockReset();
     useConnectionsMock.mockReset();
+    localStorage.clear();
   });
 
   it('renders operator-facing connection cards for ebay, craigslist, and facebook marketplace', () => {
@@ -81,6 +83,7 @@ describe('Settings connections surface', () => {
     );
 
     expect(screen.getByText(/connections/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/operator token/i)).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /^ebay$/i })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /^craigslist$/i })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /facebook marketplace/i })).toBeInTheDocument();
@@ -96,6 +99,49 @@ describe('Settings connections surface', () => {
     expect(screen.getByRole('button', { name: /run craigslist ingest/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /disable feed/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /remove feed/i })).toBeInTheDocument();
+  });
+
+  it('saves and clears the operator token used by API requests', () => {
+    useAppSettingsMock.mockReturnValue({
+      settings: {
+        defaultSortKey: 'rank',
+        defaultSortDirection: 'desc',
+        minConfidence: 0,
+        compactMode: false,
+        autoRefreshSec: 0,
+      },
+      updateSettings: vi.fn(),
+      resetSettings: vi.fn(),
+    });
+
+    useConnectionsMock.mockReturnValue({
+      data: null,
+      loading: false,
+      error: null,
+      refetch: vi.fn(),
+      createCraigslistSource: vi.fn(),
+      updateCraigslistSource: vi.fn(),
+      deleteCraigslistSource: vi.fn(),
+      runCraigslistIngest: vi.fn(),
+      testFacebookConnection: vi.fn(),
+      ingestFacebookListing: vi.fn(),
+      ingestFacebookSearch: vi.fn(),
+    });
+
+    render(
+      <MemoryRouter>
+        <Settings />
+      </MemoryRouter>
+    );
+
+    fireEvent.change(screen.getByLabelText(/operator token/i), {
+      target: { value: 'operator-token-from-settings' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: /save operator token/i }));
+    expect(localStorage.getItem(OPERATOR_TOKEN_STORAGE_KEY)).toBe('operator-token-from-settings');
+
+    fireEvent.click(screen.getByRole('button', { name: /clear operator token/i }));
+    expect(localStorage.getItem(OPERATOR_TOKEN_STORAGE_KEY)).toBeNull();
   });
 
   it('lets the operator disable and remove saved craigslist feeds', () => {

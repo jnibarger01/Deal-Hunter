@@ -3,6 +3,7 @@ import { prisma } from '../setup';
 
 const searchLiveDealsMock = jest.fn();
 const searchCompletedListingsMock = jest.fn();
+const daysAgo = (days: number) => new Date(Date.now() - days * 24 * 60 * 60 * 1000);
 
 jest.mock('../../src/services/ebay', () => ({
   __esModule: true,
@@ -119,10 +120,10 @@ describe('live eBay persistence flow', () => {
     ]);
 
     searchCompletedListingsMock.mockResolvedValueOnce(
-      Array.from({ length: 8 }).map((_, index) => ({
+      Array.from({ length: 10 }).map((_, index) => ({
         itemId: `sold-${index}`,
         soldPrice: 340 + index * 5,
-        soldDate: new Date(`2026-04-${String(index + 1).padStart(2, '0')}T12:00:00.000Z`),
+        soldDate: daysAgo(index + 1),
         condition: 'good',
       }))
     );
@@ -147,7 +148,7 @@ describe('live eBay persistence flow', () => {
 
     expect(persistedDeal).toBeTruthy();
     expect(persistedDeal?.marketplace).toBe('ebay');
-    expect(persistedDeal?.samples).toHaveLength(8);
+    expect(persistedDeal?.samples).toHaveLength(10);
     expect(persistedDeal?.tmvResult).toBeTruthy();
     expect(persistedDeal?.score).toBeTruthy();
 
@@ -164,7 +165,7 @@ describe('live eBay persistence flow', () => {
           title: 'PS5 Digital Edition',
           tmv: expect.objectContaining({
             tmv: expect.any(Number),
-            sampleCount: 8,
+            sampleCount: 10,
           }),
           score: expect.objectContaining({
             compositeRank: expect.any(Number),
@@ -191,15 +192,15 @@ describe('live eBay persistence flow', () => {
     });
 
     await prisma.marketSample.createMany({
-      data: Array.from({ length: 8 }).map((_, index) => ({
+      data: Array.from({ length: 10 }).map((_, index) => ({
         dealId: deal.id,
         observedPrice: 330 + index,
-        observedAt: new Date(`2026-03-${String(index + 1).padStart(2, '0')}T12:00:00.000Z`),
+        observedAt: daysAgo(index + 1),
         source: 'ebay',
         condition: 'good',
         status: 'sold',
         finalPrice: 335 + index,
-        soldAt: new Date(`2026-03-${String(index + 1).padStart(2, '0')}T12:00:00.000Z`),
+        soldAt: daysAgo(index + 1),
         title: 'PS5 Digital Edition',
       })),
     });
@@ -232,7 +233,7 @@ describe('live eBay persistence flow', () => {
       include: { samples: true, tmvResult: true, score: true },
     });
 
-    expect(refreshedDeal?.samples).toHaveLength(8);
+    expect(refreshedDeal?.samples).toHaveLength(10);
     expect(refreshedDeal?.tmvResult).toBeTruthy();
     expect(refreshedDeal?.score).toBeTruthy();
   });

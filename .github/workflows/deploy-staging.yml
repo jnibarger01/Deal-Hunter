@@ -77,4 +77,11 @@ jobs:
             docker compose -f docker-compose.staging.yml pull
             docker compose -f docker-compose.staging.yml run --rm server npx prisma migrate deploy
             docker compose -f docker-compose.staging.yml up -d
+            STAGING_BASE_URL="${{ vars.STAGING_BASE_URL }}"
+            STAGING_BASE_URL="${STAGING_BASE_URL%/}"
+            if [ -n "$STAGING_BASE_URL" ]; then
+              ./scripts/verify-production.sh \
+                --health-url "$STAGING_BASE_URL/health" \
+                --ready-url "$STAGING_BASE_URL/ready"
+            fi
             docker system prune -f

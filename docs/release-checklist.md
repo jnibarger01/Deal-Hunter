@@ -2,11 +2,16 @@
 
 ## 1) Quality gates
 
-- [ ] `npm --prefix server run lint`
-- [ ] `npm --prefix server run build`
-- [ ] `npm --prefix frontend run build`
-- [ ] `npm --prefix server run test`
-- [ ] `npm --prefix frontend run test`
+- [ ] `npm ci`
+- [ ] `npm run prisma:generate --workspace server`
+- [ ] `npm run lint --workspace server`
+- [ ] `npm test --workspace server`
+- [ ] `npm test --workspace frontend`
+- [ ] `npm run build`
+- [ ] `docker compose config`
+- [ ] `docker compose -f docker-compose.staging.yml config`
+- [ ] `docker compose -f docker-compose.prod.yml config`
+- [ ] `bash -n scripts/verify-production.sh`
 - [ ] CI checks green on `main`
 
 ## 2) Config and secrets
@@ -16,6 +21,7 @@
 - [ ] `API_KEY` length >= 32
 - [ ] `OPERATOR_INGEST_TOKEN` length >= 32 if operator ingest is enabled
 - [ ] `OPERATOR_SECRET_KEY` length >= 32 if Facebook cookie storage or other encrypted operator secrets are enabled
+- [ ] `MARKETPLACE_DELETE_TOKEN` length >= 32
 - [ ] SMTP vars present and validated
 - [ ] `CORS_ORIGIN` + `FRONTEND_URL` match production domain(s)
 - [ ] `TRUST_PROXY` set correctly for nginx/reverse proxy
@@ -34,7 +40,7 @@
 - [ ] `docker compose -f docker-compose.prod.yml config`
 - [ ] `docker compose -f docker-compose.prod.yml build --no-cache server nginx`
 - [ ] `docker compose -f docker-compose.prod.yml up -d --force-recreate server nginx`
-- [ ] `./scripts/verify-production.sh --health-url <production-ready-url>`
+- [ ] `./scripts/verify-production.sh --health-url <production-base-url>/health --ready-url <production-base-url>/ready`
 - [ ] `GET /nginx-health` returns 200
 - [ ] `GET /health` returns 200
 - [ ] `GET /ready` returns 200 (DB connected)

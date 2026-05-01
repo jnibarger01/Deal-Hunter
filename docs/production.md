@@ -59,16 +59,17 @@ Run migrations before exercising API routes that depend on Prisma tables. The de
 ## Verification commands
 
 ```bash
-cd server && npm run lint
-cd server && npm test              # requires migrated Postgres for integration paths
-cd frontend && npm test
-cd server && npm run build         # TypeScript build
-cd frontend && npm run build       # TypeScript + Vite build
+npm ci
+npm run prisma:generate --workspace server
+npm run lint --workspace server
+npm test --workspace server        # requires migrated Postgres for integration paths
+npm test --workspace frontend
 npm run build                      # workspace build
 
 docker compose config
 docker compose -f docker-compose.staging.yml config
 docker compose -f docker-compose.prod.yml config
+bash -n scripts/verify-production.sh
 ```
 
 ## Compose status
@@ -82,9 +83,7 @@ docker compose -f docker-compose.prod.yml config
 
 - GitHub staging and production deploy workflows run `prisma migrate deploy` before `up -d`; manual compose deploys must do the same before routing traffic to Prisma-backed endpoints.
 - No separate `workers/` image exists. Optional scheduler behavior runs in the server process when configured.
-- Ranked scoring currently sorts by raw fields instead of `compositeScore`.
-- Score route limit parsing can produce `NaN`; invalid input should return 400.
-- Frontend has no lint script/config yet. Use frontend tests and `npm run build` as current frontend gates.
+- Frontend has no lint script/config yet. Use frontend tests and `npm run build --workspace frontend` as current frontend gates.
 - `OPERATOR_INGEST_TOKEN`, `OPERATOR_SECRET_KEY`, and `MARKETPLACE_DELETE_TOKEN` are optional in the schema but required for a safe operator deployment.
 
 ## Deployment checks
@@ -93,11 +92,12 @@ Before deploy:
 
 ```bash
 docker compose config
-npm --prefix server run build
-npm --prefix frontend run build
+npm run build --workspace server
+npm run build --workspace frontend
 ```
 
 Do not deploy unless CI is green, migrations have been applied, and `scripts/verify-production.sh` passes against the target environment.
+Set `STAGING_BASE_URL` and `PRODUCTION_BASE_URL` repository environment variables to enable deploy workflow smoke checks for both `/health` and `/ready`.
 
 ## Health checks
 

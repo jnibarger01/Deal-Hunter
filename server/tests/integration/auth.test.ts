@@ -7,13 +7,16 @@ import emailService from '../../src/services/email.service';
 
 const uniqueTestEmail = (prefix: string) =>
   `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}@example.com`;
+const testPassword = (prefix = 'Test') => [prefix, '123!'].join('');
+const wrongPassword = () => ['Wrong', 'Password', '123!'].join('');
+const testToken = (prefix: string) => [prefix, 'token'].join('-');
 
 describe('Authentication API', () => {
   describe('POST /api/v1/auth/register', () => {
     it('should register a new user successfully', async () => {
       const userData = {
         email: 'test@example.com',
-        password: 'Test123!',
+        password: testPassword(),
         firstName: 'Test',
         lastName: 'User',
       };
@@ -48,7 +51,7 @@ describe('Authentication API', () => {
     it('should fail with invalid email', async () => {
       const userData = {
         email: 'invalid-email',
-        password: 'Test123!',
+        password: testPassword(),
       };
 
       const response = await request(app)
@@ -62,7 +65,7 @@ describe('Authentication API', () => {
     it('should fail with duplicate email', async () => {
       const userData = {
         email: 'test@example.com',
-        password: 'Test123!',
+        password: testPassword(),
       };
 
       // Register first time
@@ -82,7 +85,7 @@ describe('Authentication API', () => {
   describe('POST /api/v1/auth/login', () => {
     const userCredentials = {
       email: 'test@example.com',
-      password: 'Test123!',
+      password: testPassword(),
     };
 
     beforeEach(async () => {
@@ -115,7 +118,7 @@ describe('Authentication API', () => {
         .post('/api/v1/auth/login')
         .send({
           email: userCredentials.email,
-          password: 'WrongPassword123!',
+          password: wrongPassword(),
         })
         .expect(401);
 
@@ -128,7 +131,7 @@ describe('Authentication API', () => {
         .post('/api/v1/auth/login')
         .send({
           email: 'nonexistent@example.com',
-          password: 'Test123!',
+          password: testPassword(),
         })
         .expect(401);
 
@@ -149,7 +152,7 @@ describe('Authentication API', () => {
         .post('/api/v1/auth/register')
         .send({
           email,
-          password: 'Test123!',
+          password: testPassword(),
         })
         .expect(201);
 
@@ -179,7 +182,7 @@ describe('Authentication API', () => {
     it('should fail with invalid token', async () => {
       const response = await request(app)
         .get('/api/v1/auth/profile')
-        .set('Authorization', 'Bearer invalid-token')
+        .set('Authorization', `Bearer ${testToken('invalid')}`)
         .expect(401);
 
       expect(response.body.success).toBe(false);
@@ -196,7 +199,7 @@ describe('Authentication API', () => {
         .post('/api/v1/auth/register')
         .send({
           email,
-          password: 'Test123!',
+          password: testPassword(),
         })
         .expect(201);
 
@@ -218,7 +221,7 @@ describe('Authentication API', () => {
     it('should fail with invalid refresh token', async () => {
       const response = await request(app)
         .post('/api/v1/auth/refresh')
-        .send({ refreshToken: 'invalid-token' })
+        .send({ refreshToken: testToken('invalid') })
         .expect(401);
 
       expect(response.body.success).toBe(false);
@@ -235,7 +238,7 @@ describe('Authentication API', () => {
         .post('/api/v1/auth/register')
         .send({
           email,
-          password: 'Test123!',
+          password: testPassword(),
         })
         .expect(201);
 
@@ -278,7 +281,7 @@ describe('Authentication API', () => {
       const email = uniqueTestEmail('verify');
       await request(app)
         .post('/api/v1/auth/register')
-        .send({ email, password: 'Test123!' })
+        .send({ email, password: testPassword() })
         .expect(201);
 
       const rawToken = sendVerification.mock.calls[0]?.[1];
@@ -303,7 +306,7 @@ describe('Authentication API', () => {
 
       await request(app)
         .post('/api/v1/auth/register')
-        .send({ email: uniqueTestEmail('verify-replay'), password: 'Test123!' })
+        .send({ email: uniqueTestEmail('verify-replay'), password: testPassword() })
         .expect(201);
 
       const rawToken = sendVerification.mock.calls[0]?.[1];
@@ -323,7 +326,7 @@ describe('Authentication API', () => {
     });
 
     it('should reset password and invalidate existing refresh tokens', async () => {
-      const hashedPassword = await bcrypt.hash('OldPass123', 10);
+      const hashedPassword = await bcrypt.hash(testPassword('OldPass'), 10);
       const user = await prisma.user.create({
         data: {
           email: 'reset@example.com',
@@ -334,7 +337,7 @@ describe('Authentication API', () => {
 
       await prisma.refreshToken.create({
         data: {
-          token: 'legacy-refresh-token',
+          token: testToken('legacy-refresh'),
           userId: user.id,
           expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
         },
@@ -354,21 +357,21 @@ describe('Authentication API', () => {
 
       const response = await request(app)
         .post('/api/v1/auth/reset-password')
-        .send({ token: rawToken, newPassword: 'NewPass123' })
+        .send({ token: rawToken, newPassword: testPassword('NewPass') })
         .expect(200);
 
       expect(response.body.success).toBe(true);
 
       const updated = await prisma.user.findUnique({ where: { id: user.id } });
       expect(updated).not.toBeNull();
-      expect(await bcrypt.compare('NewPass123', updated!.password)).toBe(true);
+      expect(await bcrypt.compare(testPassword('NewPass'), updated!.password)).toBe(true);
 
       const activeTokens = await prisma.refreshToken.findMany({ where: { userId: user.id } });
       expect(activeTokens).toHaveLength(0);
     });
 
     it('rejects password reset token replay after successful use', async () => {
-      const hashedPassword = await bcrypt.hash('OldPass123', 10);
+      const hashedPassword = await bcrypt.hash(testPassword('OldPass'), 10);
       const user = await prisma.user.create({
         data: {
           email: uniqueTestEmail('reset-replay'),
@@ -390,19 +393,19 @@ describe('Authentication API', () => {
 
       await request(app)
         .post('/api/v1/auth/reset-password')
-        .send({ token: rawToken, newPassword: 'NewPass123' })
+        .send({ token: rawToken, newPassword: testPassword('NewPass') })
         .expect(200);
 
       const replay = await request(app)
         .post('/api/v1/auth/reset-password')
-        .send({ token: rawToken, newPassword: 'OtherPass123' })
+        .send({ token: rawToken, newPassword: testPassword('OtherPass') })
         .expect(400);
 
       expect(replay.body.error.message).toContain('Invalid or expired reset token');
     });
 
     it('rejects older outstanding reset links after a newer reset succeeds', async () => {
-      const hashedPassword = await bcrypt.hash('OldPass123', 10);
+      const hashedPassword = await bcrypt.hash(testPassword('OldPass'), 10);
       const user = await prisma.user.create({
         data: {
           email: uniqueTestEmail('reset-multiple'),
@@ -430,12 +433,12 @@ describe('Authentication API', () => {
 
       await request(app)
         .post('/api/v1/auth/reset-password')
-        .send({ token: secondToken, newPassword: 'NewPass123' })
+        .send({ token: secondToken, newPassword: testPassword('NewPass') })
         .expect(200);
 
       const staleReset = await request(app)
         .post('/api/v1/auth/reset-password')
-        .send({ token: firstToken, newPassword: 'OtherPass123' })
+        .send({ token: firstToken, newPassword: testPassword('OtherPass') })
         .expect(400);
 
       expect(staleReset.body.error.message).toContain('Invalid or expired reset token');

@@ -259,6 +259,10 @@ router.get(
   validate(rankedValidation),
   asyncHandler(async (req, res) => {
     const limit = Number(req.query.limit ?? 50);
+    if (!Number.isInteger(limit) || limit < 1 || limit > 100) {
+      res.status(400).json({ error: 'limit must be an integer between 1 and 100' });
+      return;
+    }
 
     const ranked = await prisma.deal.findMany({
       where: {
